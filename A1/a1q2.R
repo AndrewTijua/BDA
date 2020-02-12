@@ -248,7 +248,7 @@ post_wait_sim <-
                             mean_wait) + mcoefs[[2]] * rinvgamma(1e5, ex_2_prior[[1]] + n, ex_2_prior[[2]] + n *
                                                                    mean_wait)
 
-N <- 1e7
+N <- 1e6
 
 components <- sample(1:2, prob = c(mcoefs[[1]], mcoefs[[2]]), size = N, replace = TRUE)
 alphas <- c(ex_1_prior[[1]] + n, ex_2_prior[[1]] + n)
@@ -261,41 +261,98 @@ quantile(samples, c(0.025, 0.975))
 
 sum(samples > 20) / N
 
-# library(coda)
-# library(rstan)
+post_pred <- Renext::rlomax(N, betas[components], alphas[components])
+
+plot(density(post_pred))
+mean(post_pred)
+sum(post_pred > 20)/N
+
+library(coda)
+library(rstan)
+
+rstan_options(auto_write = TRUE)
+
+b_mm_data <-
+  list(
+    K = 2,
+    N = n,
+    y= waiting_times,
+    theta = c(0.5, 0.5),
+    alpha = c(6, 38),
+    beta = c(62.5, 277.5)
+  )
+
+# b_data <- list(N=n, y = waiting_times, gprior=c(38,278))
 # 
-# rstan_options(auto_write = TRUE)
+# b_m <- stan_model(file = 'a1q2simp.stan')
 # 
-# b_mm_data <-
-#   list(
-#     K = 2, 
-#     N = n,
-#     y= waiting_times,
-#     theta = c(0.5, 0.5),
-#     alpha = c(6, 38),
-#     beta = c(62.5, 278)
-#   )
-# 
-# b_mm <- stan_model(file = 'a1q2.stan')
-# 
-# b_mm_fit <- sampling(
-#   b_mm,
-#   data = b_mm_data,
+# b_m_fit <- sampling(
+#   b_m,
+#   data = b_data,
 #   chains = 7,
 #   control = list(adapt_delta = 0.8),
-#   iter = 40000
+#   iter = 1e5
 # )
-# plot(b_mm_fit)
-# b_mm_fit
+# plot(b_m_fit)
+# b_m_fit
 # 
-# smps <- extract(b_mm_fit)
-# tp <- traceplot(b_mm_fit, pars = c("lambda", "mwt"))
+# smps <- extract(b_m_fit)
+# tp <- traceplot(b_m_fit, pars = c("lambda"))
 # tp
-# 
-# b_mm_coda <- As.mcmc.list(b_mm_fit)
-# gelman.plot(b_mm_coda, ask=FALSE)
-# gelman.diag(b_mm_coda)
-# plot(density(smps$postdraw))
-# sum(smps$postdraw > 20) / (length(smps$postdraw))
-# mean(smps$postdraw)
-# quantile(smps$postdraw, c(0.025, 0.975))
+
+b_m_coda <- As.mcmc.list(b_m_fit)
+gelman.plot(b_m_coda, ask=FALSE)
+gelman.diag(b_m_coda)
+plot(density(smps$postdraw))
+sum(smps$postdraw > 20) / (length(smps$postdraw))
+mean(smps$postdraw)
+quantile(smps$postdraw, c(0.025, 0.975))
+plot(density(smps$ewt))
+sum(smps$ewt > 20) / (length(smps$ewt))
+mean(smps$ewt)
+quantile(smps$ewt, c(0.025, 0.975))
+
+b_mm <- stan_model(file = 'a1q2.stan')
+
+b_mm_fit <- sampling(
+  b_mm,
+  data = b_mm_data,
+  chains = 7,
+  control = list(adapt_delta = 0.8),
+  iter = 4000
+)
+plot(b_mm_fit)
+b_mm_fit
+
+smps <- extract(b_mm_fit)
+tp <- traceplot(b_mm_fit, pars = c("lambda", "mwt"))
+tp
+
+b_mm_coda <- As.mcmc.list(b_mm_fit)
+gelman.plot(b_mm_coda, ask=FALSE)
+gelman.diag(b_mm_coda)
+
+plot(density(smps$postdraw))
+sum(smps$postdraw > 20) / (length(smps$postdraw))
+mean(smps$postdraw)
+quantile(smps$postdraw, c(0.025, 0.975))
+
+plot(density(smps$mwt))
+sum(smps$mwt > 20) / (length(smps$mwt))
+mean(smps$mwt)
+quantile(smps$mwt, c(0.025, 0.975))
+
+
+require(rjags)
+
+model=jags.model(file = "a1q2jags.jags",data = 
+                   list(y=waiting_times,n=n,a=c(38, 6),b=c(277.5, 62.5),p=c(0.5,0.5)),n.chains=10)
+
+# Burnin for 1000 samples
+update(model,100000,progress.bar="none")
+
+# Running the model
+res=coda.samples(model, variable.names=c("lambda","ypred", "texp"), 
+                 n.iter=200000,progress.bar="none")
+summary(res)
+

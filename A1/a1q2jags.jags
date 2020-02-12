@@ -1,0 +1,9 @@
+model{
+for (i in 1:n){
+y[i]~dexp(lambda) 
+}
+lambda~dgamma(a[pick], b[pick])         # a[1]=9.2, b[1]=13.8;  a[2]=12;  b[2] = 3 
+pick~dcat(p[1:2])                     # pick takes value 1 or 2 with prior prob p[1] or p[2]
+ypred~dexp(lambda) 
+texp = 1/lambda
+}

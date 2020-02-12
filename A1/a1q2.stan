@@ -12,11 +12,12 @@ parameters {
 }
 model {
   vector[K] log_theta = log(theta);  // cache log calculation
-  y ~ exponential(lambda);
   for (n in 1:N) {
     vector[K] lps = log_theta;
-    for (k in 1:K)
+    for (k in 1:K){
       lps[k] += gamma_lpdf(lambda | alpha[k], beta[k]);
+      lps[k] += exponential_lpdf(y[n] | lambda);
+    }
     target += log_sum_exp(lps);
   }
 }
