@@ -300,17 +300,17 @@ b_mm_data <-
 # tp <- traceplot(b_m_fit, pars = c("lambda"))
 # tp
 
-b_m_coda <- As.mcmc.list(b_m_fit)
-gelman.plot(b_m_coda, ask=FALSE)
-gelman.diag(b_m_coda)
-plot(density(smps$postdraw))
-sum(smps$postdraw > 20) / (length(smps$postdraw))
-mean(smps$postdraw)
-quantile(smps$postdraw, c(0.025, 0.975))
-plot(density(smps$ewt))
-sum(smps$ewt > 20) / (length(smps$ewt))
-mean(smps$ewt)
-quantile(smps$ewt, c(0.025, 0.975))
+# b_m_coda <- As.mcmc.list(b_m_fit)
+# gelman.plot(b_m_coda, ask=FALSE)
+# gelman.diag(b_m_coda)
+# plot(density(smps$postdraw))
+# sum(smps$postdraw > 20) / (length(smps$postdraw))
+# mean(smps$postdraw)
+# quantile(smps$postdraw, c(0.025, 0.975))
+# plot(density(smps$ewt))
+# sum(smps$ewt > 20) / (length(smps$ewt))
+# mean(smps$ewt)
+# quantile(smps$ewt, c(0.025, 0.975))
 
 b_mm <- stan_model(file = 'a1q2.stan')
 

@@ -1,25 +1,19 @@
-data {
-  int<lower=1> K;          // number of mixture components
+data {          // number of mixture components
   int<lower=1> N;          // number of data points
   real y[N];               // observations
-  simplex[K] theta;          // mixing proportions
-  positive_ordered[K] alpha; // locations of mixture components
-  vector<lower=0>[K] beta;  // scales of mixture components
+  simplex[2] theta;          // mixing proportions
+  positive_ordered[2] alpha; // locations of mixture components
+  vector<lower=0>[2] beta;  // scales of mixture components
   
 }
 parameters {
   real<lower=0> lambda;
 }
 model {
-  vector[K] log_theta = log(theta);  // cache log calculation
-  for (n in 1:N) {
-    vector[K] lps = log_theta;
-    for (k in 1:K){
-      lps[k] += gamma_lpdf(lambda | alpha[k], beta[k]);
-      lps[k] += exponential_lpdf(y[n] | lambda);
-    }
-    target += log_sum_exp(lps);
-  }
+  y ~ exponential(lambda);
+  target += log_mix(theta[1],
+  gamma_lpdf(lambda | alpha[1], beta[1]),
+  gamma_lpdf(lambda | alpha[2], beta[2]));
 }
 generated quantities {
   real<lower=0> mwt = 1 / lambda;
