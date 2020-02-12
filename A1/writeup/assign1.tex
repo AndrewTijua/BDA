@@ -112,5 +112,40 @@ The credible intervals have narrowed, as expected for more observations. It is o
 
 \section*{Question 2}
 
+\subsection*{a)}
+
+We have two equally credible opinions on the distribution of $1/\lambda$. We have one stating that it lies mostly between 5 and 10, and another that states that it lies between 0 and 25. We are going to use the Gamma distribution as our prior for $\lambda$. 
+
+We are going to calculate parameters for this such that the corresponding inverse gamma distributions has mean of the midpoint and standard deviation of 1/4 the range. 
+
+Calculating these parameters we obtain 
+\[
+\alpha_1 = 38, \beta_1 = 277.5, \qquad \alpha_2 = 6, \beta_2 = 62.5,
+\]
+with the indices corresponding to the originating expert.
+
+This means that our mixture prior is of the form 
+\[
+\lambda \sim 0.5\cdot\Gamma(38, 277.5) + 0.5\cdot\Gamma(6, 62.5)
+\]
+
+\subsection*{b)}
+
+We have 100 points of data with a mean of 9.877 minutes. We calculate our posterior. The gamma distribution is a conjugate prior to the exponential distribution, so it is quite simple to calculate our new parameters. 
+
+We calculate 
+\[
+\alpha_1^{post} = 138, \beta_1^{post} = 1265.2, \qquad \alpha_2^{post} = 106, \beta_2^{post} = 1050.2
+\] using the formulae $\alpha^{post} = \alpha + n, \beta^{post} = \beta + \sum_i x_i = \beta + n\bar{x}.$ To calculate the posterior mixing proportion $Q$ we use \[Q = \frac{q\frac{\beta_1^{\alpha_1}}{\Gamma(\alpha_1)}\frac{\Gamma(\alpha_1^{post})}{\beta_1^{post \ \alpha_1^{post}}}}{q\frac{\beta_1^{\alpha_1}}{\Gamma(\alpha_1)}\frac{\Gamma(\alpha_1^{post})}{\beta_1^{post \ \alpha_1^{post}}} + (1-q)\frac{\beta_2^{\alpha_2}}{\Gamma(\alpha_2)}\frac{\Gamma(\alpha_2^{post})}{\beta_2^{post \ \alpha_2^{post}}}}.\]
+This quantity involves extremely large numbers, so we work on the log scale and exponentiate at the end. 
+
+Overall we obtain a posterior of the form
+\[
+p(\lambda|x) = 0.40455 \cdot \Gamma(138, 1265.2) + 0.59545 \cdot \Gamma(106, 1050.2). 
+\]
+
+Of course the posterior for $1/\lambda$ is analogous, with inverse gamma rather than gamma.
+
+We calculate a posterior 95\% credible interval for $1/\lambda$ as $(8.00, 11.84)$, and a mean for $1/\lambda$ of 9.692.
 \end{document}
 

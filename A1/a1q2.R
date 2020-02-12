@@ -1,0 +1,301 @@
+library(tidyverse)
+library(HDInterval)
+library(extraDistr)
+
+waiting_times  <-
+  c(
+    0.8,
+    0.8,
+    1.3,
+    1.5,
+    1.8,
+    1.9,
+    1.9,
+    2.1,
+    2.6,
+    2.7,
+    2.9,
+    3.1,
+    3.2,
+    3.3,
+    3.5,
+    3.6,
+    4.0,
+    4.1,
+    4.2,
+    4.2,
+    4.3,
+    4.3,
+    4.4,
+    4.4,
+    4.6,
+    4.7,
+    4.7,
+    4.8,
+    4.9,
+    4.9,
+    5,
+    5.3,
+    5.5,
+    5.7,
+    5.7,
+    6.1,
+    6.2,
+    6.2,
+    6.2,
+    6.3,
+    6.7,
+    6.9,
+    7.1,
+    7.1,
+    7.1,
+    7.1,
+    7.4,
+    7.6,
+    7.7,
+    8,
+    8.2,
+    8.6,
+    8.6,
+    8.6,
+    8.8,
+    8.8,
+    8.9,
+    8.9,
+    9.5,
+    9.6,
+    9.7,
+    9.8,
+    10.7,
+    10.9,
+    11,
+    11,
+    11.1,
+    11.2,
+    11.2,
+    11.5,
+    11.9,
+    12.4,
+    12.5,
+    12.9,
+    13,
+    13.1,
+    13.3,
+    13.6,
+    13.7,
+    13.9,
+    14.1,
+    15.4,
+    15.4,
+    17.3,
+    17.3,
+    18.1,
+    18.2,
+    18.4,
+    18.9,
+    19,
+    19.9,
+    20.6,
+    21.3,
+    21.4,
+    21.9,
+    23.0,
+    27,
+    31.6,
+    33.1,
+    38.5
+  )
+
+gammaShRaFromMeanSD = function(mean , sd) {
+  if (mean <= 0)
+    stop("mean must be > 0")
+  if (sd <= 0)
+    stop("sd must be > 0")
+  shape = mean ^ 2 / sd ^ 2
+  rate = mean / sd ^ 2
+  return(list(shape = shape , rate = rate))
+}
+
+gammaShRaFromModeSD = function(mode , sd) {
+  if (mode <= 0)
+    stop("mode must be > 0")
+  if (sd <= 0)
+    stop("sd must be > 0")
+  rate = (mode + sqrt(mode ^ 2 + 4 * sd ^ 2)) / (2 * sd ^ 2)
+  shape = 1 + mode * rate
+  return(list(shape = shape , rate = rate))
+}
+
+iGammaShScFromMeanVar = function(mean, var) {
+  shape <- (mean ^ 2 / var) + 2
+  scale <- (mean ^ 3 / var) + mean
+  return(list(shape = shape, scale = scale))
+}
+
+ex_1_prior <- iGammaShScFromMeanVar(7.5, (0.25 * (10 - 5)) ^ 2)
+ex_2_prior <- iGammaShScFromMeanVar(12.5, (0.25 * (25 - 0)) ^ 2)
+#prior is 0.5G(9, 0.6) + 0.5G(1,0.08)
+
+n <- length(waiting_times)
+mean_wait <- mean(waiting_times)
+
+#posterior is Q*G(9+n, 0.6+n*xbar) + (1-Q)*G(12.5+n, 12.5+n*xbar)
+
+p <- 0.5
+
+find_mix_coefs_2gamma <- function(a1, b1, a2, b2, q1, n, xbar) {
+  q2 <- 1 - q1
+  a1post <- a1 + n
+  a2post <- a2 + n
+  b1post <- b1 + (n * xbar)
+  b2post <- b2 + (n * xbar)
+  log_c1 <-
+    (a1 * log(b1) - lgamma(a1)) + (lgamma(a1post) - (a1post * log(b1post)))
+  log_c2 <-
+    (a2 * log(b2) - lgamma(a2)) + (lgamma(a2post) - (a2post * log(b2post)))
+  log_Q <-
+    (log(q1) + log_c1) - (log(q1) + log_c1 + log(1 + q2 / q1 * exp(log_c2 -
+                                                                     log_c1)))
+  #log_Q <- log(q1) + log_c1 - log(q1 * exp(log_c1) + q2 * exp(log_c2))
+  Q <- exp(log_Q)
+  # c1 <- ((b1^a1)/(gamma(a1))) * ((gamma(a1post))/ (b1post^a1post))
+  # c2 <- ((b2^a2)/(gamma(a2))) * ((gamma(a2post))/ (b2post^a2post))
+  # Q <- (q1 * c1)/(q1*c1 + q2*c2)
+  return(c(Q, 1 - Q))
+}
+
+mcoefs <-
+  find_mix_coefs_2gamma(ex_1_prior[[1]],
+                        ex_1_prior[[2]],
+                        ex_2_prior[[1]],
+                        ex_2_prior[[2]],
+                        p,
+                        n,
+                        mean_wait)
+
+lambda <- seq(0, 1, len = 5000)
+
+likelihood <-
+  as.matrix(apply(as.array(waiting_times), 1, dexp, lambda))
+likelihood <- apply(likelihood, 1, prod)
+
+area = sfsmisc::integrate.xy(lambda, likelihood)
+const = 1 / area
+likelihood <- const * likelihood
+
+prior <-
+  p * dgamma(lambda, ex_1_prior[[1]], ex_1_prior[[2]]) + (1 - p) * dgamma(lambda, ex_2_prior[[1]], ex_2_prior[[2]])
+posterior <-
+  mcoefs[[1]] * dgamma(lambda, ex_1_prior[[1]] + n, ex_1_prior[[2]] + n *
+                         mean_wait) + mcoefs[[2]] * dgamma(lambda, ex_2_prior[[1]] + n, ex_2_prior[[2]] + n *
+                                                             mean_wait)
+
+plot(
+  lambda,
+  prior,
+  col = "darkgreen",
+  ylab = "Density",
+  xlab = expression(lambda),
+  type = "l",
+  ylim = c(0, 45),
+  lwd = 2
+)
+lines(lambda, likelihood, col = "blue2", lwd = 2)
+lines(lambda, posterior, col = "red", lwd = 2)
+legend(
+  "topright",
+  legend = c("prior", "scaled likelihood", "posterior"),
+  lty = c(1, 1, 1),
+  lwd = c(2, 2, 2),
+  col = c("darkgreen", "blue2", "red"),
+  bty = "n"
+)
+
+#prior is relatively flat, posterior is very compatible with data and not very influenced by prior
+
+post_mean <-
+  mcoefs[[1]] * ((ex_1_prior[[1]] + n) / (ex_1_prior[[2]] + n * mean_wait)) + mcoefs[[2]] *
+  ((ex_2_prior[[1]] + n) / (ex_2_prior[[2]] + n * mean_wait))
+post_mean_wait <- 1 / post_mean
+
+posterior_ci <-
+  mcoefs[[1]] * qgamma(c(0.025, 0.975), ex_1_prior[[1]] + n, ex_1_prior[[2]] + n *
+                         mean_wait) + mcoefs[[2]] * qgamma(c(0.025, 0.975), ex_2_prior[[1]] + n, ex_2_prior[[2]] + n *
+                                                             mean_wait)
+
+pci_area <-
+  sfsmisc::integrate.xy(lambda, posterior, posterior_ci[[1]], posterior_ci[[2]])
+
+
+time <- seq(0, 30, len = 5000)
+
+post_wait <-
+  mcoefs[[1]] * dinvgamma(time, ex_1_prior[[1]] + n, ex_1_prior[[2]] + n *
+                            mean_wait) + mcoefs[[2]] * dinvgamma(time, ex_2_prior[[1]] + n, ex_2_prior[[2]] + n *
+                                                                   mean_wait)
+
+post_wait_ci <-
+  mcoefs[[1]] * qinvgamma(c(0.025, 0.975), ex_1_prior[[1]] + n, ex_1_prior[[2]] + n *
+                            mean_wait) + mcoefs[[2]] * qinvgamma(c(0.025, 0.975), ex_2_prior[[1]] + n, ex_2_prior[[2]] + n *
+                                                                   mean_wait)
+post_wait_20 <-
+  mcoefs[[1]] * pinvgamma(20, ex_1_prior[[1]] + n, ex_1_prior[[2]] + n *
+                            mean_wait) + mcoefs[[2]] * pinvgamma(20, ex_2_prior[[1]] + n, ex_2_prior[[2]] + n *
+                                                                   mean_wait)
+
+post_wait_sim <-
+  mcoefs[[1]] * rinvgamma(1e5, ex_1_prior[[1]] + n, ex_1_prior[[2]] + n *
+                            mean_wait) + mcoefs[[2]] * rinvgamma(1e5, ex_2_prior[[1]] + n, ex_2_prior[[2]] + n *
+                                                                   mean_wait)
+
+N <- 1e7
+
+components <- sample(1:2, prob = c(mcoefs[[1]], mcoefs[[2]]), size = N, replace = TRUE)
+alphas <- c(ex_1_prior[[1]] + n, ex_2_prior[[1]] + n)
+betas <- c(ex_1_prior[[2]] + n * mean_wait, ex_2_prior[[2]] + n * mean_wait)
+samples <- rinvgamma(N, alphas[components], betas[components])
+
+plot(density(samples))
+mean(samples)
+quantile(samples, c(0.025, 0.975))
+
+sum(samples > 20) / N
+
+# library(coda)
+# library(rstan)
+# 
+# rstan_options(auto_write = TRUE)
+# 
+# b_mm_data <-
+#   list(
+#     K = 2, 
+#     N = n,
+#     y= waiting_times,
+#     theta = c(0.5, 0.5),
+#     alpha = c(6, 38),
+#     beta = c(62.5, 278)
+#   )
+# 
+# b_mm <- stan_model(file = 'a1q2.stan')
+# 
+# b_mm_fit <- sampling(
+#   b_mm,
+#   data = b_mm_data,
+#   chains = 7,
+#   control = list(adapt_delta = 0.8),
+#   iter = 40000
+# )
+# plot(b_mm_fit)
+# b_mm_fit
+# 
+# smps <- extract(b_mm_fit)
+# tp <- traceplot(b_mm_fit, pars = c("lambda", "mwt"))
+# tp
+# 
+# b_mm_coda <- As.mcmc.list(b_mm_fit)
+# gelman.plot(b_mm_coda, ask=FALSE)
+# gelman.diag(b_mm_coda)
+# plot(density(smps$postdraw))
+# sum(smps$postdraw > 20) / (length(smps$postdraw))
+# mean(smps$postdraw)
+# quantile(smps$postdraw, c(0.025, 0.975))
