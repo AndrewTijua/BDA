@@ -150,7 +150,17 @@ Of course the posterior for $1/\lambda$ is analogous, with inverse gamma rather 
 
 We calculate a posterior 95\% credible interval for $1/\lambda$ as $(8.00, 11.84)$, and a mean for $1/\lambda$ of 9.69.
 
-To calculate the posterior probability of waiting for more than 20 minutes we need the posterior predictive distribution. We find that $$\Pr[x>20] = 0.127.$$ We note that the posterior distribution is a gamma mixture whereas the posterior predictive distribution is a generalised Pareto distribution. 
+To calculate the posterior probability of waiting for more than 20 minutes we need the posterior predictive distribution. We find that $$\Pr[x>20] = 0.127.$$ We note that the posterior distribution is a gamma mixture whereas the posterior predictive distribution is a generalised Pareto distribution. The pdf is given by 
+
+\[
+p(t_*|t) = 0.40455 \ f_l(\beta_1^{post}, \alpha_1^{post}) + 0.59545 \ f_l(\beta_2^{post}, \alpha_2^{post}),
+\]
+
+where 
+\[
+f_l(x|a,b) = \frac{a}{b}\left(1+\frac{x}{b}\right)^{-(a-1)}.
+\]
+This family of distributions is often used in survival analysis to model survival times, so it is natural that it could turn up here.
 
 \subsection*{c)}
 \begin{figure}[H]
@@ -172,7 +182,7 @@ The prior is compatible as there is no conflict between the data and the posteri
 	\label{fig:postpreddens}
 \end{figure}
 
-We plot the generalised Pareto distribution that is our posterior predictive density. We obtain a mean of $9.69$ with symmetric 95\% credible interval given by $(0.24, \  36)$.
+We plot our posterior predictive density. We obtain a mean of $9.69$ with symmetric 95\% credible interval given by $(0.24, \  36)$. This is very much in line with what we expect from the likelihood, indicating good fit.
 
 \subsection*{e)}
 We are now to take the Lindley distribution as our likelihood. This distribution has pdf of

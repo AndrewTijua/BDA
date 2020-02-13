@@ -423,7 +423,7 @@ ggdens <-
   ggplot(data = dens, aes(x = postdraw)) +
   geom_density(size = 1, color = "darkblue", fill = "lightblue") +
   theme_minimal() +
-  labs(x = "Posterior Waiting Time", y = "Density of Posterior Predictive", title = "Posterior Predictive Density") +
+  labs(x = "Posterior Waiting Time", y = "Density of Posterior Predictive", title = "Posterior Predictive Density (Exponential Likelihood)") +
   geom_vline(
     xintercept = mean(dens$postdraw),
     size = 2,
