@@ -250,22 +250,29 @@ post_wait_sim <-
 
 N <- 1e6
 
-components <- sample(1:2, prob = c(mcoefs[[1]], mcoefs[[2]]), size = N, replace = TRUE)
+components <-
+  sample(
+    1:2,
+    prob = c(mcoefs[[1]], mcoefs[[2]]),
+    size = N,
+    replace = TRUE
+  )
 alphas <- c(ex_1_prior[[1]] + n, ex_2_prior[[1]] + n)
-betas <- c(ex_1_prior[[2]] + n * mean_wait, ex_2_prior[[2]] + n * mean_wait)
+betas <-
+  c(ex_1_prior[[2]] + n * mean_wait, ex_2_prior[[2]] + n * mean_wait)
 samples <- rinvgamma(N, alphas[components], betas[components])
 
 plot(density(samples))
 mean(samples)
 quantile(samples, c(0.025, 0.975))
 
-sum(samples > 20) / N
-
-post_pred <- Renext::rlomax(N, betas[components], alphas[components])
+post_pred <-
+  Renext::rlomax(N, betas[components], alphas[components])
 
 plot(density(post_pred))
 mean(post_pred)
-sum(post_pred > 20)/N
+quantile(post_pred, c(0.025, 0.975))
+sum(post_pred > 20) / N
 
 library(coda)
 library(rstan)
@@ -276,16 +283,16 @@ b_mm_data <-
   list(
     K = 2,
     N = n,
-    y= waiting_times,
+    y = waiting_times,
     theta = c(0.5, 0.5),
     alpha = c(6, 38),
     beta = c(62.5, 277.5)
   )
 
 # b_data <- list(N=n, y = waiting_times, gprior=c(38,278))
-# 
+#
 # b_m <- stan_model(file = 'a1q2simp.stan')
-# 
+#
 # b_m_fit <- sampling(
 #   b_m,
 #   data = b_data,
@@ -295,7 +302,7 @@ b_mm_data <-
 # )
 # plot(b_m_fit)
 # b_m_fit
-# 
+#
 # smps <- extract(b_m_fit)
 # tp <- traceplot(b_m_fit, pars = c("lambda"))
 # tp
@@ -319,7 +326,7 @@ b_mm_fit <- sampling(
   data = b_mm_data,
   chains = 7,
   control = list(adapt_delta = 0.8),
-  iter = 4000
+  iter = 40000
 )
 plot(b_mm_fit)
 b_mm_fit
@@ -329,7 +336,7 @@ tp <- traceplot(b_mm_fit, pars = c("lambda", "mwt"))
 tp
 
 b_mm_coda <- As.mcmc.list(b_mm_fit)
-gelman.plot(b_mm_coda, ask=FALSE)
+gelman.plot(b_mm_coda, ask = FALSE)
 gelman.diag(b_mm_coda)
 
 plot(density(smps$postdraw))
@@ -345,14 +352,130 @@ quantile(smps$mwt, c(0.025, 0.975))
 
 require(rjags)
 
-model=jags.model(file = "a1q2jags.jags",data = 
-                   list(y=waiting_times,n=n,a=c(38, 6),b=c(277.5, 62.5),p=c(0.5,0.5)),n.chains=10)
+model = jags.model(
+  file = "a1q2jags.jags",
+  data =
+    list(
+      y = waiting_times,
+      n = n,
+      a = c(38, 6),
+      b = c(277.5, 62.5),
+      p = c(0.5, 0.5)
+    ),
+  n.chains = 10
+)
 
 # Burnin for 1000 samples
-update(model,100000,progress.bar="none")
+update(model, 100000, progress.bar = "none")
 
 # Running the model
-res=coda.samples(model, variable.names=c("lambda","ypred", "texp"), 
-                 n.iter=200000,progress.bar="none")
+res = coda.samples(
+  model,
+  variable.names = c("lambda", "ypred", "texp"),
+  n.iter = 200000,
+  progress.bar = "none"
+)
 summary(res)
 
+qqplot(smps$postdraw, waiting_times, xlim = c(0, 40))
+qqplot(post_pred, waiting_times, xlim = c(0, 40))
+qqplot(res[[1]][, "ypred"], waiting_times, xlim = c(0, 40))
+
+
+b_mm_lind <- stan_model(file = 'a1q2lindley.stan')
+
+b_mm_lind_fit <- sampling(
+  b_mm_lind,
+  data = b_mm_data,
+  chains = 7,
+  control = list(adapt_delta = 0.8),
+  iter = 40000
+)
+plot(b_mm_lind_fit)
+b_mm_lind_fit
+
+smps_lind <- extract(b_mm_lind_fit)
+tp_lind <- traceplot(b_mm_lind_fit, pars = c("lambda", "mwt"))
+tp_lind
+
+b_mm_lind_coda <- As.mcmc.list(b_mm_lind_fit)
+gelman.plot(b_mm_lind_coda, ask = FALSE)
+gelman.diag(b_mm_lind_coda)
+
+plot(density(smps_lind$postdraw))
+sum(smps_lind$postdraw > 20) / (length(smps_lind$postdraw))
+mean(smps_lind$postdraw)
+quantile(smps_lind$postdraw, c(0.025, 0.975))
+
+plot(density(smps_lind$mwt))
+sum(smps_lind$mwt > 20) / (length(smps_lind$mwt))
+mean(smps_lind$mwt)
+quantile(smps_lind$mwt, c(0.025, 0.975))
+
+qqplot(smps_lind$postdraw, waiting_times, xlim = c(0, 40))
+qqplot(smps$postdraw, waiting_times, xlim = c(0, 40))
+ks.test(smps_lind$postdraw, waiting_times)
+ks.test(smps$postdraw, waiting_times)
+
+
+dens <- data.frame(postdraw = post_pred)
+ggdens <-
+  ggplot(data = dens, aes(x = postdraw)) +
+  geom_density(size = 1, color = "darkblue", fill = "lightblue") +
+  theme_minimal() +
+  labs(x = "Posterior Waiting Time", y = "Density of Posterior Predictive", title = "Posterior Predictive Density") +
+  geom_vline(
+    xintercept = mean(dens$postdraw),
+    size = 2,
+    color = "red"
+  ) +
+  geom_vline(
+    xintercept = quantile(dens$postdraw, c(0.025, 0.975)),
+    color = "darkred",
+    size = 1
+  )
+ggdens
+
+lambda <- seq(0, 1, len = 5000)
+
+likelihood <-
+  as.matrix(apply(as.array(waiting_times), 1, dexp, lambda))
+likelihood <- apply(likelihood, 1, prod)
+
+area = sfsmisc::integrate.xy(lambda, likelihood)
+const = 1 / area
+likelihood <- const * likelihood
+
+prior <-
+  p * dgamma(lambda, ex_1_prior[[1]], ex_1_prior[[2]]) + (1 - p) * dgamma(lambda, ex_2_prior[[1]], ex_2_prior[[2]])
+posterior <-
+  mcoefs[[1]] * dgamma(lambda, ex_1_prior[[1]] + n, ex_1_prior[[2]] + n *
+                         mean_wait) + mcoefs[[2]] * dgamma(lambda, ex_2_prior[[1]] + n, ex_2_prior[[2]] + n *
+                                                             mean_wait)
+
+prlikpost <-
+  reshape2::melt(list(
+    Prior = prior,
+    Likelihood = likelihood,
+    Posterior = posterior
+  ))
+ggcompplot <-
+  ggplot(data = prlikpost) + geom_area(
+    aes(
+      x = rep(lambda, 3),
+      y = value,
+      colour = L1,
+      fill = L1
+    ),
+    alpha = 0.3,
+    size = 0.5,
+    position = "identity"
+  ) +
+  theme_minimal() +
+  labs(x = "Lambda", y = "Density", title = "Prior-Posterior Compatibility Plot")
+ggcompplot
+
+mcoefs[[1]] * 
+  Renext::qlomax(c(0.025, 0.975), betas[1], alphas[1]) +
+  mcoefs[[2]] *
+  Renext::qlomax(c(0.025, 0.975), betas[2], alphas[2])

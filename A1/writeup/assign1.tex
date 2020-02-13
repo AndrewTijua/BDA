@@ -4,7 +4,9 @@
 \usepackage{amssymb}
 \usepackage{extsizes}
 \usepackage{float}
+\usepackage{graphicx}
 \usepackage[margin = 1in]{geometry}
+\usepackage{hyperref}
 
 \newcommand{\E}{\mathbb{E}}
 \newcommand{\Var}{\mathrm{Var}}
@@ -148,6 +150,40 @@ Of course the posterior for $1/\lambda$ is analogous, with inverse gamma rather 
 
 We calculate a posterior 95\% credible interval for $1/\lambda$ as $(8.00, 11.84)$, and a mean for $1/\lambda$ of 9.69.
 
-To calculate the posterior probability of waiting for more than 20 minutes we need the posterior predictive distribution. We find that $$\Pr[x>20] = 0.127.$$ We note that the posterior 
+To calculate the posterior probability of waiting for more than 20 minutes we need the posterior predictive distribution. We find that $$\Pr[x>20] = 0.127.$$ We note that the posterior distribution is a gamma mixture whereas the posterior predictive distribution is a generalised Pareto distribution. 
+
+\subsection*{c)}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.5\textwidth]{../plpgoodnessplot}
+	\caption{Prior-Likelihood-Posterior Plot}
+	\label{fig:pgof}
+\end{figure}
+
+As seen in Figure (\ref{fig:pgof}) the posterior is highly influenced by the likelihood and not so much by the prior. The prior is compatible with the data as an initial estimate, and and served it's purpose well as the posterior has converged (mostly) onto the likelihood.
+
+The prior is compatible as there is no conflict between the data and the posterior.
+
+\subsection*{d)}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.5\textwidth]{../postpreddens}
+	\caption{Posterior Predictive Density Plot, bright red line indicates mean, darker red lines indicate 95\% CI.}
+	\label{fig:postpreddens}
+\end{figure}
+
+We plot the generalised Pareto distribution that is our posterior predictive density. We obtain a mean of $9.69$ with symmetric 95\% credible interval given by $(0.24, \  36)$.
+
+\subsection*{e)}
+We are now to take the Lindley distribution as our likelihood. This distribution has pdf of
+\[
+f(t|\lambda) = \frac{\lambda^2}{\lambda+1}(1+t)e^{-\lambda t}, \implies \ln(f(t|\lambda)) = 2\ln(\lambda) - \ln(\lambda + 1) + \ln(1+t) - \lambda t.
+\]
+The log pdf is important for implementing into our MC algorithm. 
+
+Given our data we have likelihood of the form 
+\[
+L(\lambda|\underline{t}) = \left(\frac{\lambda^2}{\lambda+1}\right)^n\exp\left(-\lambda\sum_{i=1}^{n}t_i\right)\prod_{i=1}^{n}(1+t_i)
+\]
 \end{document}
 
