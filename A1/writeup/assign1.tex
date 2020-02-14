@@ -185,7 +185,7 @@ We plot our posterior predictive density. We obtain a mean of $9.69$ with symmet
 \subsection*{e)}
 We are now to take the Lindley distribution as our likelihood. This distribution has pdf of
 \[
-f(t|\lambda) = \frac{\lambda^2}{\lambda+1}(1+t)e^{-\lambda t}, \implies \ln(f(t|\lambda)) = 2\ln(\lambda) - \ln(\lambda + 1) + \ln(1+t) - \lambda t.
+f(t|\lambda) = \frac{\lambda^2}{\lambda+1}(1+t)e^{-\lambda t} \implies \ln(f(t|\lambda)) = 2\ln(\lambda) - \ln(\lambda + 1) + \ln(1+t) - \lambda t.
 \]
 The log pdf is important for implementing into our MC algorithm.  
 
@@ -199,5 +199,20 @@ hence we have a posterior of the form
 p(\lambda|\underline{t}) &\propto \left(\Gamma(38, 277.5) + \Gamma(6, 62.5)\right)\left(\frac{\lambda^2}{\lambda+1}\right)^n\exp\left(-\lambda\sum_{i=1}^{n}t_i\right)\prod_{i=1}^{n}(1+t_i)\\
 &\propto \left(\frac{277.5^{38}}{\Gamma(38)}\lambda^{37}e^{-277.5\cdot \lambda} + \frac{62.5^6}{\Gamma(6)}\lambda^{5}e^{-62.5\cdot \lambda}\right)\left(\frac{\lambda^2}{\lambda+1}\right)^n\exp\left(-\lambda\sum_{i=1}^{n}t_i\right)\prod_{i=1}^{n}(1+t_i)
 \end{align*}
+
+We calculate our posterior. We obtain an expected waiting time of $10.4$ minutes, an increase from our previous.
+
+We also plot the new posterior predictive. 
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.5\textwidth]{../ppredlinddens}
+	\caption{Posterior Predictive Density Plot for Lindley Likelihood, bright red line indicates mean, darker red lines indicate 95\% CI.}
+	\label{fig:postpredlinddens}
+\end{figure}
+
+Notice that the credible interval for the posterior predictive derived from the Lindley likelihood are a lot tighter. 
+
+\subsection*{f)}
 \end{document}
 

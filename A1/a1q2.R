@@ -2,6 +2,8 @@ library(tidyverse)
 library(HDInterval)
 library(extraDistr)
 
+par(mfrow = c(1, 1))
+
 waiting_times  <-
   c(
     0.8,
@@ -433,7 +435,7 @@ ggdens <-
     xintercept = quantile(dens$postdraw, c(0.025, 0.975)),
     color = "darkred",
     size = 1
-  )
+  ) + coord_cartesian(xlim = c(0, 50))
 ggdens
 
 lambda <- seq(0, 1, len = 5000)
@@ -475,7 +477,41 @@ ggcompplot <-
   labs(x = "Lambda", y = "Density", title = "Prior-Posterior Compatibility Plot")
 ggcompplot
 
-mcoefs[[1]] * 
+mcoefs[[1]] *
   Renext::qlomax(c(0.025, 0.975), betas[1], alphas[1]) +
   mcoefs[[2]] *
   Renext::qlomax(c(0.025, 0.975), betas[2], alphas[2])
+
+dens_lind <- data.frame(postdraw = smps_lind$postdraw)
+ggdens_lind <-
+  ggplot(data = dens, aes(x = postdraw)) +
+  geom_density(size = 1, color = "darkblue", fill = "lightblue") +
+  theme_minimal() +
+  labs(x = "Posterior Waiting Time", y = "Density of Posterior Predictive", title = "Posterior Predictive Density (Lindley Likelihood)") +
+  geom_vline(
+    xintercept = mean(dens_lind$postdraw),
+    size = 2,
+    color = "red"
+  ) +
+  geom_vline(
+    xintercept = quantile(dens_lind$postdraw, c(0.025, 0.975)),
+    color = "darkred",
+    size = 1
+  ) + coord_cartesian(xlim = c(0, 50))
+ggdens_lind
+
+
+quantile_set <- seq(0.01, 0.99, by = 0.01)
+data_q <- quantile(waiting_times, quantile_set)
+exp_q <- quantile(smps$postdraw, quantile_set)
+lind_q <- quantile(smps_lind$postdraw, quantile_set)
+
+quantile_df <- data.frame(obs = data_q, exp = exp_q, lind = lind_q)
+ggqq <- ggplot(data = quantile_df, aes(y = obs)) +
+  geom_point(aes(x = exp, colour = "red")) + 
+  geom_point(aes(x = lind, colour = "blue")) + 
+  theme_minimal() +
+  labs(x = "Fitted Quantiles", y = "Sample Quantiles") + 
+  scale_color_discrete(name = "Distribution", labels = c("Exponential", "Lindley")) +
+  coord_cartesian(xlim = c(0, 45), ylim = c(0, 45))
+ggqq
