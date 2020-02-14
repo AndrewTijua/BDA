@@ -1,4 +1,4 @@
-\documentclass[12pt]{extarticle}
+\documentclass[10pt]{extarticle}
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{amssymb}
@@ -251,5 +251,133 @@ In order to make our results directly comparable we are going to mean centre the
 
 This points to length and Male-Female difference not having a significant effect on age. Length is likely due to high correlation with height (Pearson correlation of 0.828) and diameter (Pearson correlation of 0.987). Most of the variables have extremely high correlation, so this is going to require a long MCMC run.
 
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.5\textwidth]{../flmdiag}
+	\caption{Diagnostic plots for the standard linear model}
+	\label{fig:lmplots}
+\end{figure}
+
+Looking at diagnostic plots we see a large number of extreme observations with high leverage. Therefore it makes sense to perform a robust regression using $t$ distributed errors.  
+\subsection*{b)}
+
+We are going to fit a Bayesian linear model of the form 
+\begin{align*}
+y &\sim t_{\nu+1}(X\beta, \sigma),\\
+\beta_i & \sim \mathrm{Normal}(0, 10^4),\\
+\sigma &\sim \Gamma^{-1}(0.1, 0.1),\\
+\nu &\sim \mathrm{Exponential}(0.034),
+\end{align*}
+where $X$ is the $n \times p$ centred design matrix, $\beta$ is the $p$ vector of regression coefficients, and the $t$ distribution is understood to be shifted and scaled such that $\frac{y-X\beta}{\sigma}$ has a classic $t$ distribution with $\nu + 1$ degrees of freedom.
+
+\subsection*{c)}
+
+Fitting the model we obtain the following quantities:
+\begin{table}[ht]
+	\footnotesize
+	\centering
+	\begin{tabular}{rrrrrrrrrrr}
+		\hline
+		& mean & se\_mean & sd & 2.5\% & 25\% & 50\% & 75\% & 97.5\% & n\_eff & Rhat \\ 
+		\hline
+		beta[1] & -0.22 & 0.00 & 0.06 & -0.33 & -0.25 & -0.22 & -0.18 & -0.11 & 28239.55 & 1.00 \\ 
+		beta[2] & -0.67 & 0.00 & 0.08 & -0.83 & -0.73 & -0.67 & -0.61 & -0.51 & 32862.97 & 1.00 \\ 
+		beta[3] & 0.12 & 0.00 & 0.07 & -0.02 & 0.07 & 0.12 & 0.17 & 0.26 & 33774.18 & 1.00 \\ 
+		beta[4] & 1.88 & 0.01 & 1.51 & -1.13 & 0.86 & 1.89 & 2.90 & 4.82 & 31346.96 & 1.00 \\ 
+		beta[5] & 7.28 & 0.01 & 1.86 & 3.64 & 6.02 & 7.27 & 8.53 & 10.96 & 31154.47 & 1.00 \\ 
+		beta[6] & 15.80 & 0.01 & 2.04 & 11.81 & 14.43 & 15.80 & 17.17 & 19.80 & 50288.95 & 1.00 \\ 
+		beta[7] & 7.51 & 0.01 & 0.80 & 5.94 & 6.97 & 7.51 & 8.04 & 9.06 & 23090.61 & 1.00 \\ 
+		beta[8] & -16.35 & 0.01 & 0.90 & -18.12 & -16.95 & -16.35 & -15.74 & -14.59 & 26678.37 & 1.00 \\ 
+		beta[9] & -9.22 & 0.01 & 1.20 & -11.56 & -10.03 & -9.22 & -8.41 & -6.89 & 34525.85 & 1.00 \\ 
+		beta[10] & 6.72 & 0.01 & 1.17 & 4.43 & 5.92 & 6.71 & 7.50 & 9.05 & 28005.24 & 1.00 \\ 
+		sigma & 1.39 & 0.00 & 0.03 & 1.33 & 1.37 & 1.39 & 1.41 & 1.45 & 35667.27 & 1.00 \\ 
+		nu & 1.87 & 0.00 & 0.16 & 1.58 & 1.76 & 1.86 & 1.97 & 2.19 & 35705.46 & 1.00 \\ 
+		y\_new[1] & -0.34 & 0.01 & 2.47 & -4.85 & -1.41 & -0.34 & 0.74 & 4.22 & 56374.07 & 1.00 \\ 
+		lp\_\_ & -6470.43 & 0.02 & 2.47 & -6476.21 & -6471.85 & -6470.08 & -6468.65 & -6466.64 & 21223.39 & 1.00 \\ 
+		\hline
+	\end{tabular}
+\caption{Regression Coefficient Table}
+\label{tab:regco}
+\end{table}
+
+\subsection*{d)}
+
+The model table contains our $\hat{R}$ values, and shows that we have good reason to believe that the chains have converged. 
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.45\textwidth]{../gelman1}
+	\includegraphics[width = 0.45\textwidth]{../gelman2}
+	\caption{Plots of $\hat{R}$ as chains progressed}
+	\label{fig:gelmanplots}
+\end{figure}
+
+Although Figure \ref{fig:gelmanplots} is a bit small it is clear that after our burn-in $\hat{R}$ was very close to 1, and got closer as we computed more iterations.
+
+\subsection*{e)}
+
+We are going to alter some of the prior hyperparameters in order to test sensitivity. We are going to assume the following model:
+
+\begin{align*}
+y &\sim t_\nu(X\beta, \sigma),\\
+\beta_i & \sim \mathrm{Normal}(0, 10),\\
+\sigma &\sim \Gamma^{-1}(7, 30),\\
+\nu &\sim \mathrm{Exponential}(0.034),
+\end{align*}
+The hyperparameters are quite different, so this should be a good test of prior sensitivity. We are going to run the model for less iterations as we do not intend to use this model for inference, merely for prior sensitivity analysis.
+
+We obtain the following table of results: 
+
+\begin{table}[ht]
+	\tiny
+	\centering
+	\begin{tabular}{rrrrrrrrrrr}
+		\hline
+		& mean & se\_mean & sd & 2.5\% & 25\% & 50\% & 75\% & 97.5\% & n\_eff & Rhat \\ 
+		\hline
+		beta[1] & -0.21 & 0.00 & 0.06 & -0.32 & -0.25 & -0.21 & -0.17 & -0.10 & 5572.99 & 1.00 \\ 
+		beta[2] & -0.68 & 0.00 & 0.08 & -0.84 & -0.73 & -0.68 & -0.62 & -0.51 & 6239.80 & 1.00 \\ 
+		beta[3] & 0.12 & 0.00 & 0.07 & -0.02 & 0.07 & 0.12 & 0.17 & 0.25 & 6566.89 & 1.00 \\ 
+		beta[4] & 1.98 & 0.02 & 1.47 & -0.89 & 0.97 & 1.98 & 2.99 & 4.82 & 6567.40 & 1.00 \\ 
+		beta[5] & 7.23 & 0.02 & 1.80 & 3.71 & 5.98 & 7.24 & 8.46 & 10.72 & 6482.90 & 1.00 \\ 
+		beta[6] & 15.25 & 0.02 & 2.01 & 11.29 & 13.91 & 15.27 & 16.63 & 19.13 & 9565.22 & 1.00 \\ 
+		beta[7] & 7.36 & 0.01 & 0.78 & 5.82 & 6.83 & 7.36 & 7.89 & 8.86 & 4357.55 & 1.00 \\ 
+		beta[8] & -16.20 & 0.01 & 0.90 & -17.95 & -16.81 & -16.20 & -15.60 & -14.44 & 4957.90 & 1.00 \\ 
+		beta[9] & -8.98 & 0.01 & 1.19 & -11.31 & -9.78 & -9.00 & -8.19 & -6.64 & 6498.79 & 1.00 \\ 
+		beta[10] & 6.93 & 0.02 & 1.15 & 4.74 & 6.15 & 6.91 & 7.70 & 9.25 & 5590.50 & 1.00 \\ 
+		sigma & 1.40 & 0.00 & 0.03 & 1.34 & 1.38 & 1.40 & 1.42 & 1.46 & 6930.44 & 1.00 \\ 
+		nu & 1.90 & 0.00 & 0.16 & 1.61 & 1.79 & 1.89 & 2.00 & 2.22 & 7134.90 & 1.00 \\ 
+		y\_new[1] & -0.36 & 0.02 & 2.54 & -4.77 & -1.41 & -0.35 & 0.72 & 4.13 & 10775.23 & 1.00 \\ 
+		lp\_\_ & -6497.93 & 0.04 & 2.39 & -6503.44 & -6499.35 & -6497.65 & -6496.19 & -6494.16 & 4370.59 & 1.00 \\ 
+		\hline
+	\end{tabular}
+\end{table}
+
+This is nearly identical to the table obtained previously, so we can be confident in our results. All of the differences in means are well within their standard deviations, so overall we are happy.
+
+\subsection*{f)}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.5\textwidth]{../qqplotmodcomp}
+	\caption{QQ plots comparing our models}
+	\label{fig:qqp}
+\end{figure}
+Looking at figure \ref{fig:qqp} neither of our models fit the data very well. Performing KS tests we find a distance of 0.11827 between our predictions from the Robust Bayesian and the true data, compared with a distance of 0.15466 for the normal linear and the true data. We note that the true data is rather skewed with estimated skewness 1.11. This has not been compensated for in the model. This means that there are more old abalones than predicted by the models. This is likely due to their characteristics not changing that much after they age enough. This is shown by the deviation of the upper quantiles of the predictions from the sample quantiles.
+
+\subsection*{g)}
+
+95\% credible intervals are given in Table \ref{tab:regco}. We see that the credible intervals for $\beta_3$ and  $\beta_4$ contain 0. These are the coefficients linked to `isMale' and Length respectively. This observation is identical to that of the normal linear model. 
+
+\subsection*{h)}
+
+The 95\% credible interval for the age relating to the  new data is given in the Table \ref{tab:regco} as $(-4.85, 4.22)$ with mean of $-0.34$. We plot the density of the posterior predictive and obtain the following:
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.5\textwidth]{../pprednd}
+	\caption{Posterior predictive density for new data}
+	\label{fig:ppnd}
+\end{figure}
 \end{document}
 
