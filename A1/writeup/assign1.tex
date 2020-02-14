@@ -191,7 +191,13 @@ The log pdf is important for implementing into our MC algorithm.
 
 Given our data we have likelihood of the form 
 \[
-L(\lambda|\underline{t}) = \left(\frac{\lambda^2}{\lambda+1}\right)^n\exp\left(-\lambda\sum_{i=1}^{n}t_i\right)\prod_{i=1}^{n}(1+t_i)
+L(\lambda|\underline{t}) = \left(\frac{\lambda^2}{\lambda+1}\right)^n\exp\left(-\lambda\sum_{i=1}^{n}t_i\right)\prod_{i=1}^{n}(1+t_i),
 \]
+
+hence we have a posterior of the form
+\begin{align*}
+p(\lambda|\underline{t}) &\propto \left(\Gamma(38, 277.5) + \Gamma(6, 62.5)\right)\left(\frac{\lambda^2}{\lambda+1}\right)^n\exp\left(-\lambda\sum_{i=1}^{n}t_i\right)\prod_{i=1}^{n}(1+t_i)\\
+&\propto \left(\frac{277.5^{38}}{\Gamma(38)}\lambda^{37}e^{-277.5\cdot \lambda} + \frac{62.5^6}{\Gamma(6)}\lambda^{5}e^{-62.5\cdot \lambda}\right)\left(\frac{\lambda^2}{\lambda+1}\right)^n\exp\left(-\lambda\sum_{i=1}^{n}t_i\right)\prod_{i=1}^{n}(1+t_i)
+\end{align*}
 \end{document}
 

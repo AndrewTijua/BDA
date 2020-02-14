@@ -52,6 +52,13 @@ pear_stat <- sq_diff / expected
 chi_stat <- sum(pear_stat)
 chi_dof <- length(obs) - 1
 chi_p <- pchisq(chi_stat, chi_dof)
+chi_p
+
+nh <- rep(1/6, 6)
+mle <- obs/n1
+lr_stat <- -2 * sum(obs * log(nh/mle))
+lr_chi_stat <- pchisq(lr_stat, chi_dof)
+lr_chi_stat
 
 n <- 1e5
 
