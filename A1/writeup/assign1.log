@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 2.9.7300 64-bit) (preloaded format=pdflatex 2020.2.13)  13 FEB 2020 18:25
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 2.9.7300 64-bit) (preloaded format=pdflatex 2020.2.13)  14 FEB 2020 12:32
 entering extended mode
 **./assign1.tex
 (assign1.tex
@@ -437,24 +437,24 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 <../plpgoodnessplot.pdf, id=37, 420.57124pt x 298.11375pt>
 File: ../plpgoodnessplot.pdf Graphic file (type pdf)
 <use ../plpgoodnessplot.pdf>
-Package pdftex.def Info: ../plpgoodnessplot.pdf  used on input line 168.
+Package pdftex.def Info: ../plpgoodnessplot.pdf  used on input line 166.
 (pdftex.def)             Requested size: 234.8775pt x 166.48767pt.
  [4]
 <../postpreddens.pdf, id=44, 420.57124pt x 298.11375pt>
 File: ../postpreddens.pdf Graphic file (type pdf)
 <use ../postpreddens.pdf>
-Package pdftex.def Info: ../postpreddens.pdf  used on input line 180.
+Package pdftex.def Info: ../postpreddens.pdf  used on input line 178.
 (pdftex.def)             Requested size: 234.8775pt x 166.48767pt.
  [5 <../plpgoodnessplot.pdf> <../postpreddens.pdf>]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 198.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 196.
  [6]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 198.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 196.
  (assign1.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 198.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 198.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 196.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 196.
 Package rerunfilecheck Info: File `assign1.out' has not changed.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 198.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 196.
  ) 
 Here is how much of TeX's memory you used:
  6885 strings out of 481565
@@ -479,7 +479,7 @@ msfonts/cm/cmr6.pfb><C:/Users/Ben/AppData/Local/Programs/MiKTeX 2.9/fonts/type1
 nts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/Ben/AppData/Local/Programs/Mi
 KTeX 2.9/fonts/type1/public/amsfonts/cm/cmsy8.pfb><C:/Users/Ben/AppData/Local/P
 rograms/MiKTeX 2.9/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on assign1.pdf (6 pages, 246568 bytes).
+Output written on assign1.pdf (6 pages, 246592 bytes).
 PDF statistics:
  117 PDF objects out of 1000 (max. 8388607)
  21 named destinations out of 1000 (max. 500000)

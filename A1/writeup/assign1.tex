@@ -67,14 +67,12 @@ $$\theta_i \sim \mathrm{Beta}\left(\alpha_i, \alpha_0 - \alpha_i\right).$$ We ca
 \end{table}
 
 \subsection*{c)}
-We are going to simulate a large number of draws from our posterior for $\theta$ given our results. We are going to define a `range of practical equivalence' around $\theta_i = 1/6$, with leeway of $1/30$. That is, we are going to test how many draws have all $1/6 -1/30 < \theta_i < 1/6+1/30.$ 
+We are going to test the null hypothesis of a fair die. For the multinomial distribution there is no easy quantile function, so we are going to use the likelihood-ratio test and Pearson's $\chi^2$ test. These approach the true $p$-value from below and above respectively, so doing both should give us a very good idea.
 
-We draw 10,000 times from our posterior and calculate that with probability $0.036$ all probabilities are within our equivalence range. Therefore we can say that the dice is unlikely to be fair. 
-
-We chose $1/30$ as our range as it is a fifth of our fair probability, thus allowing for some discrepancy but not so much as to falsely not reject the null hypothesis. If we chose 0.05 as our range we would obtain a probability of 0.19372. However 0.05 is quite large compared to our probabilities, so is not a suitable choice.
+Computing the $p$-value using the likelihood-ratio test we get $p_{lr} = 0.377$. Computing the $p$-value using Pearson's $\chi^2$ test we obtain $p_{\chi^2} = 0.377$. Thus we can be fairly sure that this is very close to the true $p$-value. Therefore we do not reject the null hypothesis that the die is fair.
 
 \subsection*{d)}
-The posterior predictive distribution is the `Dirichlet-Multinomial` distribution. The pmf for this is given by 
+The posterior predictive distribution is the `Dirichlet-Multinomial' distribution. The pmf for this is given by 
 \[
 f(x|n, \alpha) = \frac{n!\Gamma(\sum\alpha_i)}{\Gamma(n+\sum\alpha_i)}\prod_{k=1}^{K}\frac{\Gamma(x_k+\alpha_k)}{(x_k!)\Gamma(\alpha_k)}
 \]
@@ -110,7 +108,7 @@ with 95\% marginal credible intervals given by
 		$\theta_6$ &0.0939960 &0.1791973\\
 	\end{tabular}
 \end{table}
-The credible intervals have narrowed, as expected for more observations. It is of note that the new credible interval for $\theta_3$ (barely) does not contain the value required for a `fair' dice. This is good evidence that the dice is not fair. 
+The credible intervals have narrowed, as expected for more observations. It is of note that the new credible interval for $\theta_3$ (barely) does not contain the value required for a `fair' dice. This is evidence that the dice is not fair. 
 
 \section*{Question 2}
 

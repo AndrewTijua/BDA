@@ -31,12 +31,29 @@ for (i in post_params_new){
   print(qbeta(c(0.025, 0.975), i, sum(post_params_new) - i))
 }
 
-n <- 1e6
-rope_r <- 0.05#1/30
-A <- rdirichlet(n, post_params)
-B <- as.matrix(A)
-f <- function(x) all((x > 1/6-rope_r)*(x < 1/6+rope_r))
-mean(apply(B, MARGIN = 1, FUN = f))
+# n <- 1e6
+# rope_r <- 0.05#1/30
+# A <- rdirichlet(n, post_params)
+# B <- as.matrix(A)
+# f <- function(x) all((x > 1/6-rope_r)*(x < 1/6+rope_r))
+# mean(apply(B, MARGIN = 1, FUN = f))
+
+# nh_p <- rep(1/6, 6)
+# n <- 1e2
+# size <- sum(obs)
+# nh_lik <- t(rmultinom(n, size, nh_p))
+
+#pearson chi-squared
+
+expected <- n1 * rep(1/6, 6)
+observed <- obs
+sq_diff <- (observed - expected)^2
+pear_stat <- sq_diff / expected
+chi_stat <- sum(pear_stat)
+chi_dof <- length(obs) - 1
+chi_p <- pchisq(chi_stat, chi_dof)
+
+n <- 1e5
 
 C <- rdirmnom(n, 60, post_params)
 D <- as.matrix(C)
