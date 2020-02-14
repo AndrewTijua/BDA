@@ -180,7 +180,7 @@ The prior is compatible as there is no conflict between the data and the posteri
 	\label{fig:postpreddens}
 \end{figure}
 
-We plot our posterior predictive density. We obtain a mean of $9.69$ with symmetric 95\% credible interval given by $(0.24, \  36)$. This is very much in line with what we expect from the likelihood, indicating good fit.
+We plot our posterior predictive density. We obtain a mean of $9.69$ with symmetric 95\% credible interval given by $(0.24, \  36)$. This is very much in line with what we expect from the likelihood, indicating good fit. 
 
 \subsection*{e)}
 We are now to take the Lindley distribution as our likelihood. This distribution has pdf of
@@ -214,7 +214,42 @@ We also plot the new posterior predictive.
 Notice that the credible interval for the posterior predictive derived from the Lindley likelihood are a lot tighter. 
 
 \subsection*{f)}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.5\textwidth]{../qqplotlindexp}
+	\caption{Q-Q plot of sample quantiles against posterior predictive quantiles}
+	\label{fig:qqplots}
+\end{figure}
+We see that the Lindley distribution fits the data much better than the exponential distribution. We perform Kolmogorov-Smirnoff tests comparing our posterior predictives and the data. For the Lindley likelihood we obtain a distance of 0.0685 with $p$-value of 0.736. For the exponential likelihood we obtain a distance of 0.1797 with corresponding $p$-value of 0.003. 
 
+This is extremely good evidence that the Lindley distribution is a better fit for the data than the Exponential distribution. 
+
+\section*{Question 3}
+\subsection*{a)} 
+
+In order to make our results directly comparable we are going to mean centre the data before we fit the initial linear model. This should only affect the intercept term. 
+
+\begin{table}[ht]
+	\centering
+	\begin{tabular}{rrrrr}
+		\hline
+		& Estimate & Std. Error & t value & Pr($>$$|$t$|$) \\ 
+		\hline
+		(Intercept) & 0.2439 & 0.0643 & 3.79 & 0.0002 \\ 
+		SexI & -0.8249 & 0.1024 & -8.06 & 0.0000 \\ 
+		SexM & 0.0577 & 0.0833 & 0.69 & 0.4887 \\ 
+		Length & -0.4583 & 1.8091 & -0.25 & 0.8000 \\ 
+		Diameter & 11.0751 & 2.2273 & 4.97 & 0.0000 \\ 
+		Height & 10.7615 & 1.5362 & 7.01 & 0.0000 \\ 
+		Whole.weight & 8.9754 & 0.7254 & 12.37 & 0.0000 \\ 
+		Shucked.weight & -19.7869 & 0.8174 & -24.21 & 0.0000 \\ 
+		Viscera.weight & -10.5818 & 1.2937 & -8.18 & 0.0000 \\ 
+		Shell.weight & 8.7418 & 1.1247 & 7.77 & 0.0000 \\ 
+		\hline
+	\end{tabular}
+\end{table}
+
+This points to length and Male-Female difference not having a significant effect on age. Length is likely due to high correlation with height (Pearson correlation of 0.828) and diameter (Pearson correlation of 0.987). Most of the variables have extremely high correlation, so this is going to require a long MCMC run.
 
 \end{document}
 

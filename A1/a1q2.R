@@ -507,11 +507,10 @@ exp_q <- quantile(smps$postdraw, quantile_set)
 lind_q <- quantile(smps_lind$postdraw, quantile_set)
 
 quantile_df <- data.frame(obs = data_q, exp = exp_q, lind = lind_q)
-ggqq <- ggplot(data = quantile_df, aes(y = obs)) +
-  geom_point(aes(x = exp, colour = "red")) + 
-  geom_point(aes(x = lind, colour = "blue")) + 
+ggqq <- ggplot(data = quantile_df, aes(y = obs)) + coord_cartesian(xlim = c(0, 45), ylim = c(0, 45)) +
+  geom_point(aes(x = exp, colour = "Exponential")) + 
+  geom_point(aes(x = lind, colour = "Lindley")) + 
   theme_minimal() +
-  labs(x = "Fitted Quantiles", y = "Sample Quantiles") + 
-  scale_color_discrete(name = "Distribution", labels = c("Exponential", "Lindley")) +
-  coord_cartesian(xlim = c(0, 45), ylim = c(0, 45))
+  labs(x = "Fitted Quantiles", y = "Sample Quantiles") + geom_abline(slope = 1, intercept = 0) + scale_colour_discrete(name = "Distribution")
 ggqq
+

@@ -84,7 +84,7 @@ b_lm_fit <- sampling(
   data = b_lm_data,
   chains = 7,
   control = list(adapt_delta = 0.8),
-  iter = 4000
+  iter = 8000
 )
 plot(b_lm_fit)
 b_lm_fit
@@ -96,6 +96,7 @@ tp
 b_lm_coda <- As.mcmc.list(b_lm_fit)
 gelman.plot(b_lm_coda, ask=FALSE)
 gelman.diag(b_lm_coda)
+plot(b_lm_coda, ask = FALSE)
 
 eap_beta <- matrix(colMeans(smps$beta), ncol = 1)
 
