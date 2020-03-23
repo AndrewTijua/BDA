@@ -125,7 +125,7 @@ gammaShRaFromModeSD = function(mode , sd) {
     stop("sd must be > 0")
   rate = (mode + sqrt(mode ^ 2 + 4 * sd ^ 2)) / (2 * sd ^ 2)
   shape = 1 + mode * rate
-  return(list(shape = shape , rate = rate))
+  return(list(shape = shape, rate = rate))
 }
 
 iGammaShScFromMeanVar = function(mean, var) {
@@ -507,10 +507,10 @@ exp_q <- quantile(smps$postdraw, quantile_set)
 lind_q <- quantile(smps_lind$postdraw, quantile_set)
 
 quantile_df <- data.frame(obs = data_q, exp = exp_q, lind = lind_q)
-ggqq <- ggplot(data = quantile_df, aes(y = obs)) + coord_cartesian(xlim = c(0, 45), ylim = c(0, 45)) +
-  geom_point(aes(x = exp, colour = "Exponential")) + 
-  geom_point(aes(x = lind, colour = "Lindley")) + 
+ggqq <-
+  ggplot(data = quantile_df, aes(y = obs)) + coord_cartesian(xlim = c(0, 45), ylim = c(0, 45)) +
+  geom_point(aes(x = exp, colour = "Exponential")) +
+  geom_point(aes(x = lind, colour = "Lindley")) +
   theme_minimal() +
   labs(x = "Fitted Quantiles", y = "Sample Quantiles") + geom_abline(slope = 1, intercept = 0) + scale_colour_discrete(name = "Distribution")
 ggqq
-

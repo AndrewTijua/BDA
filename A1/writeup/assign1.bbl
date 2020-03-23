@@ -1,0 +1,54 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.1 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{0}
+  \datalist[entry]{nty/global//global/global}
+    \entry{mnpriors}{article}{}
+      \name{author}{1}{}{%
+        {{hash=e12ca1d862c644f1bb0ee11c35be9ff4}{%
+           family={Tuyl},
+           familyi={T\bibinitperiod},
+           given={Frank},
+           giveni={F\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Taylor & Francis}%
+      }
+      \strng{namehash}{e12ca1d862c644f1bb0ee11c35be9ff4}
+      \strng{fullhash}{e12ca1d862c644f1bb0ee11c35be9ff4}
+      \strng{bibnamehash}{e12ca1d862c644f1bb0ee11c35be9ff4}
+      \strng{authorbibnamehash}{e12ca1d862c644f1bb0ee11c35be9ff4}
+      \strng{authornamehash}{e12ca1d862c644f1bb0ee11c35be9ff4}
+      \strng{authorfullhash}{e12ca1d862c644f1bb0ee11c35be9ff4}
+      \field{sortinit}{T}
+      \field{sortinithash}{51f9faf24c60c62ca764a77f78cf5666}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{The American Statistician}
+      \field{number}{4}
+      \field{title}{A Note on Priors for the Multinomial Model}
+      \field{volume}{71}
+      \field{year}{2017}
+      \field{pages}{298\bibrangedash 301}
+      \range{pages}{4}
+    \endentry
+  \enddatalist
+\endrefsection
+\endinput
+

@@ -7,11 +7,44 @@
 \usepackage{graphicx}
 \usepackage[margin = 1in]{geometry}
 \usepackage{hyperref}
+\usepackage[english]{babel}
+\usepackage[backend=biber, style=numeric]{biblatex}
+
+\addbibresource{refs.bib}
+
+\usepackage{listings}
+\usepackage{lstbayes}
+\usepackage[usenames,dvipsnames]{color}    
+
+\lstset{ 
+	language=R,                     % the language of the code
+	basicstyle=\tiny\ttfamily, % the size of the fonts that are used for the code
+	numbers=left,                   % where to put the line-numbers
+	numberstyle=\tiny\color{Blue},  % the style that is used for the line-numbers
+	stepnumber=1,                   % the step between two line-numbers. If it is 1, each line
+	% will be numbered
+	numbersep=5pt,                  % how far the line-numbers are from the code
+	backgroundcolor=\color{white},  % choose the background color. You must add \usepackage{color}
+	showspaces=false,               % show spaces adding particular underscores
+	showstringspaces=false,         % underline spaces within strings
+	showtabs=false,                 % show tabs within strings adding particular underscores
+	frame=single,                   % adds a frame around the code
+	rulecolor=\color{black},        % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+	tabsize=2,                      % sets default tabsize to 2 spaces
+	captionpos=b,                   % sets the caption-position to bottom
+	breaklines=true,                % sets automatic line breaking
+	breakatwhitespace=false,        % sets if automatic breaks should only happen at whitespace
+	keywordstyle=\color{RoyalBlue},      % keyword style
+	commentstyle=\color{YellowGreen},   % comment style
+	stringstyle=\color{ForestGreen}      % string literal style
+} 
 
 \newcommand{\E}{\mathbb{E}}
 \newcommand{\Var}{\mathrm{Var}}
 \renewcommand{\vec}[1]{\mathbf{#1}}
 \newcommand{\Cov}{\mathrm{Cov}}
+
+
 \begin{document}
 	
 \title{Bayesian Data Analysis Assignment 1}
@@ -24,7 +57,7 @@
 \subsection*{a)}
 Our probability vector is $\theta = (\theta_1, \dots, \theta_6)$ and our outcome vector is $c = (c_1, \dots, c_6).$ We are drawing from a multinomial distribution (in the same way that 10 Bern(p) trials are the same as 1 Bin(10,p) trial distributionally), ie $$c \sim \mathrm{Multinomial}(120, \theta).$$ Therefore the likelihood of $\theta$ given $c$ with $n$ trials is the following: $$L(\theta|c) = \frac{n!}{c_1!c_2!\cdots c_6!}\theta_1^{c_1}\cdots\theta_6^{c_6}.$$ A suitable conjugate prior for this would be the Dirichlet distribution (K is the number of possible outcomes, in our case 6), $$f(x| \alpha, K) = \frac{\Gamma(\sum_{i=1}^{K}\alpha_i)}{\prod_{i=1}^{k}\Gamma(\alpha_i)}\prod_{i=1}^{K}x_i^{\alpha_i-1}.$$
 The Jeffrey's prior for the multinomial corresponds to a Dirichlet distribution with $$\alpha_i = 1/2\  \forall i\in \{1,\dots,K\}.$$
-
+The above results (conjugacy and Jeffreys prior) are given in \cite{mnpriors}.
 \subsection*{b)}
 Our posterior distribution for $\theta$ is 
 \begin{align*}
@@ -379,5 +412,29 @@ The 95\% credible interval for the age relating to the  new data is given in the
 	\caption{Posterior predictive density for new data}
 	\label{fig:ppnd}
 \end{figure}
+
+\printbibliography
+
+\appendix
+
+\section{R Code for Question 1}
+\lstinputlisting{../a1q1.R}
+\section{R Code for Question 2}
+\lstinputlisting{../a1q2.R}
+\section{Stan Code for Question 2}
+\subsection{Exponential Likelihood}
+\lstinputlisting[language = Stan]{../a1q2.stan}
+\subsection{Lindley Likelihood}
+\lstinputlisting[language = Stan]{../a1q2lindley.stan}
+\section{JAGS Code for Question 2}
+\lstinputlisting[language = JAGS]{../a1q2jags.jags}
+\section{R Code for Question 3}
+\lstinputlisting{../a1q3.R}
+\section{Stan Code for Question 3}
+\subsection{Linear Model with $t$ Errors}
+\lstinputlisting[language = Stan]{../a1q3.stan}
+\subsection{Linear Model with Normal Errors}
+\lstinputlisting[language = Stan]{../a1q3normal.stan}
+
 \end{document}
 
