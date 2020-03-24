@@ -16,15 +16,19 @@ transformed data{
 
 parameters {
   vector[P] lambda;
+  real<lower=0,upper=10> theta_hyp;
+  real theta;
 }
 
 transformed parameters{
-  vector[N] log_rate = X * lambda;
-  vector[N_new] log_rate_new = X_new * lambda;
+  vector[N] log_rate = X * lambda + theta;
+  vector[N_new] log_rate_new = X_new * lambda + theta;
   vector<lower=0>[N] rate = exp(log_rate);
 }
 
 model {
+  theta_hyp ~ uniform(0, 10);
+  theta ~ normal(0, theta_hyp);
   lambda ~ normal(n_params[1], n_params[2]);
   y ~ poisson_log(log_rate);
 }
