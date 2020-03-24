@@ -105,15 +105,22 @@ pd <- dbar + 2 * p_mean_like#calculate penalty
 dic <- pd + dbar#give dic
 #####
 #prior checking
-dp_av <- avalanches$Deaths/avalanches$Rep.events
-dp_av <- dp_av[!is.nan(dp_av)]
-m_deaths <- mean(dp_av)
-xm <- dp_av - m_deaths
-lnfactor <- 2/(xm)^2
-inffactor <- dp_av / m_deaths
-beta_p <- 
-mfc <- exp(xm * inffactor)
-mfc_p <- plnorm(mfc, 0, 2)
+# dp_av <- avalanches$Deaths/avalanches$Rep.events
+# dp_av <- dp_av[!is.nan(dp_av)]
+# m_deaths <- mean(dp_av)
+# xm <- dp_av - m_deaths
+# lnfactor <- 2/(xm)^2
+# inffactor <- dp_av / m_deaths
+# beta_p <- 
+# mfc <- exp(xm * inffactor)
+# mfc_p <- plnorm(mfc, 0, 2)
+avno <- avalanches$Rep.events
+avde <- avalanches$Deaths
+mede <- mean(avde)
+psi <- avde/mede
+beta <- log(psi)/(avno - mean(avno))
+psi_p <- dlnorm(psi, 0, 2)
+beta_p <- dnorm(beta, 0, (avno-mean(avno))^(-2))
 #####
 stan_poisson_glm_exvar <- stan_model(file = "stan/poisson_glm_exvar.stan")
 stan_poisson_glm_exvar_data <-
@@ -133,7 +140,7 @@ stan_poisson_glm_exvar_s <-
     stan_poisson_glm_exvar,
     data = stan_poisson_glm_exvar_data,
     chains = 7,
-    control = list(adapt_delta = 0.8),
+    control = list(adapt_delta = 0.9),
     iter = 3000,
     init_r = 0.1
   )
