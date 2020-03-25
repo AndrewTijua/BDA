@@ -118,8 +118,11 @@ stan_binomial_glm_reff_nsf_s <-
     #init_r = 0.1
   )
 
+c_data <- extract(stan_binomial_glm_reff_nsf_s, "data_prop")
+
+
 #####
-#hieratchical on station, sans snow fortnights
+#hierarchical on station, sans snow fortnights
 X_r_station <- model.matrix(death_prop ~ Rec.station - 1, data = avalanches_prop)
 
 stan_binomial_glm_reff_station_data <-
