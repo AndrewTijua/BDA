@@ -1,0 +1,18 @@
+model {
+  #hyperparameters
+  p_mu <- 0
+  p_tau <- 0.01
+  
+  #priors
+  beta_rep ~ dnorm(p_mu, p_tau)
+  beta_w1 ~ dnorm(p_mu, p_tau)
+  beta_w2 ~ dnorm(p_mu, p_tau)
+  theta_hyp ~ dunif(0, 10)
+  theta ~ dnorm(0, 1 / pow(theta_hyp, 2))
+  
+  #likelihood
+  for (i in 1:n) {
+    log(mu[i]) <- beta_rep * rep[i] + beta_w1 * w1[i] + beta_w2 * w2[i] + theta
+    death[i] ~ dpois(mu[i])
+  }
+}

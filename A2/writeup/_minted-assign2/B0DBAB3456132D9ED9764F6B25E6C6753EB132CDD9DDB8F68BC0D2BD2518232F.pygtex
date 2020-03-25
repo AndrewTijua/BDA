@@ -119,8 +119,11 @@
     \PYG{c+c1}{\PYGZsh{}init\PYGZus{}r = 0.1}
   \PYG{p}{)}
 
+\PYG{n}{c\PYGZus{}data} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{extract}\PYG{p}{(}\PYG{n}{stan\PYGZus{}binomial\PYGZus{}glm\PYGZus{}reff\PYGZus{}nsf\PYGZus{}s}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}data\PYGZus{}prop\PYGZdq{}}\PYG{p}{)}
+
+
 \PYG{c+c1}{\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}}
-\PYG{c+c1}{\PYGZsh{}hieratchical on station, sans snow fortnights}
+\PYG{c+c1}{\PYGZsh{}hierarchical on station, sans snow fortnights}
 \PYG{n}{X\PYGZus{}r\PYGZus{}station} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{model.matrix}\PYG{p}{(}\PYG{n}{death\PYGZus{}prop} \PYG{o}{\PYGZti{}} \PYG{n}{Rec.station} \PYG{o}{\PYGZhy{}} \PYG{l+m}{1}\PYG{p}{,} \PYG{n}{data} \PYG{o}{=} \PYG{n}{avalanches\PYGZus{}prop}\PYG{p}{)}
 
 \PYG{n}{stan\PYGZus{}binomial\PYGZus{}glm\PYGZus{}reff\PYGZus{}station\PYGZus{}data} \PYG{o}{\PYGZlt{}\PYGZhy{}}
