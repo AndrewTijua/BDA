@@ -123,15 +123,21 @@ psi_p <- dlnorm(psi, 0, 2)
 beta_p <- dnorm(beta, 0, (avno-mean(avno))^(-2))
 #####
 stan_poisson_glm_exvar <- stan_model(file = "stan/poisson_glm_exvar.stan")
+
+ym <- data.frame(ym = as.factor(avalanches$Season))
+yim <- model.matrix(~ . -1, ym)
+
 stan_poisson_glm_exvar_data <-
   list(
     N = nrow(model_mat),
     P = ncol(model_mat),
     y = avalanches$Deaths,
     X = model_mat,
-    n_params = c(0, 1e2),
+    n_params = c(0, sqrt(10)),
     N_new = N_new,
-    X_new = X_new
+    X_new = X_new,
+    yearindmat = yim,
+    N_years = ncol(yim)
   )
 
 
@@ -139,15 +145,18 @@ stan_poisson_glm_exvar_s <-
   sampling(
     stan_poisson_glm_exvar,
     data = stan_poisson_glm_exvar_data,
-    chains = 7,
-    control = list(adapt_delta = 0.9),
-    iter = 3000,
-    init_r = 0.1
+    chains = 4,
+    control = list(adapt_delta = 0.999),
+    iter = 8000,
+    init_r = 1
   )
 
 post_params_exvar <- extract(stan_poisson_glm_exvar_s, "lambda")[[1]]
 colnames(post_params_exvar) <- out_names
 apply(post_params_exvar, 2, summary)
+
+dpp <- extract(stan_poisson_glm_exvar_s, "data_ppred")[[1]]
+apply(dpp, 2, summary)
 #####
 plikrar <- function(x, data) {
   sum(dpois(data, x, log = T))

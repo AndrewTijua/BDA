@@ -1,0 +1,110 @@
+\documentclass[10pt]{extarticle}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{extsizes}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage[margin = 1in]{geometry}
+\usepackage{hyperref}
+\usepackage[english]{babel}
+\usepackage[backend=biber, style=numeric]{biblatex}
+\usepackage[skins, minted]{tcolorbox}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+
+\addbibresource{refs.bib}
+
+\usepackage{minted}
+\tcbset{listing engine=minted}
+\tcbuselibrary{breakable}
+\setminted{
+	fontsize = \tiny, 
+	breaklines,
+	linenos = 1,
+	numbersep = 2mm,
+	autogobble,
+	frame = none,
+	style = friendly
+}
+
+\definecolor{rblue}{HTML}{75AADB}
+\definecolor{stanred}{HTML}{B2001D}
+\newtcbinputlisting{\tcbr}[1]{
+	listing file = #1, 
+	listing only, 
+	minted language = R, 
+	title = \lstinline{#1}, 
+	minted options = 
+	{
+		fontsize = \scriptsize, 
+		breaklines,
+		linenos,
+		numbersep = 2mm,
+		frame = none,
+		style = friendly,
+		xleftmargin = 12pt
+	}, 
+	breakable,
+	boxrule = 1pt,
+	colback = white,
+	colframe = rblue
+}
+\newtcbinputlisting{\tcbstan}[1]{
+	listing file = #1, 
+	listing only, 
+	minted language = Stan, 
+	title = \lstinline{#1}, 
+	minted options = 
+	{
+		fontsize = \scriptsize, 
+		breaklines,
+		linenos,
+		numbersep = 2mm,
+		frame = none,
+		style = friendly,
+		xleftmargin = 12pt
+	}, 
+	breakable,
+	boxrule = 1pt,
+	colback = white,
+	colframe = stanred
+}
+\usepackage{lstbayes}
+%\usepackage[usenames,dvipsnames]{color}    
+
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Var}{\mathrm{Var}}
+\renewcommand{\vec}[1]{\mathbf{#1}}
+\newcommand{\Cov}{\mathrm{Cov}}
+
+
+\begin{document}
+	
+\title{Bayesian Data Analysis Assignment 2}
+\author{Benjamin Cox, S1621312}
+\date{\vspace{-5ex}}
+\maketitle
+
+\section*{Question 1}
+
+\printbibliography
+
+\appendix
+
+\section{Code for Question 1}
+\subsection{R}
+%\inputminted{R}{../Q1.R}
+\tcbr{../Q1.R}
+\label{code:main_1}
+\subsection{Stan}
+\tcbstan{../stan/poisson_glm.stan}
+\tcbstan{../stan/poisson_glm_exvar.stan}
+\label{code:stan_1}
+\section{R Code for Question 2}
+\tcbr{../Q2.R}
+\label{code:main_2}
+\tcbstan{../stan/binomial_glm.stan}
+\tcbstan{../stan/binomial_glm_randomeffects.stan}
+\end{document}
+

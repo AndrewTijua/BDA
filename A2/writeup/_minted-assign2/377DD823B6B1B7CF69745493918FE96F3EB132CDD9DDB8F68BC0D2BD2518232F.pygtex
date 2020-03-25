@@ -1,0 +1,174 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{n+nf}{library}\PYG{p}{(}\PYG{n}{data.table}\PYG{p}{)}
+\PYG{n+nf}{library}\PYG{p}{(}\PYG{n}{ggplot2}\PYG{p}{)}
+
+\PYG{n+nf}{library}\PYG{p}{(}\PYG{n}{rstan}\PYG{p}{)}
+\PYG{n+nf}{rstan\PYGZus{}options}\PYG{p}{(}\PYG{n}{auto\PYGZus{}write} \PYG{o}{=} \PYG{k+kc}{TRUE}\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{}options(mc.cores = parallel::detectCores())}
+\PYG{n+nf}{Sys.setenv}\PYG{p}{(}\PYG{n}{LOCAL\PYGZus{}CPPFLAGS} \PYG{o}{=} \PYG{l+s}{\PYGZsq{}\PYGZhy{}march=corei7 \PYGZhy{}mtune=corei7\PYGZsq{}}\PYG{p}{)}
+\PYG{n+nf}{options}\PYG{p}{(}\PYG{n}{mc.cores} \PYG{o}{=} \PYG{l+m}{1}\PYG{p}{)}
+\PYG{n+nf}{library}\PYG{p}{(}\PYG{n}{rstanarm}\PYG{p}{)}
+\PYG{n+nf}{library}\PYG{p}{(}\PYG{n}{coda}\PYG{p}{)}
+\PYG{n+nf}{library}\PYG{p}{(}\PYG{n}{bayesplot}\PYG{p}{)}
+
+
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}}
+\PYG{c+c1}{\PYGZsh{}a}
+\PYG{n}{avalanches} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{fread}\PYG{p}{(}\PYG{n}{file} \PYG{o}{=} \PYG{l+s}{\PYGZdq{}data/Avalanches.csv\PYGZdq{}}\PYG{p}{)}
+\PYG{n}{avalanches} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{avalanches[Rep.events} \PYG{o}{\PYGZgt{}} \PYG{l+m}{0}\PYG{n}{]}
+\PYG{n}{avalanches[}\PYG{p}{,} \PYG{l+s}{\PYGZsq{}:=\PYGZsq{}} \PYG{p}{(}\PYG{n}{EADS1} \PYG{o}{=} \PYG{p}{(}\PYG{n}{Season} \PYG{o}{\PYGZgt{}=} \PYG{l+m}{1994} \PYG{o}{\PYGZam{}}
+                              \PYG{n}{Season} \PYG{o}{\PYGZlt{}=} \PYG{l+m}{2003}\PYG{p}{),}
+                   \PYG{n}{EADS2} \PYG{o}{=} \PYG{p}{(}\PYG{n}{Season} \PYG{o}{\PYGZgt{}=} \PYG{l+m}{2004}\PYG{p}{))}\PYG{n}{]}
+
+\PYG{n}{avalanches[Season} \PYG{o}{\PYGZpc{}in\PYGZpc{}} \PYG{n+nf}{c}\PYG{p}{(}\PYG{l+m}{1986}\PYG{p}{,} \PYG{l+m}{1994}\PYG{p}{,} \PYG{l+m}{2004}\PYG{p}{)}\PYG{n}{]}
+
+\PYG{n}{avalanches[}\PYG{p}{,} \PYG{n}{EWS} \PYG{o}{:=} \PYG{l+m}{1} \PYG{o}{+} \PYG{n}{EADS1} \PYG{o}{+} \PYG{l+m}{2} \PYG{o}{*} \PYG{n}{EADS2]}
+\PYG{n}{avalanches[}\PYG{p}{,} \PYG{n}{EWS} \PYG{o}{:=} \PYG{n+nf}{as.factor}\PYG{p}{(}\PYG{n}{EWS}\PYG{p}{)}\PYG{n}{]}
+
+\PYG{n}{base\PYGZus{}plot} \PYG{o}{\PYGZlt{}\PYGZhy{}}
+  \PYG{n+nf}{ggplot}\PYG{p}{(}\PYG{n}{data} \PYG{o}{=} \PYG{n+nf}{as.data.frame}\PYG{p}{(}\PYG{n}{avalanches}\PYG{p}{),} \PYG{n+nf}{aes}\PYG{p}{(}\PYG{n}{colour} \PYG{o}{=} \PYG{n}{EWS}\PYG{p}{))} \PYG{o}{+} \PYG{n+nf}{theme\PYGZus{}minimal}\PYG{p}{()}
+\PYG{n}{base\PYGZus{}plot} \PYG{o}{+} \PYG{n+nf}{geom\PYGZus{}line}\PYG{p}{(}\PYG{n+nf}{aes}\PYG{p}{(}\PYG{n}{x} \PYG{o}{=} \PYG{n}{Season}\PYG{p}{,} \PYG{n}{y} \PYG{o}{=} \PYG{n}{Rep.events}\PYG{p}{))}
+\PYG{n}{base\PYGZus{}plot} \PYG{o}{+} \PYG{n+nf}{geom\PYGZus{}line}\PYG{p}{(}\PYG{n+nf}{aes}\PYG{p}{(}\PYG{n}{x} \PYG{o}{=} \PYG{n}{Season}\PYG{p}{,} \PYG{n}{y} \PYG{o}{=} \PYG{n}{Deaths}\PYG{p}{))}
+\PYG{n}{base\PYGZus{}plot} \PYG{o}{+} \PYG{n+nf}{geom\PYGZus{}boxplot}\PYG{p}{(}\PYG{n+nf}{aes}\PYG{p}{(}\PYG{n}{x} \PYG{o}{=} \PYG{n}{EWS}\PYG{p}{,} \PYG{n}{y} \PYG{o}{=} \PYG{n}{Deaths}\PYG{p}{),} \PYG{n}{colour} \PYG{o}{=} \PYG{l+s}{\PYGZdq{}black\PYGZdq{}}\PYG{p}{)}
+
+\PYG{n+nf}{cor}\PYG{p}{(}\PYG{n}{avalanches}\PYG{n+nf}{[}\PYG{p}{(}\PYG{n}{EADS1} \PYG{o}{==} \PYG{k+kc}{FALSE} \PYG{o}{\PYGZam{}}
+                  \PYG{n}{EADS2} \PYG{o}{==} \PYG{k+kc}{FALSE}\PYG{p}{),} \PYG{n}{.(Rep.events}\PYG{p}{,} \PYG{n}{Deaths}\PYG{p}{)}\PYG{n}{]}\PYG{p}{)}
+\PYG{n+nf}{cor}\PYG{p}{(}\PYG{n}{avalanches[EADS1} \PYG{o}{==} \PYG{k+kc}{TRUE}\PYG{p}{,} \PYG{n}{.(Rep.events}\PYG{p}{,} \PYG{n}{Deaths}\PYG{p}{)}\PYG{n}{]}\PYG{p}{)}
+\PYG{n+nf}{cor}\PYG{p}{(}\PYG{n}{avalanches[EADS2} \PYG{o}{==} \PYG{k+kc}{TRUE}\PYG{p}{,} \PYG{n}{.(Rep.events}\PYG{p}{,} \PYG{n}{Deaths}\PYG{p}{)}\PYG{n}{]}\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}}
+\PYG{c+c1}{\PYGZsh{}b}
+\PYG{n}{to\PYGZus{}model} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{avalanches[}\PYG{p}{,} \PYG{n}{.(Deaths}\PYG{p}{,} \PYG{n}{Rep.events}\PYG{p}{,} \PYG{n}{EADS1}\PYG{p}{,} \PYG{n}{EADS2}\PYG{p}{)}\PYG{n}{]}
+\PYG{n}{model\PYGZus{}mat} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{model.matrix}\PYG{p}{(}\PYG{n}{Deaths} \PYG{o}{\PYGZti{}} \PYG{n}{.,} \PYG{n}{data} \PYG{o}{=} \PYG{n}{to\PYGZus{}model}\PYG{p}{)}\PYG{c+c1}{\PYGZsh{}no intercept as cannot have deaths without avalanche}
+
+\PYG{n}{model\PYGZus{}mat} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{model\PYGZus{}mat[}\PYG{p}{,}\PYG{l+m}{\PYGZhy{}1}\PYG{n}{]}
+\PYG{n}{out\PYGZus{}names} \PYG{o}{=} \PYG{n+nf}{colnames}\PYG{p}{(}\PYG{n}{model\PYGZus{}mat}\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{}no need to centre as discrete}
+
+\PYG{c+c1}{\PYGZsh{}new data}
+\PYG{c+c1}{\PYGZsh{} X\PYGZus{}new = matrix(c(1, 20, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 1),}
+\PYG{c+c1}{\PYGZsh{}                nrow = 4,}
+\PYG{c+c1}{\PYGZsh{}                byrow = T)}
+\PYG{n}{X\PYGZus{}new} \PYG{o}{=} \PYG{n+nf}{matrix}\PYG{p}{(}\PYG{n+nf}{c}\PYG{p}{(}\PYG{l+m}{20}\PYG{p}{,} \PYG{l+m}{0}\PYG{p}{,} \PYG{l+m}{1}\PYG{p}{,} \PYG{l+m}{1}\PYG{p}{,} \PYG{l+m}{0}\PYG{p}{,} \PYG{l+m}{0}\PYG{p}{,} \PYG{l+m}{1}\PYG{p}{,} \PYG{l+m}{1}\PYG{p}{,} \PYG{l+m}{0}\PYG{p}{,} \PYG{l+m}{1}\PYG{p}{,} \PYG{l+m}{0}\PYG{p}{,} \PYG{l+m}{1}\PYG{p}{),}
+               \PYG{n}{nrow} \PYG{o}{=} \PYG{l+m}{4}\PYG{p}{,}
+               \PYG{n}{byrow} \PYG{o}{=} \PYG{n+nb+bp}{T}\PYG{p}{)}
+\PYG{n}{N\PYGZus{}new} \PYG{o}{=} \PYG{n+nf}{nrow}\PYG{p}{(}\PYG{n}{X\PYGZus{}new}\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{}check, should be similar}
+\PYG{n}{f\PYGZus{}glm} \PYG{o}{\PYGZlt{}\PYGZhy{}}
+  \PYG{n+nf}{glm}\PYG{p}{(}\PYG{n}{Deaths} \PYG{o}{\PYGZti{}} \PYG{n}{.,} \PYG{n}{data} \PYG{o}{=} \PYG{n}{to\PYGZus{}model}\PYG{p}{,} \PYG{n}{family} \PYG{o}{=} \PYG{n+nf}{poisson}\PYG{p}{(}\PYG{n}{link} \PYG{o}{=} \PYG{l+s}{\PYGZdq{}log\PYGZdq{}}\PYG{p}{))}
+
+
+\PYG{n}{stan\PYGZus{}poisson\PYGZus{}glm} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{stan\PYGZus{}model}\PYG{p}{(}\PYG{n}{file} \PYG{o}{=} \PYG{l+s}{\PYGZdq{}stan/poisson\PYGZus{}glm.stan\PYGZdq{}}\PYG{p}{)}
+\PYG{n}{stan\PYGZus{}poisson\PYGZus{}glm\PYGZus{}data} \PYG{o}{\PYGZlt{}\PYGZhy{}}
+  \PYG{n+nf}{list}\PYG{p}{(}
+    \PYG{n}{N} \PYG{o}{=} \PYG{n+nf}{nrow}\PYG{p}{(}\PYG{n}{model\PYGZus{}mat}\PYG{p}{),}
+    \PYG{n}{P} \PYG{o}{=} \PYG{n+nf}{ncol}\PYG{p}{(}\PYG{n}{model\PYGZus{}mat}\PYG{p}{),}
+    \PYG{n}{y} \PYG{o}{=} \PYG{n}{avalanches}\PYG{o}{\PYGZdl{}}\PYG{n}{Deaths}\PYG{p}{,}
+    \PYG{n}{X} \PYG{o}{=} \PYG{n}{model\PYGZus{}mat}\PYG{p}{,}
+    \PYG{n}{n\PYGZus{}params} \PYG{o}{=} \PYG{n+nf}{c}\PYG{p}{(}\PYG{l+m}{0}\PYG{p}{,} \PYG{l+m}{1e2}\PYG{p}{),}
+    \PYG{n}{N\PYGZus{}new} \PYG{o}{=} \PYG{n}{N\PYGZus{}new}\PYG{p}{,}
+    \PYG{n}{X\PYGZus{}new} \PYG{o}{=} \PYG{n}{X\PYGZus{}new}
+  \PYG{p}{)}
+
+
+\PYG{n}{stan\PYGZus{}poisson\PYGZus{}glm\PYGZus{}s} \PYG{o}{\PYGZlt{}\PYGZhy{}}
+  \PYG{n+nf}{sampling}\PYG{p}{(}
+    \PYG{n}{stan\PYGZus{}poisson\PYGZus{}glm}\PYG{p}{,}
+    \PYG{n}{data} \PYG{o}{=} \PYG{n}{stan\PYGZus{}poisson\PYGZus{}glm\PYGZus{}data}\PYG{p}{,}
+    \PYG{n}{chains} \PYG{o}{=} \PYG{l+m}{7}\PYG{p}{,}
+    \PYG{n}{control} \PYG{o}{=} \PYG{n+nf}{list}\PYG{p}{(}\PYG{n}{adapt\PYGZus{}delta} \PYG{o}{=} \PYG{l+m}{0.9}\PYG{p}{),}
+    \PYG{n}{iter} \PYG{o}{=} \PYG{l+m}{3000}\PYG{p}{,}
+    \PYG{n}{init\PYGZus{}r} \PYG{o}{=} \PYG{l+m}{0.1}
+  \PYG{p}{)}
+
+\PYG{n}{post\PYGZus{}params} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{extract}\PYG{p}{(}\PYG{n}{stan\PYGZus{}poisson\PYGZus{}glm\PYGZus{}s}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}lambda\PYGZdq{}}\PYG{p}{)}\PYG{n}{[[1]]}
+\PYG{n+nf}{colnames}\PYG{p}{(}\PYG{n}{post\PYGZus{}params}\PYG{p}{)} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{out\PYGZus{}names}
+\PYG{n+nf}{apply}\PYG{p}{(}\PYG{n}{post\PYGZus{}params}\PYG{p}{,} \PYG{l+m}{2}\PYG{p}{,} \PYG{n}{summary}\PYG{p}{)}
+
+\PYG{n}{p\PYGZus{}pred} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{extract}\PYG{p}{(}\PYG{n}{stan\PYGZus{}poisson\PYGZus{}glm\PYGZus{}s}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}y\PYGZus{}new\PYGZdq{}}\PYG{p}{)}\PYG{n}{[[1]]}
+\PYG{n+nf}{mean}\PYG{p}{(}\PYG{n}{p\PYGZus{}pred[}\PYG{p}{,} \PYG{l+m}{1}\PYG{n}{]} \PYG{o}{\PYGZlt{}} \PYG{l+m}{15}\PYG{p}{)}
+\PYG{n+nf}{mean}\PYG{p}{(}\PYG{n}{p\PYGZus{}pred[}\PYG{p}{,} \PYG{l+m}{2}\PYG{n}{]} \PYG{o}{\PYGZgt{}} \PYG{l+m}{1}\PYG{p}{)}
+\PYG{n+nf}{mean}\PYG{p}{(}\PYG{n}{p\PYGZus{}pred[}\PYG{p}{,} \PYG{l+m}{3}\PYG{n}{]} \PYG{o}{\PYGZgt{}} \PYG{l+m}{1}\PYG{p}{)}
+\PYG{n+nf}{mean}\PYG{p}{(}\PYG{n}{p\PYGZus{}pred[}\PYG{p}{,} \PYG{l+m}{4}\PYG{n}{]} \PYG{o}{\PYGZgt{}} \PYG{l+m}{1}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}}
+\PYG{c+c1}{\PYGZsh{}dic is bad}
+\PYG{c+c1}{\PYGZsh{}formulae taken from https://en.wikipedia.org/wiki/Deviance\PYGZus{}information\PYGZus{}criterion}
+\PYG{n}{plikrar} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{function}\PYG{p}{(}\PYG{n}{x}\PYG{p}{,} \PYG{n}{data}\PYG{p}{)} \PYG{p}{\PYGZob{}}
+  \PYG{n+nf}{sum}\PYG{p}{(}\PYG{n+nf}{dpois}\PYG{p}{(}\PYG{n}{data}\PYG{p}{,} \PYG{n}{x}\PYG{p}{,} \PYG{n}{log} \PYG{o}{=} \PYG{n+nb+bp}{T}\PYG{p}{))}
+\PYG{p}{\PYGZcb{}}
+\PYG{n}{sampling\PYGZus{}rates} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{extract}\PYG{p}{(}\PYG{n}{stan\PYGZus{}poisson\PYGZus{}glm\PYGZus{}s}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}rate\PYGZdq{}}\PYG{p}{)}\PYG{n}{[[1]]}
+\PYG{n}{sr\PYGZus{}like} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n}{sampling\PYGZus{}rates}\PYG{p}{,} \PYG{l+m}{1}\PYG{p}{,} \PYG{n}{plikrar}\PYG{p}{,} \PYG{n}{avalanches}\PYG{o}{\PYGZdl{}}\PYG{n}{Deaths}\PYG{p}{)}\PYG{c+c1}{\PYGZsh{}calculate log likelihoods of each sampling}
+\PYG{n}{sr\PYGZus{}like\PYGZus{}mean} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{mean}\PYG{p}{(}\PYG{n}{sr\PYGZus{}like}\PYG{p}{)}\PYG{c+c1}{\PYGZsh{}calculate mean log likelihood of samples}
+\PYG{n}{eap} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{colMeans}\PYG{p}{(}\PYG{n}{sampling\PYGZus{}rates}\PYG{p}{)}\PYG{c+c1}{\PYGZsh{}calculate posterior means of rates (not parameters)}
+\PYG{n}{p\PYGZus{}mean\PYGZus{}like} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{sum}\PYG{p}{(}\PYG{n+nf}{dpois}\PYG{p}{(}\PYG{n}{avalanches}\PYG{o}{\PYGZdl{}}\PYG{n}{Deaths}\PYG{p}{,} \PYG{n}{eap}\PYG{p}{,} \PYG{n}{log} \PYG{o}{=} \PYG{n+nb+bp}{T}\PYG{p}{))}\PYG{c+c1}{\PYGZsh{}calculate log likelihood of EAP}
+\PYG{n}{dbar} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{l+m}{\PYGZhy{}2} \PYG{o}{*} \PYG{n}{sr\PYGZus{}like\PYGZus{}mean}\PYG{c+c1}{\PYGZsh{}expected deviance}
+\PYG{n}{pd} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{dbar} \PYG{o}{+} \PYG{l+m}{2} \PYG{o}{*} \PYG{n}{p\PYGZus{}mean\PYGZus{}like}\PYG{c+c1}{\PYGZsh{}calculate penalty}
+\PYG{n}{dic} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{pd} \PYG{o}{+} \PYG{n}{dbar}\PYG{c+c1}{\PYGZsh{}give dic}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}}
+\PYG{c+c1}{\PYGZsh{}prior checking}
+\PYG{c+c1}{\PYGZsh{} dp\PYGZus{}av \PYGZlt{}\PYGZhy{} avalanches\PYGZdl{}Deaths/avalanches\PYGZdl{}Rep.events}
+\PYG{c+c1}{\PYGZsh{} dp\PYGZus{}av \PYGZlt{}\PYGZhy{} dp\PYGZus{}av[!is.nan(dp\PYGZus{}av)]}
+\PYG{c+c1}{\PYGZsh{} m\PYGZus{}deaths \PYGZlt{}\PYGZhy{} mean(dp\PYGZus{}av)}
+\PYG{c+c1}{\PYGZsh{} xm \PYGZlt{}\PYGZhy{} dp\PYGZus{}av \PYGZhy{} m\PYGZus{}deaths}
+\PYG{c+c1}{\PYGZsh{} lnfactor \PYGZlt{}\PYGZhy{} 2/(xm)\PYGZca{}2}
+\PYG{c+c1}{\PYGZsh{} inffactor \PYGZlt{}\PYGZhy{} dp\PYGZus{}av / m\PYGZus{}deaths}
+\PYG{c+c1}{\PYGZsh{} beta\PYGZus{}p \PYGZlt{}\PYGZhy{} }
+\PYG{c+c1}{\PYGZsh{} mfc \PYGZlt{}\PYGZhy{} exp(xm * inffactor)}
+\PYG{c+c1}{\PYGZsh{} mfc\PYGZus{}p \PYGZlt{}\PYGZhy{} plnorm(mfc, 0, 2)}
+\PYG{n}{avno} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{avalanches}\PYG{o}{\PYGZdl{}}\PYG{n}{Rep.events}
+\PYG{n}{avde} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{avalanches}\PYG{o}{\PYGZdl{}}\PYG{n}{Deaths}
+\PYG{n}{mede} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{mean}\PYG{p}{(}\PYG{n}{avde}\PYG{p}{)}
+\PYG{n}{psi} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{avde}\PYG{o}{/}\PYG{n}{mede}
+\PYG{n}{beta} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{log}\PYG{p}{(}\PYG{n}{psi}\PYG{p}{)}\PYG{o}{/}\PYG{p}{(}\PYG{n}{avno} \PYG{o}{\PYGZhy{}} \PYG{n+nf}{mean}\PYG{p}{(}\PYG{n}{avno}\PYG{p}{))}
+\PYG{n}{psi\PYGZus{}p} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{dlnorm}\PYG{p}{(}\PYG{n}{psi}\PYG{p}{,} \PYG{l+m}{0}\PYG{p}{,} \PYG{l+m}{2}\PYG{p}{)}
+\PYG{n}{beta\PYGZus{}p} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{dnorm}\PYG{p}{(}\PYG{n}{beta}\PYG{p}{,} \PYG{l+m}{0}\PYG{p}{,} \PYG{p}{(}\PYG{n}{avno}\PYG{o}{\PYGZhy{}}\PYG{n+nf}{mean}\PYG{p}{(}\PYG{n}{avno}\PYG{p}{))}\PYG{n+nf}{\PYGZca{}}\PYG{p}{(}\PYG{l+m}{\PYGZhy{}2}\PYG{p}{))}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}}
+\PYG{n}{stan\PYGZus{}poisson\PYGZus{}glm\PYGZus{}exvar} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{stan\PYGZus{}model}\PYG{p}{(}\PYG{n}{file} \PYG{o}{=} \PYG{l+s}{\PYGZdq{}stan/poisson\PYGZus{}glm\PYGZus{}exvar.stan\PYGZdq{}}\PYG{p}{)}
+
+\PYG{n}{ym} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{data.frame}\PYG{p}{(}\PYG{n}{ym} \PYG{o}{=} \PYG{n+nf}{as.factor}\PYG{p}{(}\PYG{n}{avalanches}\PYG{o}{\PYGZdl{}}\PYG{n}{Season}\PYG{p}{))}
+\PYG{n}{yim} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{model.matrix}\PYG{p}{(}\PYG{o}{\PYGZti{}} \PYG{n}{. }\PYG{l+m}{\PYGZhy{}1}\PYG{p}{,} \PYG{n}{ym}\PYG{p}{)}
+
+\PYG{n}{stan\PYGZus{}poisson\PYGZus{}glm\PYGZus{}exvar\PYGZus{}data} \PYG{o}{\PYGZlt{}\PYGZhy{}}
+  \PYG{n+nf}{list}\PYG{p}{(}
+    \PYG{n}{N} \PYG{o}{=} \PYG{n+nf}{nrow}\PYG{p}{(}\PYG{n}{model\PYGZus{}mat}\PYG{p}{),}
+    \PYG{n}{P} \PYG{o}{=} \PYG{n+nf}{ncol}\PYG{p}{(}\PYG{n}{model\PYGZus{}mat}\PYG{p}{),}
+    \PYG{n}{y} \PYG{o}{=} \PYG{n}{avalanches}\PYG{o}{\PYGZdl{}}\PYG{n}{Deaths}\PYG{p}{,}
+    \PYG{n}{X} \PYG{o}{=} \PYG{n}{model\PYGZus{}mat}\PYG{p}{,}
+    \PYG{n}{n\PYGZus{}params} \PYG{o}{=} \PYG{n+nf}{c}\PYG{p}{(}\PYG{l+m}{0}\PYG{p}{,} \PYG{n+nf}{sqrt}\PYG{p}{(}\PYG{l+m}{10}\PYG{p}{)),}
+    \PYG{n}{N\PYGZus{}new} \PYG{o}{=} \PYG{n}{N\PYGZus{}new}\PYG{p}{,}
+    \PYG{n}{X\PYGZus{}new} \PYG{o}{=} \PYG{n}{X\PYGZus{}new}\PYG{p}{,}
+    \PYG{n}{yearindmat} \PYG{o}{=} \PYG{n}{yim}\PYG{p}{,}
+    \PYG{n}{N\PYGZus{}years} \PYG{o}{=} \PYG{n+nf}{ncol}\PYG{p}{(}\PYG{n}{yim}\PYG{p}{)}
+  \PYG{p}{)}
+
+
+\PYG{n}{stan\PYGZus{}poisson\PYGZus{}glm\PYGZus{}exvar\PYGZus{}s} \PYG{o}{\PYGZlt{}\PYGZhy{}}
+  \PYG{n+nf}{sampling}\PYG{p}{(}
+    \PYG{n}{stan\PYGZus{}poisson\PYGZus{}glm\PYGZus{}exvar}\PYG{p}{,}
+    \PYG{n}{data} \PYG{o}{=} \PYG{n}{stan\PYGZus{}poisson\PYGZus{}glm\PYGZus{}exvar\PYGZus{}data}\PYG{p}{,}
+    \PYG{n}{chains} \PYG{o}{=} \PYG{l+m}{4}\PYG{p}{,}
+    \PYG{n}{control} \PYG{o}{=} \PYG{n+nf}{list}\PYG{p}{(}\PYG{n}{adapt\PYGZus{}delta} \PYG{o}{=} \PYG{l+m}{0.999}\PYG{p}{),}
+    \PYG{n}{iter} \PYG{o}{=} \PYG{l+m}{8000}\PYG{p}{,}
+    \PYG{n}{init\PYGZus{}r} \PYG{o}{=} \PYG{l+m}{1}
+  \PYG{p}{)}
+
+\PYG{n}{post\PYGZus{}params\PYGZus{}exvar} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{extract}\PYG{p}{(}\PYG{n}{stan\PYGZus{}poisson\PYGZus{}glm\PYGZus{}exvar\PYGZus{}s}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}lambda\PYGZdq{}}\PYG{p}{)}\PYG{n}{[[1]]}
+\PYG{n+nf}{colnames}\PYG{p}{(}\PYG{n}{post\PYGZus{}params\PYGZus{}exvar}\PYG{p}{)} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{out\PYGZus{}names}
+\PYG{n+nf}{apply}\PYG{p}{(}\PYG{n}{post\PYGZus{}params\PYGZus{}exvar}\PYG{p}{,} \PYG{l+m}{2}\PYG{p}{,} \PYG{n}{summary}\PYG{p}{)}
+
+\PYG{n}{dpp} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{extract}\PYG{p}{(}\PYG{n}{stan\PYGZus{}poisson\PYGZus{}glm\PYGZus{}exvar\PYGZus{}s}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}data\PYGZus{}ppred\PYGZdq{}}\PYG{p}{)}\PYG{n}{[[1]]}
+\PYG{n+nf}{apply}\PYG{p}{(}\PYG{n}{dpp}\PYG{p}{,} \PYG{l+m}{2}\PYG{p}{,} \PYG{n}{summary}\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}}
+\PYG{n}{plikrar} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{function}\PYG{p}{(}\PYG{n}{x}\PYG{p}{,} \PYG{n}{data}\PYG{p}{)} \PYG{p}{\PYGZob{}}
+  \PYG{n+nf}{sum}\PYG{p}{(}\PYG{n+nf}{dpois}\PYG{p}{(}\PYG{n}{data}\PYG{p}{,} \PYG{n}{x}\PYG{p}{,} \PYG{n}{log} \PYG{o}{=} \PYG{n+nb+bp}{T}\PYG{p}{))}
+\PYG{p}{\PYGZcb{}}
+\PYG{n}{sampling\PYGZus{}rates\PYGZus{}exv} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{extract}\PYG{p}{(}\PYG{n}{stan\PYGZus{}poisson\PYGZus{}glm\PYGZus{}exvar\PYGZus{}s}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}rate\PYGZdq{}}\PYG{p}{)}\PYG{n}{[[1]]}
+\PYG{n}{sr\PYGZus{}like\PYGZus{}exv} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n}{sampling\PYGZus{}rates\PYGZus{}exv}\PYG{p}{,} \PYG{l+m}{1}\PYG{p}{,} \PYG{n}{plikrar}\PYG{p}{,} \PYG{n}{avalanches}\PYG{o}{\PYGZdl{}}\PYG{n}{Deaths}\PYG{p}{)}\PYG{c+c1}{\PYGZsh{}calculate log likelihoods of each sampling}
+\PYG{n}{sr\PYGZus{}like\PYGZus{}mean\PYGZus{}exv} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{mean}\PYG{p}{(}\PYG{n}{sr\PYGZus{}like\PYGZus{}exv}\PYG{p}{)}\PYG{c+c1}{\PYGZsh{}calculate mean log likelihood of samples}
+\PYG{n}{eap\PYGZus{}exv} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{colMeans}\PYG{p}{(}\PYG{n}{sampling\PYGZus{}rates\PYGZus{}exv}\PYG{p}{)}\PYG{c+c1}{\PYGZsh{}calculate posterior means of rates (not parameters)}
+\PYG{n}{p\PYGZus{}mean\PYGZus{}like\PYGZus{}exv} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{sum}\PYG{p}{(}\PYG{n+nf}{dpois}\PYG{p}{(}\PYG{n}{avalanches}\PYG{o}{\PYGZdl{}}\PYG{n}{Deaths}\PYG{p}{,} \PYG{n}{eap\PYGZus{}exv}\PYG{p}{,} \PYG{n}{log} \PYG{o}{=} \PYG{n+nb+bp}{T}\PYG{p}{))}\PYG{c+c1}{\PYGZsh{}calculate log likelihood of EAP}
+\PYG{n}{dbar\PYGZus{}exv} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{l+m}{\PYGZhy{}2} \PYG{o}{*} \PYG{n}{sr\PYGZus{}like\PYGZus{}mean\PYGZus{}exv}\PYG{c+c1}{\PYGZsh{}expected deviance}
+\PYG{n}{pd\PYGZus{}exv} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{dbar\PYGZus{}exv} \PYG{o}{+} \PYG{l+m}{2} \PYG{o}{*} \PYG{n}{p\PYGZus{}mean\PYGZus{}like\PYGZus{}exv}\PYG{c+c1}{\PYGZsh{}calculate penalty}
+\PYG{n}{dic\PYGZus{}exv} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{pd\PYGZus{}exv} \PYG{o}{+} \PYG{n}{dbar\PYGZus{}exv}\PYG{c+c1}{\PYGZsh{}give dic}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}}
+\end{Verbatim}

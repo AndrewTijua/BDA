@@ -25,7 +25,7 @@ transformed parameters{
 
 model {
   reff_sdv ~ uniform(0, 10);
-  sn_vec ~ std_normal();
+  sn_vec ~ std_normal(); //hence beta_r ~ normal(0, reff_sdv)
   beta_f ~ normal(n_params[1], n_params[2]);
   success ~ binomial(trials, inv_logit(lg_p));
 }

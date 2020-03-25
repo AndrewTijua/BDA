@@ -1,0 +1,147 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{n+nf}{library}\PYG{p}{(}\PYG{n}{data.table}\PYG{p}{)}
+\PYG{n+nf}{library}\PYG{p}{(}\PYG{n}{ggplot2}\PYG{p}{)}
+\PYG{n+nf}{library}\PYG{p}{(}\PYG{n}{dplyr}\PYG{p}{)}
+
+\PYG{n+nf}{library}\PYG{p}{(}\PYG{n}{rstan}\PYG{p}{)}
+\PYG{n+nf}{rstan\PYGZus{}options}\PYG{p}{(}\PYG{n}{auto\PYGZus{}write} \PYG{o}{=} \PYG{k+kc}{TRUE}\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{}options(mc.cores = parallel::detectCores())}
+\PYG{n+nf}{Sys.setenv}\PYG{p}{(}\PYG{n}{LOCAL\PYGZus{}CPPFLAGS} \PYG{o}{=} \PYG{l+s}{\PYGZsq{}\PYGZhy{}march=corei7 \PYGZhy{}mtune=corei7\PYGZsq{}}\PYG{p}{)}
+\PYG{n+nf}{options}\PYG{p}{(}\PYG{n}{mc.cores} \PYG{o}{=} \PYG{l+m}{1}\PYG{p}{)}
+\PYG{n+nf}{library}\PYG{p}{(}\PYG{n}{rstanarm}\PYG{p}{)}
+\PYG{n+nf}{library}\PYG{p}{(}\PYG{n}{coda}\PYG{p}{)}
+\PYG{n+nf}{library}\PYG{p}{(}\PYG{n}{bayesplot}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}}
+\PYG{c+c1}{\PYGZsh{}loading and eda}
+\PYG{n}{avalanches\PYGZus{}prop} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{fread}\PYG{p}{(}\PYG{n}{file} \PYG{o}{=} \PYG{l+s}{\PYGZdq{}data/Avalanches\PYGZus{}part2.csv\PYGZdq{}}\PYG{p}{)}
+\PYG{n}{avalanches\PYGZus{}prop[}\PYG{p}{,} \PYG{n}{Event\PYGZus{}ID} \PYG{o}{:=} \PYG{k+kc}{NULL}\PYG{n}{]}
+\PYG{n}{avalanches\PYGZus{}prop[}\PYG{p}{,} \PYG{n}{Snow\PYGZus{}meters} \PYG{o}{:=} \PYG{n}{Snow\PYGZus{}total} \PYG{o}{/} \PYG{l+m}{100}\PYG{n}{]}
+\PYG{n}{avalanches\PYGZus{}prop[}\PYG{p}{,} \PYG{n}{Snow\PYGZus{}fnights} \PYG{o}{:=} \PYG{n}{Snow\PYGZus{}days} \PYG{o}{/} \PYG{l+m}{14}\PYG{n}{]}
+\PYG{n}{avalanches\PYGZus{}prop[}\PYG{p}{,} \PYG{n}{death\PYGZus{}prop} \PYG{o}{:=} \PYG{n}{Deaths} \PYG{o}{/} \PYG{n}{Hit]}
+\PYG{n}{avalanches\PYGZus{}prop[}\PYG{p}{,} \PYG{n}{Geo\PYGZus{}space} \PYG{o}{:=} \PYG{n+nf}{as.factor}\PYG{p}{(}\PYG{n}{Geo\PYGZus{}space}\PYG{p}{)}\PYG{n}{]}
+\PYG{n}{avalanches\PYGZus{}prop[}\PYG{p}{,} \PYG{n}{Rec.station} \PYG{o}{:=} \PYG{n+nf}{as.factor}\PYG{p}{(}\PYG{n}{Rec.station}\PYG{p}{)}\PYG{n}{]}
+\PYG{n+nf}{cor}\PYG{p}{(}\PYG{n}{avalanches\PYGZus{}prop[}\PYG{p}{,} \PYG{n}{.(Season}\PYG{p}{,} \PYG{n}{Snow\PYGZus{}meters}\PYG{p}{,} \PYG{n}{Snow\PYGZus{}fnights}\PYG{p}{)}\PYG{n}{]}\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}}
+\PYG{n}{stan\PYGZus{}binomial\PYGZus{}glm\PYGZus{}reff} \PYG{o}{\PYGZlt{}\PYGZhy{}}
+  \PYG{n+nf}{stan\PYGZus{}model}\PYG{p}{(}\PYG{n}{file} \PYG{o}{=} \PYG{l+s}{\PYGZdq{}stan/binomial\PYGZus{}glm\PYGZus{}randomeffects.stan\PYGZdq{}}\PYG{p}{)}
+
+\PYG{n}{submin} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{function}\PYG{p}{(}\PYG{n}{x}\PYG{p}{)\PYGZob{}}
+  \PYG{n}{m} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{min}\PYG{p}{(}\PYG{n}{x}\PYG{p}{)}
+  \PYG{n}{x} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{x} \PYG{o}{\PYGZhy{}} \PYG{n}{m}
+  \PYG{n+nf}{attributes}\PYG{p}{(}\PYG{n}{x}\PYG{p}{)} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{list}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}scaled:submin\PYGZdq{}} \PYG{o}{=} \PYG{n}{m}\PYG{p}{)}
+  \PYG{n+nf}{return}\PYG{p}{(}\PYG{n}{x}\PYG{p}{)}
+\PYG{p}{\PYGZcb{}}
+
+\PYG{n}{cont\PYGZus{}vars} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{c}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}Snow\PYGZus{}meters\PYGZdq{}}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}Snow\PYGZus{}fnights\PYGZdq{}}\PYG{p}{)}\PYG{c+c1}{\PYGZsh{}variables to centre}
+\PYG{n}{avalanches\PYGZus{}prop[}\PYG{p}{,(}\PYG{n}{cont\PYGZus{}vars}\PYG{p}{)} \PYG{o}{:=} \PYG{n+nf}{lapply}\PYG{p}{(}\PYG{n}{.SD}\PYG{p}{,} \PYG{n}{scale}\PYG{p}{,} \PYG{n}{scale} \PYG{o}{=} \PYG{k+kc}{FALSE}\PYG{p}{),} \PYG{n}{.SDcols} \PYG{o}{=} \PYG{n}{cont\PYGZus{}vars]}\PYG{c+c1}{\PYGZsh{}centre variables}
+\PYG{n}{tm\PYGZus{}vars} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{c}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}Season\PYGZdq{}}\PYG{p}{)}
+\PYG{n}{avalanches\PYGZus{}prop[}\PYG{p}{,(}\PYG{n}{tm\PYGZus{}vars}\PYG{p}{)} \PYG{o}{:=} \PYG{n+nf}{lapply}\PYG{p}{(}\PYG{n}{.SD}\PYG{p}{,} \PYG{n}{submin}\PYG{p}{),} \PYG{n}{.SDcols} \PYG{o}{=} \PYG{n}{tm\PYGZus{}vars]}
+
+
+\PYG{n}{X\PYGZus{}fixedeff} \PYG{o}{\PYGZlt{}\PYGZhy{}}
+  \PYG{n+nf}{model.matrix}\PYG{p}{(}\PYG{n}{death\PYGZus{}prop} \PYG{o}{\PYGZti{}} \PYG{n}{Season} \PYG{o}{+} \PYG{n}{Snow\PYGZus{}meters} \PYG{o}{+} \PYG{n}{Snow\PYGZus{}fnights} \PYG{o}{\PYGZhy{}} \PYG{l+m}{1}\PYG{p}{,} \PYG{n}{data} \PYG{o}{=} \PYG{n}{avalanches\PYGZus{}prop}\PYG{p}{)}
+\PYG{n}{X\PYGZus{}randomeff} \PYG{o}{\PYGZlt{}\PYGZhy{}}
+  \PYG{n+nf}{model.matrix}\PYG{p}{(}\PYG{n}{death\PYGZus{}prop} \PYG{o}{\PYGZti{}} \PYG{n}{Geo\PYGZus{}space} \PYG{o}{\PYGZhy{}} \PYG{l+m}{1}\PYG{p}{,} \PYG{n}{data} \PYG{o}{=} \PYG{n}{avalanches\PYGZus{}prop}\PYG{p}{)}
+\PYG{n}{success} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{avalanches\PYGZus{}prop[}\PYG{p}{,} \PYG{n}{Deaths]}
+\PYG{n}{trials} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{avalanches\PYGZus{}prop[}\PYG{p}{,} \PYG{n}{Hit]}
+
+
+\PYG{n}{stan\PYGZus{}binomial\PYGZus{}glm\PYGZus{}reff\PYGZus{}data} \PYG{o}{\PYGZlt{}\PYGZhy{}}
+  \PYG{n+nf}{list}\PYG{p}{(}
+    \PYG{n}{success} \PYG{o}{=} \PYG{n}{success}\PYG{p}{,}
+    \PYG{n}{trials} \PYG{o}{=} \PYG{n}{trials}\PYG{p}{,}
+    \PYG{n}{X\PYGZus{}f} \PYG{o}{=} \PYG{n}{X\PYGZus{}fixedeff}\PYG{p}{,}
+    \PYG{n}{X\PYGZus{}r} \PYG{o}{=} \PYG{n}{X\PYGZus{}randomeff}\PYG{p}{,}
+    \PYG{n}{N} \PYG{o}{=} \PYG{n+nf}{length}\PYG{p}{(}\PYG{n}{success}\PYG{p}{),}
+    \PYG{n}{P\PYGZus{}f} \PYG{o}{=} \PYG{n+nf}{ncol}\PYG{p}{(}\PYG{n}{X\PYGZus{}fixedeff}\PYG{p}{),}
+    \PYG{n}{P\PYGZus{}r} \PYG{o}{=} \PYG{n+nf}{ncol}\PYG{p}{(}\PYG{n}{X\PYGZus{}randomeff}\PYG{p}{),}
+    \PYG{n}{n\PYGZus{}params} \PYG{o}{=} \PYG{n+nf}{c}\PYG{p}{(}\PYG{l+m}{0}\PYG{p}{,} \PYG{n+nf}{sqrt}\PYG{p}{(}\PYG{l+m}{10}\PYG{p}{))}
+  \PYG{p}{)}
+
+\PYG{n}{stan\PYGZus{}binomial\PYGZus{}glm\PYGZus{}reff\PYGZus{}s} \PYG{o}{\PYGZlt{}\PYGZhy{}}
+  \PYG{n+nf}{sampling}\PYG{p}{(}
+    \PYG{n}{stan\PYGZus{}binomial\PYGZus{}glm\PYGZus{}reff}\PYG{p}{,}
+    \PYG{n}{data} \PYG{o}{=} \PYG{n}{stan\PYGZus{}binomial\PYGZus{}glm\PYGZus{}reff\PYGZus{}data}\PYG{p}{,}
+    \PYG{n}{chains} \PYG{o}{=} \PYG{l+m}{4}\PYG{p}{,}
+    \PYG{n}{control} \PYG{o}{=} \PYG{n+nf}{list}\PYG{p}{(}\PYG{n}{adapt\PYGZus{}delta} \PYG{o}{=} \PYG{l+m}{0.9}\PYG{p}{),}
+    \PYG{n}{iter} \PYG{o}{=} \PYG{l+m}{10000}\PYG{c+c1}{\PYGZsh{},}
+    \PYG{c+c1}{\PYGZsh{}init\PYGZus{}r = 0.1}
+  \PYG{p}{)}
+\PYG{n}{reff\PYGZus{}coda} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{As.mcmc.list}\PYG{p}{(}\PYG{n}{stan\PYGZus{}binomial\PYGZus{}glm\PYGZus{}reff\PYGZus{}s}\PYG{p}{,} \PYG{n}{pars} \PYG{o}{=} \PYG{n+nf}{c}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}beta\PYGZus{}r\PYGZdq{}}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}beta\PYGZus{}f\PYGZdq{}}\PYG{p}{))}
+\PYG{n+nf}{gelman.plot}\PYG{p}{(}\PYG{n}{reff\PYGZus{}coda}\PYG{p}{,} \PYG{n}{ask} \PYG{o}{=} \PYG{k+kc}{FALSE}\PYG{p}{)}
+
+\PYG{n}{plot\PYGZus{}diag\PYGZus{}objects} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{function}\PYG{p}{(}\PYG{n}{stanfit}\PYG{p}{)\PYGZob{}}
+  \PYG{n+nf}{list}\PYG{p}{(}\PYG{n}{post} \PYG{o}{=} \PYG{n+nf}{as.array}\PYG{p}{(}\PYG{n}{stanfit}\PYG{p}{),}
+       \PYG{n}{lp} \PYG{o}{=} \PYG{n+nf}{log\PYGZus{}posterior}\PYG{p}{(}\PYG{n}{stanfit}\PYG{p}{),}
+       \PYG{n}{np} \PYG{o}{=} \PYG{n+nf}{nuts\PYGZus{}params}\PYG{p}{(}\PYG{n}{stanfit}\PYG{p}{))}
+\PYG{p}{\PYGZcb{}}
+
+\PYG{n}{plot\PYGZus{}diag} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{function}\PYG{p}{(}\PYG{n}{stanfit}\PYG{p}{,} \PYG{n}{pars}\PYG{p}{)\PYGZob{}}
+  \PYG{n}{ps} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{vars}\PYG{p}{(}\PYG{n+nf}{starts\PYGZus{}with}\PYG{p}{(}\PYG{n}{pars}\PYG{p}{))}
+  \PYG{n}{post} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{as.array}\PYG{p}{(}\PYG{n}{stanfit}\PYG{p}{)}
+  \PYG{n}{lp} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{log\PYGZus{}posterior}\PYG{p}{(}\PYG{n}{stanfit}\PYG{p}{)}
+  \PYG{n}{np} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{nuts\PYGZus{}params}\PYG{p}{(}\PYG{n}{stanfit}\PYG{p}{)}
+  \PYG{n}{p1} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{mcmc\PYGZus{}parcoord}\PYG{p}{(}\PYG{n}{post}\PYG{p}{,} \PYG{n}{np} \PYG{o}{=} \PYG{n}{np}\PYG{p}{,} \PYG{n}{pars} \PYG{o}{=} \PYG{n}{ps}\PYG{p}{)}
+  \PYG{n}{p2} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{mcmc\PYGZus{}pairs}\PYG{p}{(}\PYG{n}{post}\PYG{p}{,} \PYG{n}{np} \PYG{o}{=} \PYG{n}{np}\PYG{p}{,} \PYG{n}{pars} \PYG{o}{=} \PYG{n}{ps}\PYG{p}{)}
+  \PYG{n}{p3} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{mcmc\PYGZus{}trace}\PYG{p}{(}\PYG{n}{post}\PYG{p}{,} \PYG{n}{pars} \PYG{o}{=} \PYG{n}{ps}\PYG{p}{,} \PYG{n}{np} \PYG{o}{=} \PYG{n}{np}\PYG{p}{)}
+  \PYG{n}{p4} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{mcmc\PYGZus{}nuts\PYGZus{}divergence}\PYG{p}{(}\PYG{n}{np}\PYG{p}{,} \PYG{n}{lp}\PYG{p}{)}
+  \PYG{n}{p5} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{mcmc\PYGZus{}nuts\PYGZus{}energy}\PYG{p}{(}\PYG{n}{np}\PYG{p}{)}
+  \PYG{n+nf}{list}\PYG{p}{(}\PYG{n}{p1}\PYG{p}{,} \PYG{n}{p2}\PYG{p}{,} \PYG{n}{p3}\PYG{p}{,} \PYG{n}{p4}\PYG{p}{,} \PYG{n}{p5}\PYG{p}{)}
+\PYG{p}{\PYGZcb{}}
+
+\PYG{c+c1}{\PYGZsh{}mcmc\PYGZus{}trace(stan\PYGZus{}binomial\PYGZus{}glm\PYGZus{}reff\PYGZus{}s, pars = vars(starts\PYGZus{}with(\PYGZdq{}beta\PYGZdq{})))}
+
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}}
+\PYG{c+c1}{\PYGZsh{}sans snow fortnights}
+
+\PYG{n}{X\PYGZus{}f\PYGZus{}nsf} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{model.matrix}\PYG{p}{(}\PYG{n}{death\PYGZus{}prop} \PYG{o}{\PYGZti{}} \PYG{n}{Season} \PYG{o}{+} \PYG{n}{Snow\PYGZus{}meters} \PYG{o}{\PYGZhy{}} \PYG{l+m}{1}\PYG{p}{,} \PYG{n}{data} \PYG{o}{=} \PYG{n}{avalanches\PYGZus{}prop}\PYG{p}{)}
+
+\PYG{n}{stan\PYGZus{}binomial\PYGZus{}glm\PYGZus{}reff\PYGZus{}nsf\PYGZus{}data} \PYG{o}{\PYGZlt{}\PYGZhy{}}
+  \PYG{n+nf}{list}\PYG{p}{(}
+    \PYG{n}{success} \PYG{o}{=} \PYG{n}{success}\PYG{p}{,}
+    \PYG{n}{trials} \PYG{o}{=} \PYG{n}{trials}\PYG{p}{,}
+    \PYG{n}{X\PYGZus{}f} \PYG{o}{=} \PYG{n}{X\PYGZus{}f\PYGZus{}nsf}\PYG{p}{,}
+    \PYG{n}{X\PYGZus{}r} \PYG{o}{=} \PYG{n}{X\PYGZus{}randomeff}\PYG{p}{,}
+    \PYG{n}{N} \PYG{o}{=} \PYG{n+nf}{length}\PYG{p}{(}\PYG{n}{success}\PYG{p}{),}
+    \PYG{n}{P\PYGZus{}f} \PYG{o}{=} \PYG{n+nf}{ncol}\PYG{p}{(}\PYG{n}{X\PYGZus{}f\PYGZus{}nsf}\PYG{p}{),}
+    \PYG{n}{P\PYGZus{}r} \PYG{o}{=} \PYG{n+nf}{ncol}\PYG{p}{(}\PYG{n}{X\PYGZus{}randomeff}\PYG{p}{),}
+    \PYG{n}{n\PYGZus{}params} \PYG{o}{=} \PYG{n+nf}{c}\PYG{p}{(}\PYG{l+m}{0}\PYG{p}{,} \PYG{n+nf}{sqrt}\PYG{p}{(}\PYG{l+m}{10}\PYG{p}{))}
+  \PYG{p}{)}
+
+\PYG{n}{stan\PYGZus{}binomial\PYGZus{}glm\PYGZus{}reff\PYGZus{}nsf\PYGZus{}s} \PYG{o}{\PYGZlt{}\PYGZhy{}}
+  \PYG{n+nf}{sampling}\PYG{p}{(}
+    \PYG{n}{stan\PYGZus{}binomial\PYGZus{}glm\PYGZus{}reff}\PYG{p}{,}
+    \PYG{n}{data} \PYG{o}{=} \PYG{n}{stan\PYGZus{}binomial\PYGZus{}glm\PYGZus{}reff\PYGZus{}nsf\PYGZus{}data}\PYG{p}{,}
+    \PYG{n}{chains} \PYG{o}{=} \PYG{l+m}{4}\PYG{p}{,}
+    \PYG{n}{control} \PYG{o}{=} \PYG{n+nf}{list}\PYG{p}{(}\PYG{n}{adapt\PYGZus{}delta} \PYG{o}{=} \PYG{l+m}{0.9}\PYG{p}{),}
+    \PYG{n}{iter} \PYG{o}{=} \PYG{l+m}{10000}\PYG{c+c1}{\PYGZsh{},}
+    \PYG{c+c1}{\PYGZsh{}init\PYGZus{}r = 0.1}
+  \PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}}
+\PYG{c+c1}{\PYGZsh{}hieratchical on station, sans snow fortnights}
+\PYG{n}{X\PYGZus{}r\PYGZus{}station} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{model.matrix}\PYG{p}{(}\PYG{n}{death\PYGZus{}prop} \PYG{o}{\PYGZti{}} \PYG{n}{Rec.station} \PYG{o}{\PYGZhy{}} \PYG{l+m}{1}\PYG{p}{,} \PYG{n}{data} \PYG{o}{=} \PYG{n}{avalanches\PYGZus{}prop}\PYG{p}{)}
+
+\PYG{n}{stan\PYGZus{}binomial\PYGZus{}glm\PYGZus{}reff\PYGZus{}station\PYGZus{}data} \PYG{o}{\PYGZlt{}\PYGZhy{}}
+  \PYG{n+nf}{list}\PYG{p}{(}
+    \PYG{n}{success} \PYG{o}{=} \PYG{n}{success}\PYG{p}{,}
+    \PYG{n}{trials} \PYG{o}{=} \PYG{n}{trials}\PYG{p}{,}
+    \PYG{n}{X\PYGZus{}f} \PYG{o}{=} \PYG{n}{X\PYGZus{}f\PYGZus{}nsf}\PYG{p}{,}
+    \PYG{n}{X\PYGZus{}r} \PYG{o}{=} \PYG{n}{X\PYGZus{}r\PYGZus{}station}\PYG{p}{,}
+    \PYG{n}{N} \PYG{o}{=} \PYG{n+nf}{length}\PYG{p}{(}\PYG{n}{success}\PYG{p}{),}
+    \PYG{n}{P\PYGZus{}f} \PYG{o}{=} \PYG{n+nf}{ncol}\PYG{p}{(}\PYG{n}{X\PYGZus{}f\PYGZus{}nsf}\PYG{p}{),}
+    \PYG{n}{P\PYGZus{}r} \PYG{o}{=} \PYG{n+nf}{ncol}\PYG{p}{(}\PYG{n}{X\PYGZus{}r\PYGZus{}station}\PYG{p}{),}
+    \PYG{n}{n\PYGZus{}params} \PYG{o}{=} \PYG{n+nf}{c}\PYG{p}{(}\PYG{l+m}{0}\PYG{p}{,} \PYG{n+nf}{sqrt}\PYG{p}{(}\PYG{l+m}{10}\PYG{p}{))}
+  \PYG{p}{)}
+
+\PYG{n}{stan\PYGZus{}binomial\PYGZus{}glm\PYGZus{}reff\PYGZus{}station\PYGZus{}s} \PYG{o}{\PYGZlt{}\PYGZhy{}}
+  \PYG{n+nf}{sampling}\PYG{p}{(}
+    \PYG{n}{stan\PYGZus{}binomial\PYGZus{}glm\PYGZus{}reff}\PYG{p}{,}
+    \PYG{n}{data} \PYG{o}{=} \PYG{n}{stan\PYGZus{}binomial\PYGZus{}glm\PYGZus{}reff\PYGZus{}station\PYGZus{}data}\PYG{p}{,}
+    \PYG{n}{chains} \PYG{o}{=} \PYG{l+m}{4}\PYG{p}{,}
+    \PYG{n}{control} \PYG{o}{=} \PYG{n+nf}{list}\PYG{p}{(}\PYG{n}{adapt\PYGZus{}delta} \PYG{o}{=} \PYG{l+m}{0.9}\PYG{p}{),}
+    \PYG{n}{iter} \PYG{o}{=} \PYG{l+m}{10000}\PYG{c+c1}{\PYGZsh{},}
+    \PYG{c+c1}{\PYGZsh{}init\PYGZus{}r = 0.1}
+  \PYG{p}{)}
+\end{Verbatim}
