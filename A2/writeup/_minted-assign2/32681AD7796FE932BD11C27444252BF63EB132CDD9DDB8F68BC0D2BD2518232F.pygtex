@@ -75,6 +75,7 @@
 \PYG{c+c1}{\PYGZsh{}no need to centre as discrete}
 
 \PYG{c+c1}{\PYGZsh{}new data}
+
 \PYG{n}{X\PYGZus{}new} \PYG{o}{=} \PYG{n+nf}{matrix}\PYG{p}{(}\PYG{n+nf}{c}\PYG{p}{(}\PYG{l+m}{1}\PYG{p}{,} \PYG{l+m}{20}\PYG{p}{,} \PYG{l+m}{0}\PYG{p}{,} \PYG{l+m}{1}\PYG{p}{,} \PYG{l+m}{1}\PYG{p}{,} \PYG{l+m}{1}\PYG{p}{,} \PYG{l+m}{0}\PYG{p}{,} \PYG{l+m}{0}\PYG{p}{,} \PYG{l+m}{1}\PYG{p}{,} \PYG{l+m}{1}\PYG{p}{,} \PYG{l+m}{1}\PYG{p}{,} \PYG{l+m}{0}\PYG{p}{,} \PYG{l+m}{1}\PYG{p}{,} \PYG{l+m}{1}\PYG{p}{,} \PYG{l+m}{0}\PYG{p}{,} \PYG{l+m}{1}\PYG{p}{),}
                \PYG{n}{nrow} \PYG{o}{=} \PYG{l+m}{4}\PYG{p}{,}
                \PYG{n}{byrow} \PYG{o}{=} \PYG{n+nb+bp}{T}\PYG{p}{)}
@@ -115,12 +116,15 @@
 \PYG{n}{exp\PYGZus{}post\PYGZus{}params} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{exp}\PYG{p}{(}\PYG{n}{post\PYGZus{}params}\PYG{p}{)}
 \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n}{exp\PYGZus{}post\PYGZus{}params}\PYG{p}{,} \PYG{l+m}{2}\PYG{p}{,} \PYG{n}{summary}\PYG{p}{)}
 
+
 \PYG{n}{p\PYGZus{}pred} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{extract}\PYG{p}{(}\PYG{n}{stan\PYGZus{}poisson\PYGZus{}glm\PYGZus{}s}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}y\PYGZus{}new\PYGZdq{}}\PYG{p}{)}\PYG{n}{[[1]]}
 \PYG{n+nf}{mean}\PYG{p}{(}\PYG{n}{p\PYGZus{}pred[}\PYG{p}{,} \PYG{l+m}{1}\PYG{n}{]} \PYG{o}{\PYGZlt{}} \PYG{l+m}{15}\PYG{p}{)}
 \PYG{n+nf}{mean}\PYG{p}{(}\PYG{n}{p\PYGZus{}pred[}\PYG{p}{,} \PYG{l+m}{2}\PYG{n}{]} \PYG{o}{\PYGZgt{}} \PYG{l+m}{1}\PYG{p}{)}
 \PYG{n+nf}{mean}\PYG{p}{(}\PYG{n}{p\PYGZus{}pred[}\PYG{p}{,} \PYG{l+m}{3}\PYG{n}{]} \PYG{o}{\PYGZgt{}} \PYG{l+m}{1}\PYG{p}{)}
 \PYG{n+nf}{mean}\PYG{p}{(}\PYG{n}{p\PYGZus{}pred[}\PYG{p}{,} \PYG{l+m}{4}\PYG{n}{]} \PYG{o}{\PYGZgt{}} \PYG{l+m}{1}\PYG{p}{)}
 
+\PYG{n}{data\PYGZus{}pred} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{extract}\PYG{p}{(}\PYG{n}{stan\PYGZus{}poisson\PYGZus{}glm\PYGZus{}s}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}data\PYGZus{}ppred\PYGZdq{}}\PYG{p}{)}\PYG{n}{[[1]]}
+\PYG{n+nf}{apply}\PYG{p}{(}\PYG{n}{data\PYGZus{}pred}\PYG{p}{,} \PYG{l+m}{2}\PYG{p}{,} \PYG{n}{summary}\PYG{p}{)}
 \PYG{c+c1}{\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}}
 \PYG{c+c1}{\PYGZsh{}dic is bad}
 \PYG{c+c1}{\PYGZsh{}formulae taken from https://en.wikipedia.org/wiki/Deviance\PYGZus{}information\PYGZus{}criterion}

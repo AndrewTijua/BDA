@@ -74,6 +74,7 @@ out_names = colnames(model_mat)
 #no need to centre as discrete
 
 #new data
+
 X_new = matrix(c(1, 20, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 1),
                nrow = 4,
                byrow = T)
@@ -114,12 +115,15 @@ colnames(post_params) <- out_names
 exp_post_params <- exp(post_params)
 apply(exp_post_params, 2, summary)
 
+
 p_pred <- extract(stan_poisson_glm_s, "y_new")[[1]]
 mean(p_pred[, 1] < 15)
 mean(p_pred[, 2] > 1)
 mean(p_pred[, 3] > 1)
 mean(p_pred[, 4] > 1)
 
+data_pred <- extract(stan_poisson_glm_s, "data_ppred")[[1]]
+apply(data_pred, 2, summary)
 #####
 #dic is bad
 #formulae taken from https://en.wikipedia.org/wiki/Deviance_information_criterion

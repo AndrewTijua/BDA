@@ -164,7 +164,13 @@ We run it and obtain the following posterior summaries. We have exponentiated ou
 \label{tab:postsum_po}
 \end{table}
 
-From this we can make some conclusions. We see that the expected rate of deaths increases by 1.19 times per avalanche. We also see that each EADS evolution decreases the expected rate of deaths, by 0.85 and 0.40 times respectively. The latter is a rather large decrease, befitting of the drastic change in preparation tact that the EADS going online brought about.
+From this we can make some initial conclusions. We see that the expected number of deaths increases by 1.19 times per avalanche (all other variables held constant). We also see that each EADS evolution decreases the expected number of deaths, by 0.85 and 0.40 times respectively. The latter is a rather large decrease, befitting of the drastic change in preparation tact that the EADS going online brought about.
+
+We are interested in the posterior predictive distribution. We want to predict the probability of observing less than 15 deaths given 20 avalanches next year. We know that EADS will be online, so we have the appropriate data. 
+
+We obtain a probability of $P(D<15|A=20, EADS=2) = 0.312$. This is roughly expected, as the number of avalanches increases deaths multiplicatively in expectation. In contrast the probability of less than 15 deaths for 10 avalanches is computationally indistinguishable from 1.
+
+We are also interested in the probability of observing more than 1 death per avalanche in each stage of the EADS lifespan (not present, present, online). To do this we are going to have to make an assumption. We assume that the mean number of avalanches occurs. 
 
 \printbibliography
 
@@ -184,10 +190,11 @@ From this we can make some conclusions. We see that the expected rate of deaths 
 \tcbjags{../jags/poisson.jags}
 \tcbjags{../jags/poisson_exvar.jags}
 \label{code:jags_1}
-\section{R Code for Question 2}
+\section{Code for Question 2}
+\subsection{R}
 \tcbr{../Q2.R}
 \label{code:main_2}
-\section{Stan}
+\subsection{Stan}
 \tcbstan{../stan/binomial_glm.stan}
 \tcbstan{../stan/binomial_glm_randomeffects.stan}
 \label{code:stan_2}
