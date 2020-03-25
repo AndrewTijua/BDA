@@ -10,6 +10,9 @@ data {
   matrix[N_new, P] X_new;
   
   vector[2] n_params;
+  
+  vector[N] offset;
+  vector[N_new] offset_new;
 }
 transformed data{
 }
@@ -19,8 +22,8 @@ parameters {
 }
 
 transformed parameters{
-  vector[N] log_rate = X * lambda;
-  vector[N_new] log_rate_new = X_new * lambda;
+  vector[N] log_rate = X * lambda + offset;
+  vector[N_new] log_rate_new = X_new * lambda + offset_new;
   vector<lower=0>[N] rate = exp(log_rate);
 }
 

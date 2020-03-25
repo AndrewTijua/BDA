@@ -23,10 +23,10 @@
 \PYG{n}{pglm\PYGZus{}data} \PYG{o}{\PYGZlt{}\PYGZhy{}}
   \PYG{n+nf}{list}\PYG{p}{(}
     \PYG{n}{n} \PYG{o}{=} \PYG{n+nf}{nrow}\PYG{p}{(}\PYG{n}{avalanches}\PYG{p}{),}
-    \PYG{n}{rep} \PYG{o}{=} \PYG{n}{avalanches}\PYG{o}{\PYGZdl{}}\PYG{n}{Rep.events}\PYG{p}{,}
     \PYG{n}{w1} \PYG{o}{=} \PYG{n}{avalanches}\PYG{o}{\PYGZdl{}}\PYG{n}{EADS1}\PYG{p}{,}
     \PYG{n}{w2} \PYG{o}{=} \PYG{n}{avalanches}\PYG{o}{\PYGZdl{}}\PYG{n}{EADS2}\PYG{p}{,}
-    \PYG{n}{death} \PYG{o}{=} \PYG{n}{avalanches}\PYG{o}{\PYGZdl{}}\PYG{n}{Deaths}
+    \PYG{n}{death} \PYG{o}{=} \PYG{n}{avalanches}\PYG{o}{\PYGZdl{}}\PYG{n}{Deaths}\PYG{p}{,}
+    \PYG{n}{offset} \PYG{o}{=} \PYG{n+nf}{log}\PYG{p}{(}\PYG{n}{avalanches}\PYG{o}{\PYGZdl{}}\PYG{n}{Rep.events}\PYG{p}{)}
   \PYG{p}{)}
 
 \PYG{n}{res.a} \PYG{o}{\PYGZlt{}\PYGZhy{}}
@@ -40,7 +40,7 @@
 \PYG{n}{res.b} \PYG{o}{\PYGZlt{}\PYGZhy{}}
   \PYG{n+nf}{coda.samples}\PYG{p}{(}
     \PYG{n}{res.a}\PYG{p}{,}
-    \PYG{n}{variable.names} \PYG{o}{=} \PYG{n+nf}{c}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}intercept\PYGZdq{}}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}beta\PYGZus{}rep\PYGZdq{}}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}beta\PYGZus{}w1\PYGZdq{}}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}beta\PYGZus{}w2\PYGZdq{}}\PYG{p}{),}
+    \PYG{n}{variable.names} \PYG{o}{=} \PYG{n+nf}{c}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}intercept\PYGZdq{}}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}beta\PYGZus{}w1\PYGZdq{}}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}beta\PYGZus{}w2\PYGZdq{}}\PYG{p}{),}
     \PYG{n}{n.iter} \PYG{o}{=} \PYG{l+m}{1e4}
   \PYG{p}{)}
 \PYG{n+nf}{summary}\PYG{p}{(}\PYG{n}{res.b}\PYG{p}{)}
@@ -59,7 +59,7 @@
 \PYG{n}{res.b.ev} \PYG{o}{\PYGZlt{}\PYGZhy{}}
   \PYG{n+nf}{coda.samples}\PYG{p}{(}
     \PYG{n}{res.a.ev}\PYG{p}{,}
-    \PYG{n}{variable.names} \PYG{o}{=} \PYG{n+nf}{c}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}beta\PYGZus{}rep\PYGZdq{}}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}beta\PYGZus{}w1\PYGZdq{}}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}beta\PYGZus{}w2\PYGZdq{}}\PYG{p}{),}
+    \PYG{n}{variable.names} \PYG{o}{=} \PYG{n+nf}{c}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}beta\PYGZus{}w1\PYGZdq{}}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}beta\PYGZus{}w2\PYGZdq{}}\PYG{p}{),}
     \PYG{n}{n.iter} \PYG{o}{=} \PYG{l+m}{1e4}
   \PYG{p}{)}
 \PYG{n+nf}{summary}\PYG{p}{(}\PYG{n}{res.b.ev}\PYG{p}{)}

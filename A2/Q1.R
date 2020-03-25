@@ -65,19 +65,20 @@ boot::boot.ci(bs3,
               conf = 0.9)
 #####
 #b
-to_model <- avalanches[, .(Deaths, Rep.events, EADS1, EADS2)]
+to_model <- avalanches[, .(Deaths, EADS1, EADS2)]
 model_mat <-
   model.matrix(Deaths ~ ., data = to_model)#no intercept as cannot have deaths without avalanche
-
+d_offset <- log(avalanches$Rep.events)
 model_mat <- model_mat[,]
 out_names = colnames(model_mat)
 #no need to centre as discrete
 
 #new data
 
-X_new = matrix(c(1, 20, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 1),
+X_new = matrix(c(1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1),
                nrow = 4,
                byrow = T)
+n_offset <- log(c(20, 1, 1, 1))
 # X_new = matrix(c(20, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1),
 #                nrow = 4,
 #                byrow = T)
@@ -96,7 +97,9 @@ stan_poisson_glm_data <-
     X = model_mat,
     n_params = c(0, 1e2),
     N_new = N_new,
-    X_new = X_new
+    X_new = X_new,
+    offset = d_offset,
+    offset_new = n_offset
   )
 
 
@@ -114,6 +117,10 @@ post_params <- extract(stan_poisson_glm_s, "lambda")[[1]]
 colnames(post_params) <- out_names
 exp_post_params <- exp(post_params)
 apply(exp_post_params, 2, summary)
+
+news_1 <- mean(exp(post_params[, 1]) > 1)
+news_2 <- mean(exp(post_params[, 1] + post_params[, 2]) > 1)
+news_3 <- mean(exp(post_params[, 1] + post_params[, 3]) > 1)
 
 
 p_pred <- extract(stan_poisson_glm_s, "y_new")[[1]]
@@ -167,9 +174,11 @@ stan_poisson_glm_exvar <-
 model_mat <- model_mat[,-1]#messes with exvar
 out_names = colnames(model_mat)
 
-X_new = matrix(c(20, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1),
+X_new = matrix(c(0, 1, 0, 0, 1, 0, 0, 1),
                nrow = 4,
                byrow = T)
+
+n_offset <- log(c(20, 1, 1, 1))
 
 ym <- data.frame(ym = as.factor(avalanches$Season))
 yim <- model.matrix( ~ . - 1, ym)
@@ -184,7 +193,9 @@ stan_poisson_glm_exvar_data <-
     N_new = N_new,
     X_new = X_new,
     yearindmat = yim,
-    N_years = ncol(yim)
+    N_years = ncol(yim),
+    offset = d_offset,
+    offset_new = n_offset
   )
 
 

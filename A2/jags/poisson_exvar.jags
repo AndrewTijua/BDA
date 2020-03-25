@@ -4,7 +4,6 @@ model {
   p_tau <- 0.01
   
   #priors
-  beta_rep ~ dnorm(p_mu, p_tau)
   beta_w1 ~ dnorm(p_mu, p_tau)
   beta_w2 ~ dnorm(p_mu, p_tau)
   theta_hyp ~ dunif(0, 10)
@@ -12,7 +11,7 @@ model {
   
   #likelihood
   for (i in 1:n) {
-    log(mu[i]) <- beta_rep * rep[i] + beta_w1 * w1[i] + beta_w2 * w2[i] + theta
+    log(mu[i]) <- beta_w1 * w1[i] + beta_w2 * w2[i] + theta + offset[i]
     death[i] ~ dpois(mu[i])
   }
 }

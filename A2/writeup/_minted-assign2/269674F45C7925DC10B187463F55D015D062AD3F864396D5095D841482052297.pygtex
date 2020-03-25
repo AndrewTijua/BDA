@@ -11,21 +11,28 @@
   \PYG{k+kt}{matrix}\PYG{p}{[}\PYG{n}{N\PYGZus{}new}\PYG{p}{,} \PYG{n}{P}\PYG{p}{]} \PYG{n}{X\PYGZus{}new}\PYG{p}{;}
 
   \PYG{k+kt}{vector}\PYG{p}{[}\PYG{l+m+mf}{2}\PYG{p}{]} \PYG{n}{n\PYGZus{}params}\PYG{p}{;}
+
+  \PYG{k+kt}{vector}\PYG{p}{[}\PYG{n}{N}\PYG{p}{]} \PYG{n}{offset}\PYG{p}{;}
+  \PYG{k+kt}{vector}\PYG{p}{[}\PYG{n}{N\PYGZus{}new}\PYG{p}{]} \PYG{n}{offset\PYGZus{}new}\PYG{p}{;}
 \PYG{p}{\PYGZcb{}}
 \PYG{k+kn}{transformed data}\PYG{p}{\PYGZob{}}
 \PYG{p}{\PYGZcb{}}
 
 \PYG{k+kn}{parameters} \PYG{p}{\PYGZob{}}
   \PYG{k+kt}{vector}\PYG{p}{[}\PYG{n}{P}\PYG{p}{]} \PYG{n}{lambda}\PYG{p}{;}
+  \PYG{k+kt}{real}\PYG{o}{\PYGZlt{}}\PYG{k}{lower}\PYG{p}{=}\PYG{l+m+mf}{0}\PYG{p}{,}\PYG{k}{upper}\PYG{p}{=}\PYG{l+m+mf}{10}\PYG{o}{\PYGZgt{}} \PYG{n}{theta\PYGZus{}hyp}\PYG{p}{;}
+  \PYG{k+kt}{real} \PYG{n}{theta}\PYG{p}{;}
 \PYG{p}{\PYGZcb{}}
 
 \PYG{k+kn}{transformed parameters}\PYG{p}{\PYGZob{}}
-  \PYG{k+kt}{vector}\PYG{p}{[}\PYG{n}{N}\PYG{p}{]} \PYG{n}{log\PYGZus{}rate} \PYG{o}{=} \PYG{n}{X} \PYG{o}{*} \PYG{n}{lambda}\PYG{p}{;}
-  \PYG{k+kt}{vector}\PYG{p}{[}\PYG{n}{N\PYGZus{}new}\PYG{p}{]} \PYG{n}{log\PYGZus{}rate\PYGZus{}new} \PYG{o}{=} \PYG{n}{X\PYGZus{}new} \PYG{o}{*} \PYG{n}{lambda}\PYG{p}{;}
+  \PYG{k+kt}{vector}\PYG{p}{[}\PYG{n}{N}\PYG{p}{]} \PYG{n}{log\PYGZus{}rate} \PYG{o}{=} \PYG{n}{X} \PYG{o}{*} \PYG{n}{lambda} \PYG{o}{+} \PYG{n}{theta} \PYG{o}{+} \PYG{n}{offset}\PYG{p}{;}
+  \PYG{k+kt}{vector}\PYG{p}{[}\PYG{n}{N\PYGZus{}new}\PYG{p}{]} \PYG{n}{log\PYGZus{}rate\PYGZus{}new} \PYG{o}{=} \PYG{n}{X\PYGZus{}new} \PYG{o}{*} \PYG{n}{lambda} \PYG{o}{+} \PYG{n}{theta} \PYG{o}{+} \PYG{n}{offset\PYGZus{}new}\PYG{p}{;}
   \PYG{k+kt}{vector}\PYG{o}{\PYGZlt{}}\PYG{k}{lower}\PYG{p}{=}\PYG{l+m+mf}{0}\PYG{o}{\PYGZgt{}}\PYG{p}{[}\PYG{n}{N}\PYG{p}{]} \PYG{n}{rate} \PYG{o}{=} \PYG{n+nb}{exp}\PYG{p}{(}\PYG{n}{log\PYGZus{}rate}\PYG{p}{);}
 \PYG{p}{\PYGZcb{}}
 
 \PYG{k+kn}{model} \PYG{p}{\PYGZob{}}
+  \PYG{n}{theta\PYGZus{}hyp} \PYG{o}{\PYGZti{}}\PYG{+w}{ }\PYG{n+nb}{uniform}\PYG{p}{(}\PYG{l+m+mf}{0}\PYG{p}{,} \PYG{l+m+mf}{10}\PYG{p}{);}
+  \PYG{n}{theta} \PYG{o}{\PYGZti{}}\PYG{+w}{ }\PYG{n+nb}{normal}\PYG{p}{(}\PYG{l+m+mf}{0}\PYG{p}{,} \PYG{n}{theta\PYGZus{}hyp}\PYG{p}{);}
   \PYG{n}{lambda} \PYG{o}{\PYGZti{}}\PYG{+w}{ }\PYG{n+nb}{normal}\PYG{p}{(}\PYG{n}{n\PYGZus{}params}\PYG{p}{[}\PYG{l+m+mf}{1}\PYG{p}{],} \PYG{n}{n\PYGZus{}params}\PYG{p}{[}\PYG{l+m+mf}{2}\PYG{p}{]);}
   \PYG{n}{y} \PYG{o}{\PYGZti{}}\PYG{+w}{ }\PYG{n+nb}{poisson\PYGZus{}log}\PYG{p}{(}\PYG{n}{log\PYGZus{}rate}\PYG{p}{);}
 \PYG{p}{\PYGZcb{}}

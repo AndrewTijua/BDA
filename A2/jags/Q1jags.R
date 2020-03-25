@@ -22,10 +22,10 @@ avalanches[, EWS := as.factor(EWS)]
 pglm_data <-
   list(
     n = nrow(avalanches),
-    rep = avalanches$Rep.events,
     w1 = avalanches$EADS1,
     w2 = avalanches$EADS2,
-    death = avalanches$Deaths
+    death = avalanches$Deaths,
+    offset = log(avalanches$Rep.events)
   )
 
 res.a <-
@@ -39,7 +39,7 @@ update(res.a, n.iter = 1e4)
 res.b <-
   coda.samples(
     res.a,
-    variable.names = c("intercept", "beta_rep", "beta_w1", "beta_w2"),
+    variable.names = c("intercept", "beta_w1", "beta_w2"),
     n.iter = 1e4
   )
 summary(res.b)
@@ -58,7 +58,7 @@ update(res.a, n.iter = 1e4)
 res.b.ev <-
   coda.samples(
     res.a.ev,
-    variable.names = c("beta_rep", "beta_w1", "beta_w2"),
+    variable.names = c("beta_w1", "beta_w2"),
     n.iter = 1e4
   )
 summary(res.b.ev)

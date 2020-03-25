@@ -6,13 +6,12 @@
 
   \PYG{c+c1}{\PYGZsh{}priors}
   \PYG{n}{intercept} \PYG{o}{\PYGZti{}} \PYG{n+nf}{dnorm}\PYG{p}{(}\PYG{n}{p\PYGZus{}mu}\PYG{p}{,} \PYG{n}{p\PYGZus{}tau}\PYG{p}{)}
-  \PYG{n}{beta\PYGZus{}rep} \PYG{o}{\PYGZti{}} \PYG{n+nf}{dnorm}\PYG{p}{(}\PYG{n}{p\PYGZus{}mu}\PYG{p}{,} \PYG{n}{p\PYGZus{}tau}\PYG{p}{)}
   \PYG{n}{beta\PYGZus{}w1} \PYG{o}{\PYGZti{}} \PYG{n+nf}{dnorm}\PYG{p}{(}\PYG{n}{p\PYGZus{}mu}\PYG{p}{,} \PYG{n}{p\PYGZus{}tau}\PYG{p}{)}
   \PYG{n}{beta\PYGZus{}w2} \PYG{o}{\PYGZti{}} \PYG{n+nf}{dnorm}\PYG{p}{(}\PYG{n}{p\PYGZus{}mu}\PYG{p}{,} \PYG{n}{p\PYGZus{}tau}\PYG{p}{)}
 
   \PYG{c+c1}{\PYGZsh{}likelihood}
   \PYG{n+nf}{for}\PYG{p}{(}\PYG{n}{i} \PYG{n}{in} \PYG{l+m}{1}\PYG{o}{:}\PYG{n}{n}\PYG{p}{)\PYGZob{}}
-    \PYG{n+nf}{log}\PYG{p}{(}\PYG{n}{mu[i]}\PYG{p}{)} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{intercept} \PYG{o}{+} \PYG{n}{beta\PYGZus{}rep} \PYG{o}{*} \PYG{n}{rep[i]} \PYG{o}{+} \PYG{n}{beta\PYGZus{}w1} \PYG{o}{*} \PYG{n}{w1[i]} \PYG{o}{+} \PYG{n}{beta\PYGZus{}w2} \PYG{o}{*} \PYG{n}{w2[i]}
+    \PYG{n+nf}{log}\PYG{p}{(}\PYG{n}{mu[i]}\PYG{p}{)} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{intercept} \PYG{o}{+} \PYG{n}{beta\PYGZus{}w1} \PYG{o}{*} \PYG{n}{w1[i]} \PYG{o}{+} \PYG{n}{beta\PYGZus{}w2} \PYG{o}{*} \PYG{n}{w2[i]} \PYG{o}{+} \PYG{n}{offset[i]}
     \PYG{n}{death[i]} \PYG{o}{\PYGZti{}} \PYG{n+nf}{dpois}\PYG{p}{(}\PYG{n}{mu[i]}\PYG{p}{)}
   \PYG{p}{\PYGZcb{}}
 \PYG{p}{\PYGZcb{}}
