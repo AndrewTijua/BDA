@@ -29,9 +29,9 @@ base_plot + geom_line(aes(x = Season, y = Rep.events, group = F))
 base_plot + geom_line(aes(x = Season, y = Deaths, group = F))
 base_plot + geom_boxplot(aes(x = EWS, y = Deaths), colour = "black")
 
-avalanches <- avalanches[Rep.events > 0]
+#avalanches <- avalanches[Rep.events > 0]
 cor_boot <- function(data, index) {
-  dt_s <- data[index,]
+  dt_s <- data[index, ]
   return(cor(dt_s))
 }
 
@@ -64,23 +64,30 @@ boot::boot.ci(bs3,
               conf = 0.9)
 #####
 #b
-to_model <- avalanches[, .(Deaths, EADS1, EADS2)]
+to_model <- avalanches[, .(Rep.events, Deaths, EADS1, EADS2)]
 model_mat <-
   model.matrix(Deaths ~ ., data = to_model)#no intercept as cannot have deaths without avalanche
-d_offset <- log(avalanches$Rep.events)
-model_mat <- model_mat[, ]
+#d_offset <- log(avalanches$Rep.events)
+d_offset <- rep(0, nrow(avalanches))
+model_mat <- model_mat[,]
 out_names = colnames(model_mat)
 #no need to centre as discrete
 
 #new data
 
-X_new = matrix(c(1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1),
-               nrow = 4,
-               byrow = T)
-n_offset <- log(c(20, 1, 1, 1))
-# X_new = matrix(c(20, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1),
+# X_new = matrix(c(1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1),
 #                nrow = 4,
 #                byrow = T)
+
+X_new = matrix(c(1, 20, 0, 1,
+                 1, 1, 0, 0,
+                 1, 1, 1, 0,
+                 1, 1, 0, 1),
+               nrow = 4,
+               byrow = T)
+#n_offset <- log(c(20, 1, 1, 1))
+n_offset <- rep(0, nrow(X_new))
+
 N_new = nrow(X_new)
 #check, should be similar
 f_glm <-
@@ -107,15 +114,16 @@ stan_poisson_glm_s <-
     stan_poisson_glm,
     data = stan_poisson_glm_data,
     chains = 7,
-    control = list(adapt_delta = 0.6),
-    iter = 3000#,
-    #init_r = 0.1
+    control = list(adapt_delta = 0.8),
+    iter = 1e5,
+    init_r = 0.1
   )
 
 post_params <- extract(stan_poisson_glm_s, "lambda")[[1]]
 colnames(post_params) <- out_names
 exp_post_params <- exp(post_params)
 apply(exp_post_params, 2, summary)
+apply(post_params, 2, summary)
 
 news_1 <- mean(exp(post_params[, 1]) > 1)
 news_2 <- mean(exp(post_params[, 1] + post_params[, 2]) > 1)
@@ -128,8 +136,26 @@ mean(p_pred[, 2] > 1)
 mean(p_pred[, 3] > 1)
 mean(p_pred[, 4] > 1)
 
+pp1 <- p_pred[,1] < 15
+
+mean_boot <- function(data, index) {
+  dt_s <- data[index]
+  return(mean(dt_s))
+}
+
+bs4 <- boot::boot(pp1, mean_boot, R = 1e3)
+boot::boot.ci(bs4, type = "perc", conf = 0.95)
+
 data_pred <- extract(stan_poisson_glm_s, "data_ppred")[[1]]
 apply(data_pred, 2, summary)
+
+dpp_m1_plotdf <-
+  data.frame(
+    mean = apply(data_pred, 2, mean),
+    lq = apply(data_pred, 2, quantile, 0.05),
+    uq = apply(data_pred, 2, quantile, 0.95),
+    Season = avalanches$Season
+  )
 #####
 #dic is bad
 #formulae taken from https://en.wikipedia.org/wiki/Deviance_information_criterion
@@ -170,17 +196,24 @@ beta_p <- dnorm(beta, 0, (avno - mean(avno)) ^ (-2))
 stan_poisson_glm_exvar <-
   stan_model(file = "stan/poisson_glm_exvar.stan")
 
-model_mat <- model_mat[, -1]#messes with exvar
+model_mat <- model_mat[,-1]#messes with exvar
 out_names = colnames(model_mat)
 
-X_new = matrix(c(0, 1, 0, 0, 1, 0, 0, 1),
+# X_new = matrix(c(0, 1, 0, 0, 1, 0, 0, 1),
+#                nrow = 4,
+#                byrow = T)
+
+X_new = matrix(c(20, 0, 1,
+                 1, 0, 0,
+                 1, 1, 0,
+                 1, 0, 1),
                nrow = 4,
                byrow = T)
 
-n_offset <- log(c(20, 1, 1, 1))
+#n_offset <- log(c(20, 1, 1, 1))
 
 ym <- data.frame(ym = as.factor(avalanches$Season))
-yim <- model.matrix(~ . - 1, ym)
+yim <- model.matrix( ~ . - 1, ym)
 
 stan_poisson_glm_exvar_data <-
   list(
@@ -204,8 +237,9 @@ stan_poisson_glm_exvar_s <-
     data = stan_poisson_glm_exvar_data,
     chains = 4,
     control = list(adapt_delta = 0.99, max_treedepth = 15),
-    iter = 4000,
-    init_r = 0.05
+    iter = 8000,
+    init_r = 0.05,
+    pars = c("lambda", "theta", "data_ppred", "rate")
   )
 
 post_params_exvar <-
@@ -214,12 +248,20 @@ post_params_theta <- extract(stan_poisson_glm_exvar_s, "theta")[[1]]
 colnames(post_params_exvar) <- out_names
 names(post_params_theta) <- "theta"
 
-bound <-cbind(post_params_exvar, post_params_theta)
+bound <- cbind(post_params_exvar, post_params_theta)
 colnames(bound) <- c(out_names, "theta")
-apply(bound, 2, summary)
+apply(exp(bound), 2, summary)
 
 dpp <- extract(stan_poisson_glm_exvar_s, "data_ppred")[[1]]
 apply(dpp, 2, summary)
+
+dpp_m2_plotdf <-
+  data.frame(
+    mean = apply(dpp, 2, mean),
+    lq = apply(dpp, 2, quantile, 0.05),
+    uq = apply(dpp, 2, quantile, 0.95),
+    Season = avalanches$Season
+  )
 #####
 plikrar <- function(x, data) {
   sum(dpois(data, x, log = T))
@@ -237,3 +279,20 @@ dbar_exv <- -2 * sr_like_mean_exv#expected deviance
 pd_exv <- dbar_exv + 2 * p_mean_like_exv#calculate penalty
 dic_exv <- pd_exv + dbar_exv#give dic
 #####
+ggplot(data = dpp_m1_plotdf, aes(x = Season)) + theme_minimal() +
+  geom_ribbon(aes(ymin = lq, ymax = uq), alpha = 0.5) + labs(title = "Posterior Predictive for Model 1", y = "Number of Deaths") +
+  geom_line(aes(y = mean), size = 2, colour = "red")
+
+ggplot(data = dpp_m2_plotdf, aes(x = Season)) + theme_minimal() +
+  geom_ribbon(aes(ymin = lq, ymax = uq), alpha = 0.5) + labs(title = "Posterior Predictive for Model 2 (extra variance)", y = "Number of Deaths") +
+  geom_line(aes(y = mean), size = 2, colour = "red")
+
+pp_mod_1 <- as.data.frame(exp_post_params)
+pp_mod_1_long <- reshape2::melt(pp_mod_1)
+pp_mod_2 <- as.data.frame(exp(bound))
+pp_mod_2_long <- reshape2::melt(pp_mod_2)
+
+ggplot(data = pp_mod_1_long, aes(x = variable, y = value)) + theme_minimal() +
+  geom_boxplot() + labs(title = "Posterior summaries for model 1", y = "Parameter value", x = "Parameter") + coord_cartesian(ylim = c(0, 3))
+ggplot(data = pp_mod_2_long, aes(x = variable, y = value)) + theme_minimal() +
+  geom_boxplot() + labs(title = "Posterior summaries for model 2 (extra variance)", y = "Parameter value", x = "Parameter") + coord_cartesian(ylim = c(0, 3))

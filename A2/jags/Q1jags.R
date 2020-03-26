@@ -9,7 +9,7 @@ library(bayesplot)
 #####
 #a
 avalanches <- fread(file = "data/Avalanches.csv")
-avalanches <- avalanches[Rep.events > 0]
+#avalanches <- avalanches[Rep.events > 0]
 avalanches[, ':=' (EADS1 = (Season >= 1994 &
                               Season <= 2003),
                    EADS2 = (Season >= 2004))]
@@ -19,13 +19,16 @@ avalanches[Season %in% c(1986, 1994, 2004)]
 avalanches[, EWS := 1 + EADS1 + 2 * EADS2]
 avalanches[, EWS := as.factor(EWS)]
 
+d_offset <- rep(0, nrow(avalanches))
+
 pglm_data <-
   list(
     n = nrow(avalanches),
     w1 = avalanches$EADS1,
     w2 = avalanches$EADS2,
+    rep = avalanches$Rep.events,
     death = avalanches$Deaths,
-    offset = log(avalanches$Rep.events)
+    offset = d_offset
   )
 
 res.a <-
@@ -39,7 +42,7 @@ update(res.a, n.iter = 1e4)
 res.b <-
   coda.samples(
     res.a,
-    variable.names = c("intercept", "beta_w1", "beta_w2"),
+    variable.names = c("intercept", "beta_w1", "beta_w2", "beta_rep"),
     n.iter = 1e4
   )
 summary(res.b)
@@ -62,9 +65,11 @@ res.a.ev <-
   )
 update(res.a, n.iter = 1e4)
 res.b.ev <-
-  coda.samples(res.a.ev,
-               variable.names = c("beta_w1", "beta_w2", "theta"),
-               n.iter = 1e5)
+  coda.samples(
+    res.a.ev,
+    variable.names = c("beta_w1", "beta_w2", "beta_rep", "theta"),
+    n.iter = 1e4
+  )
 summary(res.b.ev)
 dic.samples(model = res.a.ev,
             n.iter = 1e4,

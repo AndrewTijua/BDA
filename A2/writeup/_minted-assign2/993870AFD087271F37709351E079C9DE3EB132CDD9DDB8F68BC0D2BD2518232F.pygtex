@@ -30,9 +30,9 @@
 \PYG{n}{base\PYGZus{}plot} \PYG{o}{+} \PYG{n+nf}{geom\PYGZus{}line}\PYG{p}{(}\PYG{n+nf}{aes}\PYG{p}{(}\PYG{n}{x} \PYG{o}{=} \PYG{n}{Season}\PYG{p}{,} \PYG{n}{y} \PYG{o}{=} \PYG{n}{Deaths}\PYG{p}{,} \PYG{n}{group} \PYG{o}{=} \PYG{n+nb+bp}{F}\PYG{p}{))}
 \PYG{n}{base\PYGZus{}plot} \PYG{o}{+} \PYG{n+nf}{geom\PYGZus{}boxplot}\PYG{p}{(}\PYG{n+nf}{aes}\PYG{p}{(}\PYG{n}{x} \PYG{o}{=} \PYG{n}{EWS}\PYG{p}{,} \PYG{n}{y} \PYG{o}{=} \PYG{n}{Deaths}\PYG{p}{),} \PYG{n}{colour} \PYG{o}{=} \PYG{l+s}{\PYGZdq{}black\PYGZdq{}}\PYG{p}{)}
 
-\PYG{n}{avalanches} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{avalanches[Rep.events} \PYG{o}{\PYGZgt{}} \PYG{l+m}{0}\PYG{n}{]}
+\PYG{c+c1}{\PYGZsh{}avalanches \PYGZlt{}\PYGZhy{} avalanches[Rep.events \PYGZgt{} 0]}
 \PYG{n}{cor\PYGZus{}boot} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{function}\PYG{p}{(}\PYG{n}{data}\PYG{p}{,} \PYG{n}{index}\PYG{p}{)} \PYG{p}{\PYGZob{}}
-  \PYG{n}{dt\PYGZus{}s} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{data[index}\PYG{p}{,}\PYG{n}{]}
+  \PYG{n}{dt\PYGZus{}s} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{data[index}\PYG{p}{,} \PYG{n}{]}
   \PYG{n+nf}{return}\PYG{p}{(}\PYG{n+nf}{cor}\PYG{p}{(}\PYG{n}{dt\PYGZus{}s}\PYG{p}{))}
 \PYG{p}{\PYGZcb{}}
 
@@ -65,23 +65,30 @@
               \PYG{n}{conf} \PYG{o}{=} \PYG{l+m}{0.9}\PYG{p}{)}
 \PYG{c+c1}{\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}}
 \PYG{c+c1}{\PYGZsh{}b}
-\PYG{n}{to\PYGZus{}model} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{avalanches[}\PYG{p}{,} \PYG{n}{.(Deaths}\PYG{p}{,} \PYG{n}{EADS1}\PYG{p}{,} \PYG{n}{EADS2}\PYG{p}{)}\PYG{n}{]}
+\PYG{n}{to\PYGZus{}model} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{avalanches[}\PYG{p}{,} \PYG{n}{.(Rep.events}\PYG{p}{,} \PYG{n}{Deaths}\PYG{p}{,} \PYG{n}{EADS1}\PYG{p}{,} \PYG{n}{EADS2}\PYG{p}{)}\PYG{n}{]}
 \PYG{n}{model\PYGZus{}mat} \PYG{o}{\PYGZlt{}\PYGZhy{}}
   \PYG{n+nf}{model.matrix}\PYG{p}{(}\PYG{n}{Deaths} \PYG{o}{\PYGZti{}} \PYG{n}{.,} \PYG{n}{data} \PYG{o}{=} \PYG{n}{to\PYGZus{}model}\PYG{p}{)}\PYG{c+c1}{\PYGZsh{}no intercept as cannot have deaths without avalanche}
-\PYG{n}{d\PYGZus{}offset} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{log}\PYG{p}{(}\PYG{n}{avalanches}\PYG{o}{\PYGZdl{}}\PYG{n}{Rep.events}\PYG{p}{)}
-\PYG{n}{model\PYGZus{}mat} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{model\PYGZus{}mat[}\PYG{p}{,} \PYG{n}{]}
+\PYG{c+c1}{\PYGZsh{}d\PYGZus{}offset \PYGZlt{}\PYGZhy{} log(avalanches\PYGZdl{}Rep.events)}
+\PYG{n}{d\PYGZus{}offset} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{rep}\PYG{p}{(}\PYG{l+m}{0}\PYG{p}{,} \PYG{n+nf}{nrow}\PYG{p}{(}\PYG{n}{avalanches}\PYG{p}{))}
+\PYG{n}{model\PYGZus{}mat} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{model\PYGZus{}mat[}\PYG{p}{,}\PYG{n}{]}
 \PYG{n}{out\PYGZus{}names} \PYG{o}{=} \PYG{n+nf}{colnames}\PYG{p}{(}\PYG{n}{model\PYGZus{}mat}\PYG{p}{)}
 \PYG{c+c1}{\PYGZsh{}no need to centre as discrete}
 
 \PYG{c+c1}{\PYGZsh{}new data}
 
-\PYG{n}{X\PYGZus{}new} \PYG{o}{=} \PYG{n+nf}{matrix}\PYG{p}{(}\PYG{n+nf}{c}\PYG{p}{(}\PYG{l+m}{1}\PYG{p}{,} \PYG{l+m}{0}\PYG{p}{,} \PYG{l+m}{1}\PYG{p}{,} \PYG{l+m}{1}\PYG{p}{,} \PYG{l+m}{0}\PYG{p}{,} \PYG{l+m}{0}\PYG{p}{,} \PYG{l+m}{1}\PYG{p}{,} \PYG{l+m}{1}\PYG{p}{,} \PYG{l+m}{0}\PYG{p}{,} \PYG{l+m}{1}\PYG{p}{,} \PYG{l+m}{0}\PYG{p}{,} \PYG{l+m}{1}\PYG{p}{),}
-               \PYG{n}{nrow} \PYG{o}{=} \PYG{l+m}{4}\PYG{p}{,}
-               \PYG{n}{byrow} \PYG{o}{=} \PYG{n+nb+bp}{T}\PYG{p}{)}
-\PYG{n}{n\PYGZus{}offset} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{log}\PYG{p}{(}\PYG{n+nf}{c}\PYG{p}{(}\PYG{l+m}{20}\PYG{p}{,} \PYG{l+m}{1}\PYG{p}{,} \PYG{l+m}{1}\PYG{p}{,} \PYG{l+m}{1}\PYG{p}{))}
-\PYG{c+c1}{\PYGZsh{} X\PYGZus{}new = matrix(c(20, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1),}
+\PYG{c+c1}{\PYGZsh{} X\PYGZus{}new = matrix(c(1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1),}
 \PYG{c+c1}{\PYGZsh{}                nrow = 4,}
 \PYG{c+c1}{\PYGZsh{}                byrow = T)}
+
+\PYG{n}{X\PYGZus{}new} \PYG{o}{=} \PYG{n+nf}{matrix}\PYG{p}{(}\PYG{n+nf}{c}\PYG{p}{(}\PYG{l+m}{1}\PYG{p}{,} \PYG{l+m}{20}\PYG{p}{,} \PYG{l+m}{0}\PYG{p}{,} \PYG{l+m}{1}\PYG{p}{,}
+                 \PYG{l+m}{1}\PYG{p}{,} \PYG{l+m}{1}\PYG{p}{,} \PYG{l+m}{0}\PYG{p}{,} \PYG{l+m}{0}\PYG{p}{,}
+                 \PYG{l+m}{1}\PYG{p}{,} \PYG{l+m}{1}\PYG{p}{,} \PYG{l+m}{1}\PYG{p}{,} \PYG{l+m}{0}\PYG{p}{,}
+                 \PYG{l+m}{1}\PYG{p}{,} \PYG{l+m}{1}\PYG{p}{,} \PYG{l+m}{0}\PYG{p}{,} \PYG{l+m}{1}\PYG{p}{),}
+               \PYG{n}{nrow} \PYG{o}{=} \PYG{l+m}{4}\PYG{p}{,}
+               \PYG{n}{byrow} \PYG{o}{=} \PYG{n+nb+bp}{T}\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{}n\PYGZus{}offset \PYGZlt{}\PYGZhy{} log(c(20, 1, 1, 1))}
+\PYG{n}{n\PYGZus{}offset} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{rep}\PYG{p}{(}\PYG{l+m}{0}\PYG{p}{,} \PYG{n+nf}{nrow}\PYG{p}{(}\PYG{n}{X\PYGZus{}new}\PYG{p}{))}
+
 \PYG{n}{N\PYGZus{}new} \PYG{o}{=} \PYG{n+nf}{nrow}\PYG{p}{(}\PYG{n}{X\PYGZus{}new}\PYG{p}{)}
 \PYG{c+c1}{\PYGZsh{}check, should be similar}
 \PYG{n}{f\PYGZus{}glm} \PYG{o}{\PYGZlt{}\PYGZhy{}}
@@ -109,14 +116,15 @@
     \PYG{n}{data} \PYG{o}{=} \PYG{n}{stan\PYGZus{}poisson\PYGZus{}glm\PYGZus{}data}\PYG{p}{,}
     \PYG{n}{chains} \PYG{o}{=} \PYG{l+m}{7}\PYG{p}{,}
     \PYG{n}{control} \PYG{o}{=} \PYG{n+nf}{list}\PYG{p}{(}\PYG{n}{adapt\PYGZus{}delta} \PYG{o}{=} \PYG{l+m}{0.6}\PYG{p}{),}
-    \PYG{n}{iter} \PYG{o}{=} \PYG{l+m}{3000}\PYG{c+c1}{\PYGZsh{},}
-    \PYG{c+c1}{\PYGZsh{}init\PYGZus{}r = 0.1}
+    \PYG{n}{iter} \PYG{o}{=} \PYG{l+m}{3000}\PYG{p}{,}
+    \PYG{n}{init\PYGZus{}r} \PYG{o}{=} \PYG{l+m}{0.1}
   \PYG{p}{)}
 
 \PYG{n}{post\PYGZus{}params} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{extract}\PYG{p}{(}\PYG{n}{stan\PYGZus{}poisson\PYGZus{}glm\PYGZus{}s}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}lambda\PYGZdq{}}\PYG{p}{)}\PYG{n}{[[1]]}
 \PYG{n+nf}{colnames}\PYG{p}{(}\PYG{n}{post\PYGZus{}params}\PYG{p}{)} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{out\PYGZus{}names}
 \PYG{n}{exp\PYGZus{}post\PYGZus{}params} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{exp}\PYG{p}{(}\PYG{n}{post\PYGZus{}params}\PYG{p}{)}
 \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n}{exp\PYGZus{}post\PYGZus{}params}\PYG{p}{,} \PYG{l+m}{2}\PYG{p}{,} \PYG{n}{summary}\PYG{p}{)}
+\PYG{n+nf}{apply}\PYG{p}{(}\PYG{n}{post\PYGZus{}params}\PYG{p}{,} \PYG{l+m}{2}\PYG{p}{,} \PYG{n}{summary}\PYG{p}{)}
 
 \PYG{n}{news\PYGZus{}1} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{mean}\PYG{p}{(}\PYG{n+nf}{exp}\PYG{p}{(}\PYG{n}{post\PYGZus{}params[}\PYG{p}{,} \PYG{l+m}{1}\PYG{n}{]}\PYG{p}{)} \PYG{o}{\PYGZgt{}} \PYG{l+m}{1}\PYG{p}{)}
 \PYG{n}{news\PYGZus{}2} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{mean}\PYG{p}{(}\PYG{n+nf}{exp}\PYG{p}{(}\PYG{n}{post\PYGZus{}params[}\PYG{p}{,} \PYG{l+m}{1}\PYG{n}{]} \PYG{o}{+} \PYG{n}{post\PYGZus{}params[}\PYG{p}{,} \PYG{l+m}{2}\PYG{n}{]}\PYG{p}{)} \PYG{o}{\PYGZgt{}} \PYG{l+m}{1}\PYG{p}{)}
@@ -131,6 +139,14 @@
 
 \PYG{n}{data\PYGZus{}pred} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{extract}\PYG{p}{(}\PYG{n}{stan\PYGZus{}poisson\PYGZus{}glm\PYGZus{}s}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}data\PYGZus{}ppred\PYGZdq{}}\PYG{p}{)}\PYG{n}{[[1]]}
 \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n}{data\PYGZus{}pred}\PYG{p}{,} \PYG{l+m}{2}\PYG{p}{,} \PYG{n}{summary}\PYG{p}{)}
+
+\PYG{n}{dpp\PYGZus{}m1\PYGZus{}plotdf} \PYG{o}{\PYGZlt{}\PYGZhy{}}
+  \PYG{n+nf}{data.frame}\PYG{p}{(}
+    \PYG{n}{mean} \PYG{o}{=} \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n}{data\PYGZus{}pred}\PYG{p}{,} \PYG{l+m}{2}\PYG{p}{,} \PYG{n}{mean}\PYG{p}{),}
+    \PYG{n}{lq} \PYG{o}{=} \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n}{data\PYGZus{}pred}\PYG{p}{,} \PYG{l+m}{2}\PYG{p}{,} \PYG{n}{quantile}\PYG{p}{,} \PYG{l+m}{0.05}\PYG{p}{),}
+    \PYG{n}{uq} \PYG{o}{=} \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n}{data\PYGZus{}pred}\PYG{p}{,} \PYG{l+m}{2}\PYG{p}{,} \PYG{n}{quantile}\PYG{p}{,} \PYG{l+m}{0.95}\PYG{p}{),}
+    \PYG{n}{Season} \PYG{o}{=} \PYG{n}{avalanches}\PYG{o}{\PYGZdl{}}\PYG{n}{Season}
+  \PYG{p}{)}
 \PYG{c+c1}{\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}}
 \PYG{c+c1}{\PYGZsh{}dic is bad}
 \PYG{c+c1}{\PYGZsh{}formulae taken from https://en.wikipedia.org/wiki/Deviance\PYGZus{}information\PYGZus{}criterion}
@@ -171,17 +187,24 @@
 \PYG{n}{stan\PYGZus{}poisson\PYGZus{}glm\PYGZus{}exvar} \PYG{o}{\PYGZlt{}\PYGZhy{}}
   \PYG{n+nf}{stan\PYGZus{}model}\PYG{p}{(}\PYG{n}{file} \PYG{o}{=} \PYG{l+s}{\PYGZdq{}stan/poisson\PYGZus{}glm\PYGZus{}exvar.stan\PYGZdq{}}\PYG{p}{)}
 
-\PYG{n}{model\PYGZus{}mat} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{model\PYGZus{}mat[}\PYG{p}{,} \PYG{l+m}{\PYGZhy{}1}\PYG{n}{]}\PYG{c+c1}{\PYGZsh{}messes with exvar}
+\PYG{n}{model\PYGZus{}mat} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{model\PYGZus{}mat[}\PYG{p}{,}\PYG{l+m}{\PYGZhy{}1}\PYG{n}{]}\PYG{c+c1}{\PYGZsh{}messes with exvar}
 \PYG{n}{out\PYGZus{}names} \PYG{o}{=} \PYG{n+nf}{colnames}\PYG{p}{(}\PYG{n}{model\PYGZus{}mat}\PYG{p}{)}
 
-\PYG{n}{X\PYGZus{}new} \PYG{o}{=} \PYG{n+nf}{matrix}\PYG{p}{(}\PYG{n+nf}{c}\PYG{p}{(}\PYG{l+m}{0}\PYG{p}{,} \PYG{l+m}{1}\PYG{p}{,} \PYG{l+m}{0}\PYG{p}{,} \PYG{l+m}{0}\PYG{p}{,} \PYG{l+m}{1}\PYG{p}{,} \PYG{l+m}{0}\PYG{p}{,} \PYG{l+m}{0}\PYG{p}{,} \PYG{l+m}{1}\PYG{p}{),}
+\PYG{c+c1}{\PYGZsh{} X\PYGZus{}new = matrix(c(0, 1, 0, 0, 1, 0, 0, 1),}
+\PYG{c+c1}{\PYGZsh{}                nrow = 4,}
+\PYG{c+c1}{\PYGZsh{}                byrow = T)}
+
+\PYG{n}{X\PYGZus{}new} \PYG{o}{=} \PYG{n+nf}{matrix}\PYG{p}{(}\PYG{n+nf}{c}\PYG{p}{(}\PYG{l+m}{20}\PYG{p}{,} \PYG{l+m}{0}\PYG{p}{,} \PYG{l+m}{1}\PYG{p}{,}
+                 \PYG{l+m}{1}\PYG{p}{,} \PYG{l+m}{0}\PYG{p}{,} \PYG{l+m}{0}\PYG{p}{,}
+                 \PYG{l+m}{1}\PYG{p}{,} \PYG{l+m}{1}\PYG{p}{,} \PYG{l+m}{0}\PYG{p}{,}
+                 \PYG{l+m}{1}\PYG{p}{,} \PYG{l+m}{0}\PYG{p}{,} \PYG{l+m}{1}\PYG{p}{),}
                \PYG{n}{nrow} \PYG{o}{=} \PYG{l+m}{4}\PYG{p}{,}
                \PYG{n}{byrow} \PYG{o}{=} \PYG{n+nb+bp}{T}\PYG{p}{)}
 
-\PYG{n}{n\PYGZus{}offset} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{log}\PYG{p}{(}\PYG{n+nf}{c}\PYG{p}{(}\PYG{l+m}{20}\PYG{p}{,} \PYG{l+m}{1}\PYG{p}{,} \PYG{l+m}{1}\PYG{p}{,} \PYG{l+m}{1}\PYG{p}{))}
+\PYG{c+c1}{\PYGZsh{}n\PYGZus{}offset \PYGZlt{}\PYGZhy{} log(c(20, 1, 1, 1))}
 
 \PYG{n}{ym} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{data.frame}\PYG{p}{(}\PYG{n}{ym} \PYG{o}{=} \PYG{n+nf}{as.factor}\PYG{p}{(}\PYG{n}{avalanches}\PYG{o}{\PYGZdl{}}\PYG{n}{Season}\PYG{p}{))}
-\PYG{n}{yim} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{model.matrix}\PYG{p}{(}\PYG{o}{\PYGZti{}} \PYG{n}{. }\PYG{o}{\PYGZhy{}} \PYG{l+m}{1}\PYG{p}{,} \PYG{n}{ym}\PYG{p}{)}
+\PYG{n}{yim} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{model.matrix}\PYG{p}{(} \PYG{o}{\PYGZti{}} \PYG{n}{. }\PYG{o}{\PYGZhy{}} \PYG{l+m}{1}\PYG{p}{,} \PYG{n}{ym}\PYG{p}{)}
 
 \PYG{n}{stan\PYGZus{}poisson\PYGZus{}glm\PYGZus{}exvar\PYGZus{}data} \PYG{o}{\PYGZlt{}\PYGZhy{}}
   \PYG{n+nf}{list}\PYG{p}{(}
@@ -205,8 +228,9 @@
     \PYG{n}{data} \PYG{o}{=} \PYG{n}{stan\PYGZus{}poisson\PYGZus{}glm\PYGZus{}exvar\PYGZus{}data}\PYG{p}{,}
     \PYG{n}{chains} \PYG{o}{=} \PYG{l+m}{4}\PYG{p}{,}
     \PYG{n}{control} \PYG{o}{=} \PYG{n+nf}{list}\PYG{p}{(}\PYG{n}{adapt\PYGZus{}delta} \PYG{o}{=} \PYG{l+m}{0.99}\PYG{p}{,} \PYG{n}{max\PYGZus{}treedepth} \PYG{o}{=} \PYG{l+m}{15}\PYG{p}{),}
-    \PYG{n}{iter} \PYG{o}{=} \PYG{l+m}{4000}\PYG{p}{,}
-    \PYG{n}{init\PYGZus{}r} \PYG{o}{=} \PYG{l+m}{0.05}
+    \PYG{n}{iter} \PYG{o}{=} \PYG{l+m}{8000}\PYG{p}{,}
+    \PYG{n}{init\PYGZus{}r} \PYG{o}{=} \PYG{l+m}{0.05}\PYG{p}{,}
+    \PYG{n}{pars} \PYG{o}{=} \PYG{n+nf}{c}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}lambda\PYGZdq{}}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}theta\PYGZdq{}}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}data\PYGZus{}ppred\PYGZdq{}}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}rate\PYGZdq{}}\PYG{p}{)}
   \PYG{p}{)}
 
 \PYG{n}{post\PYGZus{}params\PYGZus{}exvar} \PYG{o}{\PYGZlt{}\PYGZhy{}}
@@ -215,12 +239,20 @@
 \PYG{n+nf}{colnames}\PYG{p}{(}\PYG{n}{post\PYGZus{}params\PYGZus{}exvar}\PYG{p}{)} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{out\PYGZus{}names}
 \PYG{n+nf}{names}\PYG{p}{(}\PYG{n}{post\PYGZus{}params\PYGZus{}theta}\PYG{p}{)} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{l+s}{\PYGZdq{}theta\PYGZdq{}}
 
-\PYG{n}{bound} \PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{n+nf}{cbind}\PYG{p}{(}\PYG{n}{post\PYGZus{}params\PYGZus{}exvar}\PYG{p}{,} \PYG{n}{post\PYGZus{}params\PYGZus{}theta}\PYG{p}{)}
+\PYG{n}{bound} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{cbind}\PYG{p}{(}\PYG{n}{post\PYGZus{}params\PYGZus{}exvar}\PYG{p}{,} \PYG{n}{post\PYGZus{}params\PYGZus{}theta}\PYG{p}{)}
 \PYG{n+nf}{colnames}\PYG{p}{(}\PYG{n}{bound}\PYG{p}{)} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{c}\PYG{p}{(}\PYG{n}{out\PYGZus{}names}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}theta\PYGZdq{}}\PYG{p}{)}
-\PYG{n+nf}{apply}\PYG{p}{(}\PYG{n}{bound}\PYG{p}{,} \PYG{l+m}{2}\PYG{p}{,} \PYG{n}{summary}\PYG{p}{)}
+\PYG{n+nf}{apply}\PYG{p}{(}\PYG{n+nf}{exp}\PYG{p}{(}\PYG{n}{bound}\PYG{p}{),} \PYG{l+m}{2}\PYG{p}{,} \PYG{n}{summary}\PYG{p}{)}
 
 \PYG{n}{dpp} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{extract}\PYG{p}{(}\PYG{n}{stan\PYGZus{}poisson\PYGZus{}glm\PYGZus{}exvar\PYGZus{}s}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}data\PYGZus{}ppred\PYGZdq{}}\PYG{p}{)}\PYG{n}{[[1]]}
 \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n}{dpp}\PYG{p}{,} \PYG{l+m}{2}\PYG{p}{,} \PYG{n}{summary}\PYG{p}{)}
+
+\PYG{n}{dpp\PYGZus{}m2\PYGZus{}plotdf} \PYG{o}{\PYGZlt{}\PYGZhy{}}
+  \PYG{n+nf}{data.frame}\PYG{p}{(}
+    \PYG{n}{mean} \PYG{o}{=} \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n}{dpp}\PYG{p}{,} \PYG{l+m}{2}\PYG{p}{,} \PYG{n}{mean}\PYG{p}{),}
+    \PYG{n}{lq} \PYG{o}{=} \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n}{dpp}\PYG{p}{,} \PYG{l+m}{2}\PYG{p}{,} \PYG{n}{quantile}\PYG{p}{,} \PYG{l+m}{0.05}\PYG{p}{),}
+    \PYG{n}{uq} \PYG{o}{=} \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n}{dpp}\PYG{p}{,} \PYG{l+m}{2}\PYG{p}{,} \PYG{n}{quantile}\PYG{p}{,} \PYG{l+m}{0.95}\PYG{p}{),}
+    \PYG{n}{Season} \PYG{o}{=} \PYG{n}{avalanches}\PYG{o}{\PYGZdl{}}\PYG{n}{Season}
+  \PYG{p}{)}
 \PYG{c+c1}{\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}}
 \PYG{n}{plikrar} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{function}\PYG{p}{(}\PYG{n}{x}\PYG{p}{,} \PYG{n}{data}\PYG{p}{)} \PYG{p}{\PYGZob{}}
   \PYG{n+nf}{sum}\PYG{p}{(}\PYG{n+nf}{dpois}\PYG{p}{(}\PYG{n}{data}\PYG{p}{,} \PYG{n}{x}\PYG{p}{,} \PYG{n}{log} \PYG{o}{=} \PYG{n+nb+bp}{T}\PYG{p}{))}
@@ -238,4 +270,21 @@
 \PYG{n}{pd\PYGZus{}exv} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{dbar\PYGZus{}exv} \PYG{o}{+} \PYG{l+m}{2} \PYG{o}{*} \PYG{n}{p\PYGZus{}mean\PYGZus{}like\PYGZus{}exv}\PYG{c+c1}{\PYGZsh{}calculate penalty}
 \PYG{n}{dic\PYGZus{}exv} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{pd\PYGZus{}exv} \PYG{o}{+} \PYG{n}{dbar\PYGZus{}exv}\PYG{c+c1}{\PYGZsh{}give dic}
 \PYG{c+c1}{\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}}
+\PYG{n+nf}{ggplot}\PYG{p}{(}\PYG{n}{data} \PYG{o}{=} \PYG{n}{dpp\PYGZus{}m1\PYGZus{}plotdf}\PYG{p}{,} \PYG{n+nf}{aes}\PYG{p}{(}\PYG{n}{x} \PYG{o}{=} \PYG{n}{Season}\PYG{p}{))} \PYG{o}{+} \PYG{n+nf}{theme\PYGZus{}minimal}\PYG{p}{()} \PYG{o}{+}
+  \PYG{n+nf}{geom\PYGZus{}ribbon}\PYG{p}{(}\PYG{n+nf}{aes}\PYG{p}{(}\PYG{n}{ymin} \PYG{o}{=} \PYG{n}{lq}\PYG{p}{,} \PYG{n}{ymax} \PYG{o}{=} \PYG{n}{uq}\PYG{p}{),} \PYG{n}{alpha} \PYG{o}{=} \PYG{l+m}{0.5}\PYG{p}{)} \PYG{o}{+} \PYG{n+nf}{labs}\PYG{p}{(}\PYG{n}{title} \PYG{o}{=} \PYG{l+s}{\PYGZdq{}Posterior Predictive for Model 1\PYGZdq{}}\PYG{p}{,} \PYG{n}{y} \PYG{o}{=} \PYG{l+s}{\PYGZdq{}Number of Deaths\PYGZdq{}}\PYG{p}{)} \PYG{o}{+}
+  \PYG{n+nf}{geom\PYGZus{}line}\PYG{p}{(}\PYG{n+nf}{aes}\PYG{p}{(}\PYG{n}{y} \PYG{o}{=} \PYG{n}{mean}\PYG{p}{),} \PYG{n}{size} \PYG{o}{=} \PYG{l+m}{2}\PYG{p}{,} \PYG{n}{colour} \PYG{o}{=} \PYG{l+s}{\PYGZdq{}red\PYGZdq{}}\PYG{p}{)}
+
+\PYG{n+nf}{ggplot}\PYG{p}{(}\PYG{n}{data} \PYG{o}{=} \PYG{n}{dpp\PYGZus{}m2\PYGZus{}plotdf}\PYG{p}{,} \PYG{n+nf}{aes}\PYG{p}{(}\PYG{n}{x} \PYG{o}{=} \PYG{n}{Season}\PYG{p}{))} \PYG{o}{+} \PYG{n+nf}{theme\PYGZus{}minimal}\PYG{p}{()} \PYG{o}{+}
+  \PYG{n+nf}{geom\PYGZus{}ribbon}\PYG{p}{(}\PYG{n+nf}{aes}\PYG{p}{(}\PYG{n}{ymin} \PYG{o}{=} \PYG{n}{lq}\PYG{p}{,} \PYG{n}{ymax} \PYG{o}{=} \PYG{n}{uq}\PYG{p}{),} \PYG{n}{alpha} \PYG{o}{=} \PYG{l+m}{0.5}\PYG{p}{)} \PYG{o}{+} \PYG{n+nf}{labs}\PYG{p}{(}\PYG{n}{title} \PYG{o}{=} \PYG{l+s}{\PYGZdq{}Posterior Predictive for Model 2 (extra variance)\PYGZdq{}}\PYG{p}{,} \PYG{n}{y} \PYG{o}{=} \PYG{l+s}{\PYGZdq{}Number of Deaths\PYGZdq{}}\PYG{p}{)} \PYG{o}{+}
+  \PYG{n+nf}{geom\PYGZus{}line}\PYG{p}{(}\PYG{n+nf}{aes}\PYG{p}{(}\PYG{n}{y} \PYG{o}{=} \PYG{n}{mean}\PYG{p}{),} \PYG{n}{size} \PYG{o}{=} \PYG{l+m}{2}\PYG{p}{,} \PYG{n}{colour} \PYG{o}{=} \PYG{l+s}{\PYGZdq{}red\PYGZdq{}}\PYG{p}{)}
+
+\PYG{n}{pp\PYGZus{}mod\PYGZus{}1} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{as.data.frame}\PYG{p}{(}\PYG{n}{exp\PYGZus{}post\PYGZus{}params}\PYG{p}{)}
+\PYG{n}{pp\PYGZus{}mod\PYGZus{}1\PYGZus{}long} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{reshape2}\PYG{o}{::}\PYG{n+nf}{melt}\PYG{p}{(}\PYG{n}{pp\PYGZus{}mod\PYGZus{}1}\PYG{p}{)}
+\PYG{n}{pp\PYGZus{}mod\PYGZus{}2} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{as.data.frame}\PYG{p}{(}\PYG{n+nf}{exp}\PYG{p}{(}\PYG{n}{bound}\PYG{p}{))}
+\PYG{n}{pp\PYGZus{}mod\PYGZus{}2\PYGZus{}long} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{reshape2}\PYG{o}{::}\PYG{n+nf}{melt}\PYG{p}{(}\PYG{n}{pp\PYGZus{}mod\PYGZus{}2}\PYG{p}{)}
+
+\PYG{n+nf}{ggplot}\PYG{p}{(}\PYG{n}{data} \PYG{o}{=} \PYG{n}{pp\PYGZus{}mod\PYGZus{}1\PYGZus{}long}\PYG{p}{,} \PYG{n+nf}{aes}\PYG{p}{(}\PYG{n}{x} \PYG{o}{=} \PYG{n}{variable}\PYG{p}{,} \PYG{n}{y} \PYG{o}{=} \PYG{n}{value}\PYG{p}{))} \PYG{o}{+} \PYG{n+nf}{theme\PYGZus{}minimal}\PYG{p}{()} \PYG{o}{+}
+  \PYG{n+nf}{geom\PYGZus{}boxplot}\PYG{p}{()} \PYG{o}{+} \PYG{n+nf}{labs}\PYG{p}{(}\PYG{n}{title} \PYG{o}{=} \PYG{l+s}{\PYGZdq{}Posterior summaries for model 1\PYGZdq{}}\PYG{p}{,} \PYG{n}{y} \PYG{o}{=} \PYG{l+s}{\PYGZdq{}Parameter value\PYGZdq{}}\PYG{p}{,} \PYG{n}{x} \PYG{o}{=} \PYG{l+s}{\PYGZdq{}Parameter\PYGZdq{}}\PYG{p}{)} \PYG{o}{+} \PYG{n+nf}{coord\PYGZus{}cartesian}\PYG{p}{(}\PYG{n}{ylim} \PYG{o}{=} \PYG{n+nf}{c}\PYG{p}{(}\PYG{l+m}{0}\PYG{p}{,} \PYG{l+m}{3}\PYG{p}{))}
+\PYG{n+nf}{ggplot}\PYG{p}{(}\PYG{n}{data} \PYG{o}{=} \PYG{n}{pp\PYGZus{}mod\PYGZus{}2\PYGZus{}long}\PYG{p}{,} \PYG{n+nf}{aes}\PYG{p}{(}\PYG{n}{x} \PYG{o}{=} \PYG{n}{variable}\PYG{p}{,} \PYG{n}{y} \PYG{o}{=} \PYG{n}{value}\PYG{p}{))} \PYG{o}{+} \PYG{n+nf}{theme\PYGZus{}minimal}\PYG{p}{()} \PYG{o}{+}
+  \PYG{n+nf}{geom\PYGZus{}boxplot}\PYG{p}{()} \PYG{o}{+} \PYG{n+nf}{labs}\PYG{p}{(}\PYG{n}{title} \PYG{o}{=} \PYG{l+s}{\PYGZdq{}Posterior summaries for model 2 (extra variance)\PYGZdq{}}\PYG{p}{,} \PYG{n}{y} \PYG{o}{=} \PYG{l+s}{\PYGZdq{}Parameter value\PYGZdq{}}\PYG{p}{,} \PYG{n}{x} \PYG{o}{=} \PYG{l+s}{\PYGZdq{}Parameter\PYGZdq{}}\PYG{p}{)} \PYG{o}{+} \PYG{n+nf}{coord\PYGZus{}cartesian}\PYG{p}{(}\PYG{n}{ylim} \PYG{o}{=} \PYG{n+nf}{c}\PYG{p}{(}\PYG{l+m}{0}\PYG{p}{,} \PYG{l+m}{3}\PYG{p}{))}
 \end{Verbatim}

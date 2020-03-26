@@ -10,7 +10,7 @@
 \PYG{c+c1}{\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}}
 \PYG{c+c1}{\PYGZsh{}a}
 \PYG{n}{avalanches} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{fread}\PYG{p}{(}\PYG{n}{file} \PYG{o}{=} \PYG{l+s}{\PYGZdq{}data/Avalanches.csv\PYGZdq{}}\PYG{p}{)}
-\PYG{n}{avalanches} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{avalanches[Rep.events} \PYG{o}{\PYGZgt{}} \PYG{l+m}{0}\PYG{n}{]}
+\PYG{c+c1}{\PYGZsh{}avalanches \PYGZlt{}\PYGZhy{} avalanches[Rep.events \PYGZgt{} 0]}
 \PYG{n}{avalanches[}\PYG{p}{,} \PYG{l+s}{\PYGZsq{}:=\PYGZsq{}} \PYG{p}{(}\PYG{n}{EADS1} \PYG{o}{=} \PYG{p}{(}\PYG{n}{Season} \PYG{o}{\PYGZgt{}=} \PYG{l+m}{1994} \PYG{o}{\PYGZam{}}
                               \PYG{n}{Season} \PYG{o}{\PYGZlt{}=} \PYG{l+m}{2003}\PYG{p}{),}
                    \PYG{n}{EADS2} \PYG{o}{=} \PYG{p}{(}\PYG{n}{Season} \PYG{o}{\PYGZgt{}=} \PYG{l+m}{2004}\PYG{p}{))}\PYG{n}{]}
@@ -20,13 +20,16 @@
 \PYG{n}{avalanches[}\PYG{p}{,} \PYG{n}{EWS} \PYG{o}{:=} \PYG{l+m}{1} \PYG{o}{+} \PYG{n}{EADS1} \PYG{o}{+} \PYG{l+m}{2} \PYG{o}{*} \PYG{n}{EADS2]}
 \PYG{n}{avalanches[}\PYG{p}{,} \PYG{n}{EWS} \PYG{o}{:=} \PYG{n+nf}{as.factor}\PYG{p}{(}\PYG{n}{EWS}\PYG{p}{)}\PYG{n}{]}
 
+\PYG{n}{d\PYGZus{}offset} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{rep}\PYG{p}{(}\PYG{l+m}{0}\PYG{p}{,} \PYG{n+nf}{nrow}\PYG{p}{(}\PYG{n}{avalanches}\PYG{p}{))}
+
 \PYG{n}{pglm\PYGZus{}data} \PYG{o}{\PYGZlt{}\PYGZhy{}}
   \PYG{n+nf}{list}\PYG{p}{(}
     \PYG{n}{n} \PYG{o}{=} \PYG{n+nf}{nrow}\PYG{p}{(}\PYG{n}{avalanches}\PYG{p}{),}
     \PYG{n}{w1} \PYG{o}{=} \PYG{n}{avalanches}\PYG{o}{\PYGZdl{}}\PYG{n}{EADS1}\PYG{p}{,}
     \PYG{n}{w2} \PYG{o}{=} \PYG{n}{avalanches}\PYG{o}{\PYGZdl{}}\PYG{n}{EADS2}\PYG{p}{,}
+    \PYG{n}{rep} \PYG{o}{=} \PYG{n}{avalanches}\PYG{o}{\PYGZdl{}}\PYG{n}{Rep.events}\PYG{p}{,}
     \PYG{n}{death} \PYG{o}{=} \PYG{n}{avalanches}\PYG{o}{\PYGZdl{}}\PYG{n}{Deaths}\PYG{p}{,}
-    \PYG{n}{offset} \PYG{o}{=} \PYG{n+nf}{log}\PYG{p}{(}\PYG{n}{avalanches}\PYG{o}{\PYGZdl{}}\PYG{n}{Rep.events}\PYG{p}{)}
+    \PYG{n}{offset} \PYG{o}{=} \PYG{n}{d\PYGZus{}offset}
   \PYG{p}{)}
 
 \PYG{n}{res.a} \PYG{o}{\PYGZlt{}\PYGZhy{}}
@@ -40,7 +43,7 @@
 \PYG{n}{res.b} \PYG{o}{\PYGZlt{}\PYGZhy{}}
   \PYG{n+nf}{coda.samples}\PYG{p}{(}
     \PYG{n}{res.a}\PYG{p}{,}
-    \PYG{n}{variable.names} \PYG{o}{=} \PYG{n+nf}{c}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}intercept\PYGZdq{}}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}beta\PYGZus{}w1\PYGZdq{}}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}beta\PYGZus{}w2\PYGZdq{}}\PYG{p}{),}
+    \PYG{n}{variable.names} \PYG{o}{=} \PYG{n+nf}{c}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}intercept\PYGZdq{}}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}beta\PYGZus{}w1\PYGZdq{}}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}beta\PYGZus{}w2\PYGZdq{}}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}beta\PYGZus{}rep\PYGZdq{}}\PYG{p}{),}
     \PYG{n}{n.iter} \PYG{o}{=} \PYG{l+m}{1e4}
   \PYG{p}{)}
 \PYG{n+nf}{summary}\PYG{p}{(}\PYG{n}{res.b}\PYG{p}{)}
@@ -63,9 +66,11 @@
   \PYG{p}{)}
 \PYG{n+nf}{update}\PYG{p}{(}\PYG{n}{res.a}\PYG{p}{,} \PYG{n}{n.iter} \PYG{o}{=} \PYG{l+m}{1e4}\PYG{p}{)}
 \PYG{n}{res.b.ev} \PYG{o}{\PYGZlt{}\PYGZhy{}}
-  \PYG{n+nf}{coda.samples}\PYG{p}{(}\PYG{n}{res.a.ev}\PYG{p}{,}
-               \PYG{n}{variable.names} \PYG{o}{=} \PYG{n+nf}{c}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}beta\PYGZus{}w1\PYGZdq{}}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}beta\PYGZus{}w2\PYGZdq{}}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}theta\PYGZdq{}}\PYG{p}{),}
-               \PYG{n}{n.iter} \PYG{o}{=} \PYG{l+m}{1e5}\PYG{p}{)}
+  \PYG{n+nf}{coda.samples}\PYG{p}{(}
+    \PYG{n}{res.a.ev}\PYG{p}{,}
+    \PYG{n}{variable.names} \PYG{o}{=} \PYG{n+nf}{c}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}beta\PYGZus{}w1\PYGZdq{}}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}beta\PYGZus{}w2\PYGZdq{}}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}beta\PYGZus{}rep\PYGZdq{}}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}theta\PYGZdq{}}\PYG{p}{),}
+    \PYG{n}{n.iter} \PYG{o}{=} \PYG{l+m}{1e4}
+  \PYG{p}{)}
 \PYG{n+nf}{summary}\PYG{p}{(}\PYG{n}{res.b.ev}\PYG{p}{)}
 \PYG{n+nf}{dic.samples}\PYG{p}{(}\PYG{n}{model} \PYG{o}{=} \PYG{n}{res.a.ev}\PYG{p}{,}
             \PYG{n}{n.iter} \PYG{o}{=} \PYG{l+m}{1e4}\PYG{p}{,}
