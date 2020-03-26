@@ -13,12 +13,13 @@ data {
 }
 
 parameters {
-  vector[P_f] beta_f;
+  vector[P_f] beta_f_raw;
   vector[P_r] sn_vec;
   real<lower=0,upper=10> reff_sdv;
 }
 
 transformed parameters{
+  vector[P_f] beta_f = n_params[2] * beta_f_raw + n_params[1]; 
   vector[P_r] beta_r = reff_sdv * sn_vec;
   vector[N] lg_p = X_f * beta_f + X_r * beta_r;
 }
@@ -26,7 +27,8 @@ transformed parameters{
 model {
   reff_sdv ~ uniform(0, 10);
   sn_vec ~ std_normal(); //hence beta_r ~ normal(0, reff_sdv)
-  beta_f ~ normal(n_params[1], n_params[2]);
+  beta_f_raw ~ std_normal(); //hence beta_f ~ normal(n_params[1], n_params[2])
+  //beta_f ~ normal(n_params[1], n_params[2]);
   success ~ binomial(trials, inv_logit(lg_p));
 }
 generated quantities{

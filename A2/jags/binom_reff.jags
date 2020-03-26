@@ -1,0 +1,23 @@
+model {
+  #hyperparameters
+  p_mu <- 0
+  p_tau <- 0.1
+  
+  #priors
+  #beta_0 ~ dnorm(p_mu, p_tau)
+  beta_snow ~ dnorm(p_mu, p_tau)
+  beta_season ~ dnorm(p_mu, p_tau)
+  beta_fnight ~ dnorm(p_mu, p_tau)
+  
+  reff_hyp ~ dunif(0, 10)
+  for (i in 1:n_eff) {
+    reff[i] ~ dnorm(0, 1 / pow(reff_hyp, 2))
+  }
+  
+  #likelihood
+  for (i in 1:n) {
+    logit(p[i]) <-
+      beta_snow * snow[i] + beta_season * season[i] + beta_fnight * fnight[i] + reff[eff[i]]
+    deaths[i] ~ dbinom(p[i], hit[i])
+  }
+}

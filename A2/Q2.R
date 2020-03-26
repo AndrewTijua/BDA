@@ -25,7 +25,7 @@ cor(avalanches_prop[, .(Season, Snow_meters, Snow_fnights)])
 stan_binomial_glm_reff <-
   stan_model(file = "stan/binomial_glm_randomeffects.stan")
 
-submin <- function(x){
+submin <- function(x) {
   m <- min(x)
   x <- x - m
   attributes(x) <- list("scaled:submin" = m)
@@ -33,9 +33,9 @@ submin <- function(x){
 }
 
 cont_vars <- c("Snow_meters", "Snow_fnights")#variables to centre
-avalanches_prop[,(cont_vars) := lapply(.SD, scale, scale = FALSE), .SDcols = cont_vars]#centre variables
+avalanches_prop[, (cont_vars) := lapply(.SD, scale, scale = FALSE), .SDcols = cont_vars]#centre variables
 tm_vars <- c("Season")
-avalanches_prop[,(tm_vars) := lapply(.SD, submin), .SDcols = tm_vars]
+avalanches_prop[, (tm_vars) := lapply(.SD, submin), .SDcols = tm_vars]
 
 
 X_fixedeff <-
@@ -63,20 +63,39 @@ stan_binomial_glm_reff_s <-
     stan_binomial_glm_reff,
     data = stan_binomial_glm_reff_data,
     chains = 4,
-    control = list(adapt_delta = 0.9),
-    iter = 10000#,
-    #init_r = 0.1
+    control = list(adapt_delta = 0.95),
+    iter = 1e4,
+    init_r = 0.1
   )
-reff_coda <- As.mcmc.list(stan_binomial_glm_reff_s, pars = c("beta_r", "beta_f"))
+
+post_params_rand <-
+  extract(stan_binomial_glm_reff_s, c("beta_r"))[[1]]
+post_params_fixed <-
+  extract(stan_binomial_glm_reff_s, c("beta_f"))[[1]]
+post_params <- cbind(post_params_fixed, post_params_rand)
+colnames(post_params) <-
+  c(colnames(X_fixedeff), colnames(X_randomeff))
+ilogit_post_params <- plogis(post_params)
+apply(ilogit_post_params, 2, summary)
+apply(post_params, 2, summary)
+
+dpp_rand <- extract(stan_binomial_glm_reff_s, "data_ppred")[[1]]
+dpp_prop <- apply(dpp_rand, 1, "/", avalanches_prop$Hit)
+apply(dpp_prop, 1, summary)
+
+reff_coda <-
+  As.mcmc.list(stan_binomial_glm_reff_s, pars = c("beta_r", "beta_f"))
 gelman.plot(reff_coda, ask = FALSE)
 
-plot_diag_objects <- function(stanfit){
-  list(post = as.array(stanfit),
-       lp = log_posterior(stanfit),
-       np = nuts_params(stanfit))
+plot_diag_objects <- function(stanfit) {
+  list(
+    post = as.array(stanfit),
+    lp = log_posterior(stanfit),
+    np = nuts_params(stanfit)
+  )
 }
 
-plot_diag <- function(stanfit, pars){
+plot_diag <- function(stanfit, pars) {
   ps <- vars(starts_with(pars))
   post <- as.array(stanfit)
   lp <- log_posterior(stanfit)
@@ -94,7 +113,8 @@ plot_diag <- function(stanfit, pars){
 #####
 #sans snow fortnights
 
-X_f_nsf <- model.matrix(death_prop ~ Season + Snow_meters - 1, data = avalanches_prop)
+X_f_nsf <-
+  model.matrix(death_prop ~ Season + Snow_meters - 1, data = avalanches_prop)
 
 stan_binomial_glm_reff_nsf_data <-
   list(
@@ -113,17 +133,30 @@ stan_binomial_glm_reff_nsf_s <-
     stan_binomial_glm_reff,
     data = stan_binomial_glm_reff_nsf_data,
     chains = 4,
-    control = list(adapt_delta = 0.9),
-    iter = 10000#,
-    #init_r = 0.1
+    control = list(adapt_delta = 0.95),
+    iter = 10000,
+    init_r = 0.1
   )
 
-c_data <- extract(stan_binomial_glm_reff_nsf_s, "data_prop")
+post_params_rand_ns <-
+  extract(stan_binomial_glm_reff_nsf_s, c("beta_r"))[[1]]
+post_params_fixed_ns <-
+  extract(stan_binomial_glm_reff_nsf_s, c("beta_f"))[[1]]
+post_params_ns <- cbind(post_params_fixed_ns, post_params_rand_ns)
+colnames(post_params_ns) <-
+  c(colnames(X_f_nsf), colnames(X_randomeff))
+ilogit_post_params_ns <- plogis(post_params_ns)
+apply(ilogit_post_params_ns, 2, summary)
+apply(post_params_ns, 2, summary)
 
+dpp_rand <- extract(stan_binomial_glm_reff_nsf_s, "data_ppred")[[1]]
+dpp_prop <- apply(dpp_rand, 1, "/", avalanches_prop$Hit)
+apply(dpp_prop, 1, summary)
 
 #####
 #hierarchical on station, sans snow fortnights
-X_r_station <- model.matrix(death_prop ~ Rec.station - 1, data = avalanches_prop)
+X_r_station <-
+  model.matrix(death_prop ~ Rec.station - 1, data = avalanches_prop)
 
 stan_binomial_glm_reff_station_data <-
   list(

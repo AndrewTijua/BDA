@@ -115,8 +115,8 @@
     \PYG{n}{stan\PYGZus{}poisson\PYGZus{}glm}\PYG{p}{,}
     \PYG{n}{data} \PYG{o}{=} \PYG{n}{stan\PYGZus{}poisson\PYGZus{}glm\PYGZus{}data}\PYG{p}{,}
     \PYG{n}{chains} \PYG{o}{=} \PYG{l+m}{7}\PYG{p}{,}
-    \PYG{n}{control} \PYG{o}{=} \PYG{n+nf}{list}\PYG{p}{(}\PYG{n}{adapt\PYGZus{}delta} \PYG{o}{=} \PYG{l+m}{0.6}\PYG{p}{),}
-    \PYG{n}{iter} \PYG{o}{=} \PYG{l+m}{3000}\PYG{p}{,}
+    \PYG{n}{control} \PYG{o}{=} \PYG{n+nf}{list}\PYG{p}{(}\PYG{n}{adapt\PYGZus{}delta} \PYG{o}{=} \PYG{l+m}{0.8}\PYG{p}{),}
+    \PYG{n}{iter} \PYG{o}{=} \PYG{l+m}{1e5}\PYG{p}{,}
     \PYG{n}{init\PYGZus{}r} \PYG{o}{=} \PYG{l+m}{0.1}
   \PYG{p}{)}
 
@@ -136,6 +136,16 @@
 \PYG{n+nf}{mean}\PYG{p}{(}\PYG{n}{p\PYGZus{}pred[}\PYG{p}{,} \PYG{l+m}{2}\PYG{n}{]} \PYG{o}{\PYGZgt{}} \PYG{l+m}{1}\PYG{p}{)}
 \PYG{n+nf}{mean}\PYG{p}{(}\PYG{n}{p\PYGZus{}pred[}\PYG{p}{,} \PYG{l+m}{3}\PYG{n}{]} \PYG{o}{\PYGZgt{}} \PYG{l+m}{1}\PYG{p}{)}
 \PYG{n+nf}{mean}\PYG{p}{(}\PYG{n}{p\PYGZus{}pred[}\PYG{p}{,} \PYG{l+m}{4}\PYG{n}{]} \PYG{o}{\PYGZgt{}} \PYG{l+m}{1}\PYG{p}{)}
+
+\PYG{n}{pp1} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{p\PYGZus{}pred[}\PYG{p}{,}\PYG{l+m}{1}\PYG{n}{]} \PYG{o}{\PYGZlt{}} \PYG{l+m}{15}
+
+\PYG{n}{mean\PYGZus{}boot} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{function}\PYG{p}{(}\PYG{n}{data}\PYG{p}{,} \PYG{n}{index}\PYG{p}{)} \PYG{p}{\PYGZob{}}
+  \PYG{n}{dt\PYGZus{}s} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{data[index]}
+  \PYG{n+nf}{return}\PYG{p}{(}\PYG{n+nf}{mean}\PYG{p}{(}\PYG{n}{dt\PYGZus{}s}\PYG{p}{))}
+\PYG{p}{\PYGZcb{}}
+
+\PYG{n}{bs4} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{boot}\PYG{o}{::}\PYG{n+nf}{boot}\PYG{p}{(}\PYG{n}{pp1}\PYG{p}{,} \PYG{n}{mean\PYGZus{}boot}\PYG{p}{,} \PYG{n}{R} \PYG{o}{=} \PYG{l+m}{1e3}\PYG{p}{)}
+\PYG{n}{boot}\PYG{o}{::}\PYG{n+nf}{boot.ci}\PYG{p}{(}\PYG{n}{bs4}\PYG{p}{,} \PYG{n}{type} \PYG{o}{=} \PYG{l+s}{\PYGZdq{}perc\PYGZdq{}}\PYG{p}{,} \PYG{n}{conf} \PYG{o}{=} \PYG{l+m}{0.95}\PYG{p}{)}
 
 \PYG{n}{data\PYGZus{}pred} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{extract}\PYG{p}{(}\PYG{n}{stan\PYGZus{}poisson\PYGZus{}glm\PYGZus{}s}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}data\PYGZus{}ppred\PYGZdq{}}\PYG{p}{)}\PYG{n}{[[1]]}
 \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n}{data\PYGZus{}pred}\PYG{p}{,} \PYG{l+m}{2}\PYG{p}{,} \PYG{n}{summary}\PYG{p}{)}

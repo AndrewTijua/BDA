@@ -153,7 +153,7 @@ We obtain the following posterior summaries. We have exponentiated our parameter
 
 \begin{table}[ht]
 	\centering
-\begin{tabular}{rrrrr}
+\begin{tabular}{r|rrrr}
 	\hline
 	& (Intercept) $(\beta_0)$ & Rep.events $(\beta_3)$ & EADS1TRUE $(\beta_1)$ & EADS2TRUE $(\beta_2)$\\ 
 	\hline
@@ -226,7 +226,7 @@ We obtain the following table for our posterior values
 
 \begin{table}[ht]
 	\centering
-	\begin{tabular}{rrrrr}
+	\begin{tabular}{r|rrrr}
 		\hline
 		& Rep.events $(\beta_3)$ & EADS1TRUE $(\beta_1)$ & EADS2TRUE $(\beta_2)$ & theta ($\theta$) \\ 
 		\hline
@@ -273,6 +273,107 @@ However it would not account for some years having more avalanches and thus bein
 
 \section*{Question 2}
 
+We have data on each avalanche reported in the Piedmont region between 2014 and 2019. The data contains the year reported (Season), the number of people involved (Hit), the number of fatalities (Deaths), and the nearest recording station (Rec.station). Furthermore for each recording station the total amount of snow (Snow\_total, cm) and the snow permanence (Snow\_days, days) are recorded for each year. The recording stations are divided into 3 geographical regions (Geo.space). 
+
+We transform Snow\_days into Snow\_fnights by dividing by 14. This gives us the permanence in fortnights. We transform Snow\_total into Snow\_meters by dividing by 100. This gives us the amount of snow in meters.  We do not round, as this would lose information. 
+
+We centre both Snow\_fnights and Snow\_meters, as they are continuous variables, so centering them will bot aid in interpretation and in sampler convergence. 
+
+We subtract the minimum of Season from Season, meaning that we interpret Season as the number of years since 2014. This will aid in interpretation and in sampler convergence. 
+
+None of these transformations will change correlations or variance, as they are additive. 
+
+We obtain the following correlations between our three variables. 
+\begin{table}[ht]
+	\centering
+	\begin{tabular}{r|rrr}
+	Pearson Correlation	& Season & Snow\_meters & Snow\_fnights \\ 
+		\hline
+		Season & 1.00 & -0.10 & -0.10 \\ 
+		Snow\_meters & -0.10 & 1.00 & 0.83 \\ 
+		Snow\_fnights & -0.10 & 0.83 & 1.00 \\ 
+	\end{tabular}
+\end{table}
+
+From this we can deduce a weak negative correlation between Season and both Snow\_meters and Snow\_fnights, likely due to climate change. Furthermore we see that Snow\_meters and Snow\_fnights are extremely highly correlated, as expected (more snow means more time for snow to melt). This could prove to be a problem, so we will address this later. 
+
+We are interested in fitting a random effects model for the proportion of fatalities in an avalanche. We assume fixed effects for Season, Snow\_meters,and Snow\_fnights, with a random effect on Geo.space. This is characterised by the following equations:
+
+\begin{align*}
+\mathrm{logit}(p_i) &= \beta_1 \cdot \mathrm{Season} + \beta_2 \cdot \mathrm{Snow\_meters} + \beta_3 \cdot \mathrm{Snow\_fnight} + R_{\mathrm{Geo.space}_i}\\
+R_i \equiv R_{\mathrm{Geo.space}_i} &\sim \mathrm{Normal}(0, R_{hyp})\\
+R_{hyp} &\sim \mathrm{Uniform}(0, 10)\\
+\beta_i &\sim \mathrm{Normal}(0, 10)\\
+\mathrm{Deaths}_i &\sim \mathrm{Binomial}(\mathrm{Hit}_i, p_i)
+\end{align*}
+
+Note that there is no intercept as the random effects on the geographical location serve the same purpose. If we included an intercept we would not get repeatable results as the random effects would be offset by the intercept, thus both the intercept and random effects would converge to different values in each run (but would sum to the same distribution). We would include an intercept if some events had no random effect associated, but that is not the case here.
+
+We are going to run $4$ parallel chains with initial values drawn from a Uniform(-0.1, 0.1) distribution. We are going to run each chain for 10000 iterations and discard the first 5000 (HMC/NUTS converges faster than Gibbs so the length is fine). We are going to increase the adaptation acceptance probability to 0.95 (from 0.8). These will help us to deal with the implied distributional shape given by the uniform-normal combination. It will significantly slow sampling, but this is required for convergence.
+
+After running we check BGR statistics and find that they have all converged to 1. We also check NUTS specific diagnostics (divergences, energies) and find them satisfactory as well (no divergences, good energy mixing). Therefore we proceed with our analysis.
+
+We obtain the following posterior summaries for our parameters:
+
+\begin{table}[ht]
+	\centering
+	\footnotesize
+	\begin{tabular}{r|rrrrrr}
+		\hline
+		& Season ($\beta_1$) & Snow\_meters ($\beta_2$) & Snow\_fnights ($\beta_3$) & Geo\_space1 ($\mathrm{R}_{1}$) & Geo\_space2 ($\mathrm{R}_{2}$) & Geo\_space3 ($\mathrm{R}_{3}$)\\ 
+		\hline
+		Min. & -0.69 & -1.01 & -0.71 & -2.12 & -1.70 & -3.89 \\ 
+		1st Qu. & -0.27 & -0.33 & -0.04 & -0.09 & -0.26 & -0.87 \\ 
+		Median & -0.19 & -0.19 & 0.08 & 0.10 & -0.05 & -0.40 \\ 
+		Mean & -0.18 & -0.18 & 0.08 & 0.18 & -0.07 & -0.52 \\ 
+		3rd Qu. & -0.10 & -0.04 & 0.19 & 0.45 & 0.11 & -0.07 \\ 
+		Max. & 0.43 & 0.89 & 0.80 & 2.83 & 1.36 & 1.24 \\ 
+		\hline
+	\end{tabular}
+\caption{Posterior summaries for the first binomial random effects model, which has the effects on geographical area}
+\label{tab:postsum_binmod1}
+\end{table}
+
+These parameters have an effect on the logit scale, meaning that they affect the log-odds of deaths:survived. For example a snow depth of 1 meter above the mean subtracts 0.18 from the expected log-odds (all other variables held constant). This means that survival becomes more likely the more snow that has occurred. 
+
+Looking at the regions we see that region 1 is more dangerous than region 2, which is more dangerous than region 3 (if all other variables are the same). 
+
+Some of these estimates seem strange, as we would intuitively think that more snow is more deadly. The seasonal trend is expected, and the geographical trend is interesting. However the high correlation between the amount of snow and its permanence seems to be affecting the model, as realistically both of them should have the same sign due to their correlation. Therefore we propose a second model without the Snow\_fnights term.
+
+\[
+\mathrm{logit}(p_i) = \beta_1 \cdot \mathrm{Season} + \beta_2 \cdot \mathrm{Snow\_meters} + R_{\mathrm{Geo.space}_i}
+\]
+
+We perform the same adjustments to the sampler that we did for this model, and check the same statistics.
+
+We obtain the following posterior summaries for our parameters:
+
+\begin{table}[ht]
+	\centering
+	\begin{tabular}{r|rrrrr}
+		\hline
+		& Season ($\beta_1$) & Snow\_meters ($\beta_2$) & Geo\_space1 ($\mathrm{R}_{1}$) & Geo\_space2 ($\mathrm{R}_{2}$) & Geo\_space3 ($\mathrm{R}_{3}$)\\ 
+		\hline
+		Min. & -0.87 & -0.56 & -2.04 & -1.51 & -3.12 \\ 
+		1st Qu. & -0.26 & -0.17 & -0.10 & -0.24 & -0.93 \\ 
+		Median & -0.18 & -0.09 & 0.13 & -0.03 & -0.57 \\ 
+		Mean & -0.18 & -0.10 & 0.20 & -0.05 & -0.61 \\ 
+		3rd Qu. & -0.09 & -0.02 & 0.50 & 0.14 & -0.23 \\ 
+		Max. & 0.35 & 0.29 & 2.91 & 1.73 & 0.72 \\ 
+		\hline
+	\end{tabular}
+\caption{Posterior summaries for the second binomial random effects model, which has the effects on geographical area. This model has been adjusted to compensate for collinearity between Snow\_meters and Snow\_fnights.}
+\label{tab:postsum_binmod2}
+\end{table}
+
+Looking at the tables we come to very similar conclusions. Of particular note is that $\beta_2$ has mean equal to the sum of the means of the previous $\beta_2$ and $\beta_3$. This is due to the high correlation between these variables. 
+
+This means that the random effects are more prominent. Notable is that the 3rd region seems more dangerous under this model. 
+
+
+
+
+
 \printbibliography
 
 \newpage
@@ -301,5 +402,9 @@ However it would not account for some years having more avalanches and thus bein
 \tcbstan{../stan/binomial_glm.stan}
 \tcbstan{../stan/binomial_glm_randomeffects.stan}
 \label{code:stan_2}
+\subsection{JAGS}
+\tcbr{../jags/Q2jags.R}
+\tcbjags{../jags/binom_reff.jags}
+\label{code:jags_2}
 \end{document}
 
