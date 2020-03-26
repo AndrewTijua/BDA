@@ -48,6 +48,12 @@
             \PYG{n}{n.iter} \PYG{o}{=} \PYG{l+m}{1e4}\PYG{p}{,}
             \PYG{n}{type} \PYG{o}{=} \PYG{l+s}{\PYGZsq{}pD\PYGZsq{}}\PYG{p}{)}
 
+\PYG{n}{sm} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{rbindlist}\PYG{p}{(}\PYG{n+nf}{lapply}\PYG{p}{(}\PYG{n}{res.b}\PYG{p}{,} \PYG{n}{as.data.frame}\PYG{p}{))}
+
+\PYG{n}{news\PYGZus{}1\PYGZus{}j} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{mean}\PYG{p}{(}\PYG{n+nf}{exp}\PYG{p}{(}\PYG{n}{sm}\PYG{o}{\PYGZdl{}}\PYG{n}{intercept}\PYG{p}{)} \PYG{o}{\PYGZgt{}} \PYG{l+m}{1}\PYG{p}{)}
+\PYG{n}{news\PYGZus{}2\PYGZus{}j} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{mean}\PYG{p}{(}\PYG{n+nf}{exp}\PYG{p}{(}\PYG{n}{sm}\PYG{o}{\PYGZdl{}}\PYG{n}{beta\PYGZus{}w1} \PYG{o}{+} \PYG{n}{sm}\PYG{o}{\PYGZdl{}}\PYG{n}{intercept}\PYG{p}{)} \PYG{o}{\PYGZgt{}} \PYG{l+m}{1}\PYG{p}{)}
+\PYG{n}{news\PYGZus{}3\PYGZus{}j} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{mean}\PYG{p}{(}\PYG{n+nf}{exp}\PYG{p}{(}\PYG{n}{sm}\PYG{o}{\PYGZdl{}}\PYG{n}{beta\PYGZus{}w2} \PYG{o}{+} \PYG{n}{sm}\PYG{o}{\PYGZdl{}}\PYG{n}{intercept}\PYG{p}{)} \PYG{o}{\PYGZgt{}} \PYG{l+m}{1}\PYG{p}{)}
+
 \PYG{n}{res.a.ev} \PYG{o}{\PYGZlt{}\PYGZhy{}}
   \PYG{n+nf}{jags.model}\PYG{p}{(}
     \PYG{n}{file} \PYG{o}{=} \PYG{l+s}{\PYGZdq{}jags/poisson\PYGZus{}exvar.jags\PYGZdq{}}\PYG{p}{,}
@@ -57,11 +63,9 @@
   \PYG{p}{)}
 \PYG{n+nf}{update}\PYG{p}{(}\PYG{n}{res.a}\PYG{p}{,} \PYG{n}{n.iter} \PYG{o}{=} \PYG{l+m}{1e4}\PYG{p}{)}
 \PYG{n}{res.b.ev} \PYG{o}{\PYGZlt{}\PYGZhy{}}
-  \PYG{n+nf}{coda.samples}\PYG{p}{(}
-    \PYG{n}{res.a.ev}\PYG{p}{,}
-    \PYG{n}{variable.names} \PYG{o}{=} \PYG{n+nf}{c}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}beta\PYGZus{}w1\PYGZdq{}}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}beta\PYGZus{}w2\PYGZdq{}}\PYG{p}{),}
-    \PYG{n}{n.iter} \PYG{o}{=} \PYG{l+m}{1e4}
-  \PYG{p}{)}
+  \PYG{n+nf}{coda.samples}\PYG{p}{(}\PYG{n}{res.a.ev}\PYG{p}{,}
+               \PYG{n}{variable.names} \PYG{o}{=} \PYG{n+nf}{c}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}beta\PYGZus{}w1\PYGZdq{}}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}beta\PYGZus{}w2\PYGZdq{}}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}theta\PYGZdq{}}\PYG{p}{),}
+               \PYG{n}{n.iter} \PYG{o}{=} \PYG{l+m}{1e5}\PYG{p}{)}
 \PYG{n+nf}{summary}\PYG{p}{(}\PYG{n}{res.b.ev}\PYG{p}{)}
 \PYG{n+nf}{dic.samples}\PYG{p}{(}\PYG{n}{model} \PYG{o}{=} \PYG{n}{res.a.ev}\PYG{p}{,}
             \PYG{n}{n.iter} \PYG{o}{=} \PYG{l+m}{1e4}\PYG{p}{,}

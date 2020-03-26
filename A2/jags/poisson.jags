@@ -9,8 +9,9 @@ model {
   beta_w2 ~ dnorm(p_mu, p_tau)
   
   #likelihood
-  for(i in 1:n){
-    log(mu[i]) <- intercept + beta_w1 * w1[i] + beta_w2 * w2[i] + offset[i]
+  for (i in 1:n) {
+    log(mu[i]) <-
+      intercept + beta_w1 * w1[i] + beta_w2 * w2[i] + offset[i]
     death[i] ~ dpois(mu[i])
   }
 }

@@ -47,6 +47,12 @@ dic.samples(model = res.a,
             n.iter = 1e4,
             type = 'pD')
 
+sm <- rbindlist(lapply(res.b, as.data.frame))
+
+news_1_j <- mean(exp(sm$intercept) > 1)
+news_2_j <- mean(exp(sm$beta_w1 + sm$intercept) > 1)
+news_3_j <- mean(exp(sm$beta_w2 + sm$intercept) > 1)
+
 res.a.ev <-
   jags.model(
     file = "jags/poisson_exvar.jags",
@@ -56,11 +62,9 @@ res.a.ev <-
   )
 update(res.a, n.iter = 1e4)
 res.b.ev <-
-  coda.samples(
-    res.a.ev,
-    variable.names = c("beta_w1", "beta_w2"),
-    n.iter = 1e4
-  )
+  coda.samples(res.a.ev,
+               variable.names = c("beta_w1", "beta_w2", "theta"),
+               n.iter = 1e5)
 summary(res.b.ev)
 dic.samples(model = res.a.ev,
             n.iter = 1e4,

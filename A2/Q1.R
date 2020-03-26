@@ -14,7 +14,6 @@ library(bayesplot)
 #####
 #a
 avalanches <- fread(file = "data/Avalanches.csv")
-avalanches <- avalanches[Rep.events > 0]
 avalanches[, ':=' (EADS1 = (Season >= 1994 &
                               Season <= 2003),
                    EADS2 = (Season >= 2004))]
@@ -30,9 +29,9 @@ base_plot + geom_line(aes(x = Season, y = Rep.events, group = F))
 base_plot + geom_line(aes(x = Season, y = Deaths, group = F))
 base_plot + geom_boxplot(aes(x = EWS, y = Deaths), colour = "black")
 
-
+avalanches <- avalanches[Rep.events > 0]
 cor_boot <- function(data, index) {
-  dt_s <- data[index, ]
+  dt_s <- data[index,]
   return(cor(dt_s))
 }
 
@@ -69,7 +68,7 @@ to_model <- avalanches[, .(Deaths, EADS1, EADS2)]
 model_mat <-
   model.matrix(Deaths ~ ., data = to_model)#no intercept as cannot have deaths without avalanche
 d_offset <- log(avalanches$Rep.events)
-model_mat <- model_mat[,]
+model_mat <- model_mat[, ]
 out_names = colnames(model_mat)
 #no need to centre as discrete
 
@@ -108,9 +107,9 @@ stan_poisson_glm_s <-
     stan_poisson_glm,
     data = stan_poisson_glm_data,
     chains = 7,
-    control = list(adapt_delta = 0.9),
-    iter = 3000,
-    init_r = 0.1
+    control = list(adapt_delta = 0.6),
+    iter = 3000#,
+    #init_r = 0.1
   )
 
 post_params <- extract(stan_poisson_glm_s, "lambda")[[1]]
@@ -171,7 +170,7 @@ beta_p <- dnorm(beta, 0, (avno - mean(avno)) ^ (-2))
 stan_poisson_glm_exvar <-
   stan_model(file = "stan/poisson_glm_exvar.stan")
 
-model_mat <- model_mat[,-1]#messes with exvar
+model_mat <- model_mat[, -1]#messes with exvar
 out_names = colnames(model_mat)
 
 X_new = matrix(c(0, 1, 0, 0, 1, 0, 0, 1),
@@ -181,7 +180,7 @@ X_new = matrix(c(0, 1, 0, 0, 1, 0, 0, 1),
 n_offset <- log(c(20, 1, 1, 1))
 
 ym <- data.frame(ym = as.factor(avalanches$Season))
-yim <- model.matrix( ~ . - 1, ym)
+yim <- model.matrix(~ . - 1, ym)
 
 stan_poisson_glm_exvar_data <-
   list(
@@ -204,15 +203,20 @@ stan_poisson_glm_exvar_s <-
     stan_poisson_glm_exvar,
     data = stan_poisson_glm_exvar_data,
     chains = 4,
-    control = list(adapt_delta = 0.999),
-    iter = 8000,
-    init_r = 1
+    control = list(adapt_delta = 0.99, max_treedepth = 15),
+    iter = 4000,
+    init_r = 0.05
   )
 
 post_params_exvar <-
-  extract(stan_poisson_glm_exvar_s, "lambda")[[1]]
+  extract(stan_poisson_glm_exvar_s, c("lambda"))[[1]]
+post_params_theta <- extract(stan_poisson_glm_exvar_s, "theta")[[1]]
 colnames(post_params_exvar) <- out_names
-apply(post_params_exvar, 2, summary)
+names(post_params_theta) <- "theta"
+
+bound <-cbind(post_params_exvar, post_params_theta)
+colnames(bound) <- c(out_names, "theta")
+apply(bound, 2, summary)
 
 dpp <- extract(stan_poisson_glm_exvar_s, "data_ppred")[[1]]
 apply(dpp, 2, summary)

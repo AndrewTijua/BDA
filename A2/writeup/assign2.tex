@@ -112,7 +112,7 @@
 \begin{figure}[H]
 	\includegraphics[width = 0.45\textwidth]{../ava_sea}
 	\includegraphics[width = 0.45\textwidth]{../dea_sea}
-	\caption{Plots illustrating the temporal evolution of avalanche related statistics. The EWS measure is 1 = No EADS, 2 = EADS present, 3 = EADS online daily.}
+	\caption{Plots illustrating the temporal evolution of avalanche related statistics. The EWS measure is 1 = No EADS, 2 = EADS extant, 3 = EADS online daily.}
 	\label{fig:tempevava}
 \end{figure}	
 
@@ -141,9 +141,9 @@ Our formulae are as follows:
 \mathrm{Deaths}_i &\sim \mathrm{Poisson}(\lambda_i)
 \end{align*}
 
-We note that these parameters have a multiplicative effect on the rate, so it is fine to have an intercept on physical terms. We will remove the intercept later. Note that we are using an offset, as we are calculating the rate of casualty per avalanche, so the rate should be the same per avalanche and hence the offset.
+We note that these parameters have a multiplicative effect on the rate, so it is fine to have an intercept on physical terms. Note that we are using an offset, as we are calculating the rate of casualty per avalanche, so the rate should be the same per avalanche and hence the offset. We need to filter out years that have no avalanches, as they will break the 2nd equation. This is fine, as those years give no information anyway. 
 
-We could model without the offset and with a regression coefficient on the number of avalanches. However this would be nonsensical, as it would imply that there can be avalanche deaths without an avalanche even occurring. That model also had quite a bit larger DIC (and was overall worse in other measures such as WAIC and LOO) than the model that we are using.
+We could model without the offset and with a regression coefficient on the number of avalanches. However this would be nonsensical, as it would imply that there can be avalanche deaths without an avalanche even occurring. That model also had a larger DIC (and was overall worse in other measures such as WAIC and LOO) than the model that we are using.
 
 We place wide normal priors on all $\beta_i$ and code up our model. The code is given in \ref{code:stan_1}, with a JAGS version given in \ref{code:jags_1}. 
 
@@ -153,21 +153,21 @@ We run it and obtain the following posterior summaries. We have exponentiated ou
 	\centering
 	\begin{tabular}{rrrr}
 		\hline
-		& (Intercept) & EADS1TRUE & EADS2TRUE \\ 
+		& Intercept ($\beta_0$) & EADS1TRUE ($\beta_1$) & EADS2TRUE ($\beta_2$) \\ 
 		\hline
-		Min. & 0.30 & 0.26 & 0.16 \\ 
-		1st Qu. & 0.66 & 0.64 & 0.39 \\ 
-		Median & 0.77 & 0.78 & 0.47 \\ 
-		Mean & 0.78 & 0.82 & 0.48 \\ 
-		3rd Qu. & 0.89 & 0.96 & 0.55 \\ 
-		Max. & 1.64 & 2.44 & 1.21 \\ 
+		Min. & 0.276 & 0.258 & 0.174 \\ 
+		1st Qu. & 0.668 & 0.635 & 0.388 \\ 
+		Median & 0.776 & 0.778 & 0.459 \\ 
+		Mean & 0.787 & 0.815 & 0.479 \\ 
+		3rd Qu. & 0.893 & 0.954 & 0.549 \\ 
+		Max. & 1.646 & 3.019 & 1.419 \\ 
 		\hline
 	\end{tabular}
 \caption{Posterior summaries for the first Poisson model}
 \label{tab:postsum_po}
 \end{table}
 
-From this we can make some initial conclusions. We see that the expected number of deaths per avalanche given no mitigation is 0.78. We also see that each EADS evolution decreases the expected number of deaths, by 0.82 and 0.48 times respectively (if all other variables are held constant). The latter is a rather large decrease, befitting of the drastic change in preparation tact that the EADS going online brought about.
+From this we can make some initial conclusions. We see that the expected number of deaths per avalanche given no mitigation is 0.79. We also see that each EADS evolution decreases the expected number of deaths, by 0.82 and 0.48 times respectively (if all other variables are held constant). The latter is a rather large decrease, befitting of the drastic change in preparation tact that the EADS going online brought about.
 
 We are interested in the posterior predictive distribution. We want to predict the probability of observing less than 15 deaths given 20 avalanches next year. We know that the EADS will still be online, so we have the appropriate data. 
 
@@ -183,7 +183,7 @@ We calculate these probabilities for all values of the EADS and obtain
 	\hline
 	No EADS & EADS & EADS online \\
 	\hline
-	0.104 & 0.005 & 0 (machine precision) \\
+	0.105 & 0.005 & 0 (machine precision) \\
 	\hline
 \end{tabular}
 \caption{Probabilities of multiple fatalities per avalanche given the various states of the EADS}
@@ -194,9 +194,49 @@ After this we are told that on average the number of avalanches per year is betw
 
 From this we work out that the mean number of avalanches is 10 with standard deviation 5. We also want to give the multiplier high mass between 0.25 and 4. 
 
-Suggested is a log-normal prior with mean 0 and standard deviation 2 on \[\phi = \exp((x-\mu_x)\cdot\beta_{\mathrm{Rep.events}}),\] the multiplier. This implies a normal prior with mean 0 and standard deviation 2 for $(x-\mu_x)\cdot\beta_{\mathrm{Rep.events}}$, or $\beta_{\mathrm{Rep.events}} \sim N(\mu = 0, \sigma^2 = 4(x-\mu_x)^2).$ There could be problems with this, as it is possible for $(x-\mu_x)$ to be 0. 
+Suggested is a log-normal prior with mean 0 and standard deviation 2 on $\phi = \exp((x-\mu_x)\cdot\beta_{\mathrm{Rep.events}}),$ the multiplier. This implies a normal prior with mean 0 and standard deviation 2 for $(x-\mu_x)\cdot\beta_{\mathrm{Rep.events}}$, or $\beta_{\mathrm{Rep.events}} \sim N(\mu = 0, \sigma^2 = 4(x-\mu_x)^2).$ There could be problems with this, as it is possible for $(x-\mu_x)$ to be 0. 
 
 The mean and standard deviation parameters for a lognormal distribution are typically given as the mean and standard deviation of the underlying normal distribution. Hence we calculate the true mean and SD as \[\mu_{\phi} = \exp\left(0 + \frac{2^2}{2}\right) = e^2 \approx 7.39, \qquad \sigma^2_{\phi} = (\exp(2^2)-1)\exp(2\cdot0 + 2^2) = e^8 - e^4 \approx 2925, \implies \sigma \approx 54.\] This is clearly not appropriate for the multiplier, as the mean is too high, and the standard deviation even moreso.
+
+We are now going to expand our model to include a term to capture randomness not accounted for by the other components. We are going to design the model as follows
+
+\begin{align*}
+\theta_{hyp} &\sim \mathrm{Uniform}(0, 10),\\
+\theta &\sim \mathrm{Normal}(0, \theta_{hyp}),\\
+\lambda_i &= \mathrm{Rep.events}_i \cdot \exp(\beta_1 \cdot \mathrm{EADS1}_i + \beta_2 \cdot \mathrm{EADS2}_i + \theta),\\
+\log(\lambda_i) &= \beta_1 \cdot \mathrm{EADS1}_i + \beta_2 \cdot \mathrm{EADS2}_i + \ln(\mathrm{Rep.events}_i) + \theta,\\
+\mathrm{Deaths}_i &\sim \mathrm{Poisson}(\lambda_i)
+\end{align*} 
+
+This model is a lot more computationally complex than the other model and requires us to make some tweaks to the sampling and model code in order to make it converge well. It runs significantly slower than the previous model, but we do get convergence. We have re-parametrised and de-centred the model so that it is mathematically equivalent, but we are dealing with standard normals and multiples thereof, rather than working with normals with variable $\sigma$. 
+
+To make this model run well we must remove the intercept term. This is because $\theta$ and the intercept term serve the same purpose; capture the latent effect. Therefore the intercept term must be removed, as $\theta + \beta_0$ should be constant, but this does not constrain either of them, thus without removing the intercept we do not get convergence. We note that $\beta_0$ had a normal prior with mean 0, so $\theta$ should well compensate for it.
+
+This is one of the few times I have seen JAGS converge better than Stan, as the NUTS sampler finds it somewhat tricky to deal with the implied distribution space given by the normal-uniform combination alongside the others. We have to run for more iterations and with a smaller stepping than we would like, so it takes significantly longer to run. A single chain of this model takes over 3 times as long as all of the chains of the previous model. Given all of this it should give us a lot better predictions right?
+
+Well, no.
+
+We obtain the following table for our posterior values
+
+\begin{table}[ht]
+	\centering
+	\begin{tabular}{rrrr}
+		\hline
+		& EADS1TRUE ($\beta_1$) & EADS2TRUE ($\beta_2$) & theta ($\theta$) \\ 
+		\hline
+		Min. & -1.322 & -1.660 & -1.101 \\ 
+		1st Qu. & -0.491 & -0.982 & -0.357 \\ 
+		Median & -0.298 & -0.816 & -0.206 \\ 
+		Mean & -0.290 & -0.809 & -0.222 \\ 
+		3rd Qu. & -0.096 & -0.647 & -0.069 \\ 
+		Max. & 0.788 & 0.111 & 0.434 \\ 
+		\hline
+	\end{tabular}
+\caption{Posterior summaries for the second Poisson model, which attempts to encapsulate the extra variability}
+\label{tab:postsum_poexv}
+\end{table}
+
+
 \printbibliography
 
 \newpage
