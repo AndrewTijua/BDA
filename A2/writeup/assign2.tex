@@ -125,7 +125,7 @@
 		\hline
 		No EADS & EADS & EADS Online \\
 		\hline
-		0.807 (0.9325, 0.9986) & 0.875 (0.1890, 0.9728) & 0.602 (0.3842, 0.8147) \\
+		0.807 (0.6397, 0.9986) & 0.875 (0.1890, 0.9728) & 0.602 (0.3842, 0.8147) \\
 		\hline
 	\end{tabular}
 \end{table}
@@ -137,13 +137,13 @@ Our formulae are as follows:
 
 \begin{align*}
 \lambda_i &= \mathrm{Rep.events}_i \cdot \exp(\beta_0 + \beta_1 \cdot \mathrm{EADS1}_i + \beta_2 \cdot \mathrm{EADS2}_i)\\
-\log(\lambda_i) &= \beta_0 + \beta_1 \cdot \mathrm{EADS1}_i + \beta_2 \cdot \mathrm{EADS2}_i) + \ln(\mathrm{Rep.events}_i)\\
+\log(\lambda_i) &= \beta_0 + \beta_1 \cdot \mathrm{EADS1}_i + \beta_2 \cdot \mathrm{EADS2}_i + \ln(\mathrm{Rep.events}_i)\\
 \mathrm{Deaths}_i &\sim \mathrm{Poisson}(\lambda_i)
 \end{align*}
 
 We note that these parameters have a multiplicative effect on the rate, so it is fine to have an intercept on physical terms. We will remove the intercept later. Note that we are using an offset, as we are calculating the rate of casualty per avalanche, so the rate should be the same per avalanche and hence the offset.
 
-We could model without the offset and with a regression coefficient on the number of avalanches. However this nonsensical, as it would imply that there can be avalanche deaths without an avalanche even occurring. That model also had quite a bit larger DIC (and was overall worse in other measures such as WAIC and LOO) than the model that we are using.
+We could model without the offset and with a regression coefficient on the number of avalanches. However this would be nonsensical, as it would imply that there can be avalanche deaths without an avalanche even occurring. That model also had quite a bit larger DIC (and was overall worse in other measures such as WAIC and LOO) than the model that we are using.
 
 We place wide normal priors on all $\beta_i$ and code up our model. The code is given in \ref{code:stan_1}, with a JAGS version given in \ref{code:jags_1}. 
 
@@ -183,7 +183,7 @@ We calculate these probabilities for all values of the EADS and obtain
 	\hline
 	No EADS & EADS & EADS online \\
 	\hline
-	0.104 & 0.005 & 0 \\
+	0.104 & 0.005 & 0 (machine precision) \\
 	\hline
 \end{tabular}
 \caption{Probabilities of multiple fatalities per avalanche given the various states of the EADS}
