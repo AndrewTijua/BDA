@@ -415,7 +415,7 @@ This model is very similar to our previous model, but we expect more finely tune
 
 We run the sampler with the same settings as above and obtain the following summary statistics: 
 
-\begin{table}[ht]
+\begin{table}[H]
 	\centering
 	\begin{tabular}{r|rrrrrrr}
 		\hline
@@ -444,7 +444,21 @@ We run the sampler with the same settings as above and obtain the following summ
 		Max. & 2.63 & 18.10 & 3.29 & 1.70 & 3.54 & 2.58 \\ 
 		\hline
 	\end{tabular}
+\caption{Posterior summaries for the third binomial random effects model, which has the effects on the recording station. This model has been adjusted to compensate for collinearity between Snow\_meters and Snow\_fnights.}
+\label{tab:postsum_binmod3}
 \end{table}
+
+However we could have a random effect on the recording station drawn from the geographical area drawn from an overarching distribution. We propose the following model:
+
+\begin{align*}
+\sigma_1, \sigma_2 &\sim \Gamma(1, 0.1), \\
+\mu_{\mathrm{Geo.space}_i} &\sim \mathrm{Normal}(0, \sigma_2^{-2})\\\
+R_{\mathrm{(Rep.station, Geo.space)}_i} &\sim \mathrm{Normal}(\mu_{\mathrm{Geo.space}_i}, \sigma_1^{-2}),\\
+\mathrm{logit}(p_i) &= \beta_1 \cdot \mathrm{Season} + \beta_2 \cdot \mathrm{Snow\_meters} + R_{\mathrm{(Rep.station, Geo.space)}_i}, \\
+\mathrm{Deaths}_i &\sim \mathrm{Binomial}(\mathrm{Hit}_i, p_i),
+\end{align*}
+
+which we have encoded in JAGS in \texttt{binom\_doublereff.jags}.
 \printbibliography
 
 \newpage
@@ -477,6 +491,7 @@ We run the sampler with the same settings as above and obtain the following summ
 \tcbr{../jags/Q2jags.R}
 \tcbjags{../jags/binom_reff.jags}
 \tcbjags{../jags/binom_reff_nofn.jags}
+\tcbjags{../jags/binom_doublereff.jags}
 \label{code:jags_2}
 \end{document}
 

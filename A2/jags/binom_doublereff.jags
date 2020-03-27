@@ -1,0 +1,28 @@
+model {
+  #hyperparameters
+  p_mu <- 0
+  p_tau <- 0.1
+  
+  #priors
+  #beta_0 ~ dnorm(p_mu, p_tau)
+  beta_snow ~ dnorm(p_mu, p_tau)
+  beta_season ~ dnorm(p_mu, p_tau)
+  
+  sigma_1 ~ dgamma(1, 0.1)
+  sigma_2 ~ dgamma(1, 0.1)
+  
+  for(i in 1:n_geo){
+    r_eff_geo[i] ~ dnorm(0, sigma_1)
+  }
+  
+  for(i in 1:n_station){
+    r_eff_statgeo[i] ~ dnorm(r_eff_geo[geos[i]], sigma_2)
+  }
+  
+  #likelihood
+  for (i in 1:n) {
+    logit(p[i]) <-
+      beta_snow * snow[i] + beta_season * season[i] + r_eff_statgeo[stations[i]]
+    deaths[i] ~ dbinom(p[i], hit[i])
+  }
+}

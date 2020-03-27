@@ -140,3 +140,45 @@ res.b_nf_stat <-
   )
 
 summary(res.b_nf_stat)
+#####
+snow <- avalanches_prop$Snow_meters
+season <- avalanches_prop$Season
+#n_eff <- length(unique(avalanches_prop$Geo_space))
+#eff <- as.integer(avalanches_prop$Geo_space)
+stations <- as.integer(avalanches_prop$Rec.station)
+geos <- as.integer(avalanches_prop$Geo_space)
+n_station <- length(unique(stations))
+n_geo <- length(unique(geos))
+n <- nrow(avalanches_prop)
+deaths <- as.integer(avalanches_prop$Deaths)
+hit <- as.integer(avalanches_prop$Hit)
+
+bglm_data_nf_statgeo <-
+  list(
+    n = n,
+    snow = snow,
+    season = season,
+    geos = geos,
+    stations = stations,
+    n_station = n_station,
+    n_geo = n_geo,
+    deaths = deaths,
+    hit = hit
+  )
+
+res.a_nf_statgeo <-
+  jags.model(
+    file = "jags/binom_doublereff.jags",
+    data = bglm_data_nf_statgeo,
+    n.chains = 4,
+    quiet = T
+  )
+update(res.a_nf_statgeo, n.iter = 1e4)
+res.b_nf_statgeo <-
+  coda.samples(
+    res.a_nf_statgeo,
+    variable.names = c("beta_snow", "beta_season", "r_eff_geo", "r_eff_statgeo"),
+    n.iter = 1e5
+  )
+
+summary(res.b_nf_statgeo)

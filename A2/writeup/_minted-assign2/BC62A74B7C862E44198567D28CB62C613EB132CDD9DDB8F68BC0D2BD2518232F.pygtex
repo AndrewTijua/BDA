@@ -141,4 +141,46 @@
   \PYG{p}{)}
 
 \PYG{n+nf}{summary}\PYG{p}{(}\PYG{n}{res.b\PYGZus{}nf\PYGZus{}stat}\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}}
+\PYG{n}{snow} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{avalanches\PYGZus{}prop}\PYG{o}{\PYGZdl{}}\PYG{n}{Snow\PYGZus{}meters}
+\PYG{n}{season} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{avalanches\PYGZus{}prop}\PYG{o}{\PYGZdl{}}\PYG{n}{Season}
+\PYG{c+c1}{\PYGZsh{}n\PYGZus{}eff \PYGZlt{}\PYGZhy{} length(unique(avalanches\PYGZus{}prop\PYGZdl{}Geo\PYGZus{}space))}
+\PYG{c+c1}{\PYGZsh{}eff \PYGZlt{}\PYGZhy{} as.integer(avalanches\PYGZus{}prop\PYGZdl{}Geo\PYGZus{}space)}
+\PYG{n}{stations} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{as.integer}\PYG{p}{(}\PYG{n}{avalanches\PYGZus{}prop}\PYG{o}{\PYGZdl{}}\PYG{n}{Rec.station}\PYG{p}{)}
+\PYG{n}{geos} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{as.integer}\PYG{p}{(}\PYG{n}{avalanches\PYGZus{}prop}\PYG{o}{\PYGZdl{}}\PYG{n}{Geo\PYGZus{}space}\PYG{p}{)}
+\PYG{n}{n\PYGZus{}station} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{length}\PYG{p}{(}\PYG{n+nf}{unique}\PYG{p}{(}\PYG{n}{stations}\PYG{p}{))}
+\PYG{n}{n\PYGZus{}geo} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{length}\PYG{p}{(}\PYG{n+nf}{unique}\PYG{p}{(}\PYG{n}{geos}\PYG{p}{))}
+\PYG{n}{n} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{nrow}\PYG{p}{(}\PYG{n}{avalanches\PYGZus{}prop}\PYG{p}{)}
+\PYG{n}{deaths} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{as.integer}\PYG{p}{(}\PYG{n}{avalanches\PYGZus{}prop}\PYG{o}{\PYGZdl{}}\PYG{n}{Deaths}\PYG{p}{)}
+\PYG{n}{hit} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{as.integer}\PYG{p}{(}\PYG{n}{avalanches\PYGZus{}prop}\PYG{o}{\PYGZdl{}}\PYG{n}{Hit}\PYG{p}{)}
+
+\PYG{n}{bglm\PYGZus{}data\PYGZus{}nf\PYGZus{}statgeo} \PYG{o}{\PYGZlt{}\PYGZhy{}}
+  \PYG{n+nf}{list}\PYG{p}{(}
+    \PYG{n}{n} \PYG{o}{=} \PYG{n}{n}\PYG{p}{,}
+    \PYG{n}{snow} \PYG{o}{=} \PYG{n}{snow}\PYG{p}{,}
+    \PYG{n}{season} \PYG{o}{=} \PYG{n}{season}\PYG{p}{,}
+    \PYG{n}{geos} \PYG{o}{=} \PYG{n}{geos}\PYG{p}{,}
+    \PYG{n}{stations} \PYG{o}{=} \PYG{n}{stations}\PYG{p}{,}
+    \PYG{n}{n\PYGZus{}station} \PYG{o}{=} \PYG{n}{n\PYGZus{}station}\PYG{p}{,}
+    \PYG{n}{n\PYGZus{}geo} \PYG{o}{=} \PYG{n}{n\PYGZus{}geo}\PYG{p}{,}
+    \PYG{n}{deaths} \PYG{o}{=} \PYG{n}{deaths}\PYG{p}{,}
+    \PYG{n}{hit} \PYG{o}{=} \PYG{n}{hit}
+  \PYG{p}{)}
+
+\PYG{n}{res.a\PYGZus{}nf\PYGZus{}statgeo} \PYG{o}{\PYGZlt{}\PYGZhy{}}
+  \PYG{n+nf}{jags.model}\PYG{p}{(}
+    \PYG{n}{file} \PYG{o}{=} \PYG{l+s}{\PYGZdq{}jags/binom\PYGZus{}doublereff.jags\PYGZdq{}}\PYG{p}{,}
+    \PYG{n}{data} \PYG{o}{=} \PYG{n}{bglm\PYGZus{}data\PYGZus{}nf\PYGZus{}statgeo}\PYG{p}{,}
+    \PYG{n}{n.chains} \PYG{o}{=} \PYG{l+m}{4}\PYG{p}{,}
+    \PYG{n}{quiet} \PYG{o}{=} \PYG{n+nb+bp}{T}
+  \PYG{p}{)}
+\PYG{n+nf}{update}\PYG{p}{(}\PYG{n}{res.a\PYGZus{}nf\PYGZus{}statgeo}\PYG{p}{,} \PYG{n}{n.iter} \PYG{o}{=} \PYG{l+m}{1e4}\PYG{p}{)}
+\PYG{n}{res.b\PYGZus{}nf\PYGZus{}statgeo} \PYG{o}{\PYGZlt{}\PYGZhy{}}
+  \PYG{n+nf}{coda.samples}\PYG{p}{(}
+    \PYG{n}{res.a\PYGZus{}nf\PYGZus{}statgeo}\PYG{p}{,}
+    \PYG{n}{variable.names} \PYG{o}{=} \PYG{n+nf}{c}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}beta\PYGZus{}snow\PYGZdq{}}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}beta\PYGZus{}season\PYGZdq{}}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}r\PYGZus{}eff\PYGZus{}geo\PYGZdq{}}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}r\PYGZus{}eff\PYGZus{}statgeo\PYGZdq{}}\PYG{p}{),}
+    \PYG{n}{n.iter} \PYG{o}{=} \PYG{l+m}{1e5}
+  \PYG{p}{)}
+
+\PYG{n+nf}{summary}\PYG{p}{(}\PYG{n}{res.b\PYGZus{}nf\PYGZus{}statgeo}\PYG{p}{)}
 \end{Verbatim}
