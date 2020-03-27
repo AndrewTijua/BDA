@@ -122,7 +122,7 @@ plot_diag <- function(stanfit, pars) {
 #####
 #sans snow fortnights
 varofint <- avalanches_prop[(Rec.station %in% c(1, 8, 10)) & (Year %in% c(2015, 2018))]
-ids <- unique(varofint, by = c("Rec.station", "Year"))
+ids <- unique(varofint, by = c("Rec.station", "Year"))$Event_ID
 index <- which(avalanches_prop$Event_ID %in% ids)
 
 X_f_nsf <-
@@ -207,3 +207,10 @@ colnames(post_params_ns_stat) <-
 ilogit_post_params_ns_stat <- plogis(post_params_ns_stat)
 apply(ilogit_post_params_ns_stat, 2, summary)
 apply(post_params_ns_stat, 2, summary)
+
+dpp_rand_ns_stat <- extract(stan_binomial_glm_reff_station_s, "data_prop")[[1]]
+apply(dpp_rand_ns_stat, 2, summary)
+dpp_ofintns_stat <- dpp_rand_ns_stat[,index]
+apply(dpp_ofintns_stat, 2, mean)
+apply(dpp_ofintns_stat, 2, quantile, c(0.025, 0.975))
+apply(dpp_ofintns_stat > 0.6, 2, mean)

@@ -123,7 +123,7 @@
 \PYG{c+c1}{\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}}
 \PYG{c+c1}{\PYGZsh{}sans snow fortnights}
 \PYG{n}{varofint} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{avalanches\PYGZus{}prop}\PYG{n+nf}{[}\PYG{p}{(}\PYG{n}{Rec.station} \PYG{o}{\PYGZpc{}in\PYGZpc{}} \PYG{n+nf}{c}\PYG{p}{(}\PYG{l+m}{1}\PYG{p}{,} \PYG{l+m}{8}\PYG{p}{,} \PYG{l+m}{10}\PYG{p}{))} \PYG{o}{\PYGZam{}} \PYG{p}{(}\PYG{n}{Year} \PYG{o}{\PYGZpc{}in\PYGZpc{}} \PYG{n+nf}{c}\PYG{p}{(}\PYG{l+m}{2015}\PYG{p}{,} \PYG{l+m}{2018}\PYG{p}{))}\PYG{n}{]}
-\PYG{n}{ids} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{unique}\PYG{p}{(}\PYG{n}{varofint}\PYG{p}{,} \PYG{n}{by} \PYG{o}{=} \PYG{n+nf}{c}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}Rec.station\PYGZdq{}}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}Year\PYGZdq{}}\PYG{p}{))}
+\PYG{n}{ids} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{unique}\PYG{p}{(}\PYG{n}{varofint}\PYG{p}{,} \PYG{n}{by} \PYG{o}{=} \PYG{n+nf}{c}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}Rec.station\PYGZdq{}}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}Year\PYGZdq{}}\PYG{p}{))}\PYG{o}{\PYGZdl{}}\PYG{n}{Event\PYGZus{}ID}
 \PYG{n}{index} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{which}\PYG{p}{(}\PYG{n}{avalanches\PYGZus{}prop}\PYG{o}{\PYGZdl{}}\PYG{n}{Event\PYGZus{}ID} \PYG{o}{\PYGZpc{}in\PYGZpc{}} \PYG{n}{ids}\PYG{p}{)}
 
 \PYG{n}{X\PYGZus{}f\PYGZus{}nsf} \PYG{o}{\PYGZlt{}\PYGZhy{}}
@@ -208,4 +208,11 @@
 \PYG{n}{ilogit\PYGZus{}post\PYGZus{}params\PYGZus{}ns\PYGZus{}stat} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{plogis}\PYG{p}{(}\PYG{n}{post\PYGZus{}params\PYGZus{}ns\PYGZus{}stat}\PYG{p}{)}
 \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n}{ilogit\PYGZus{}post\PYGZus{}params\PYGZus{}ns\PYGZus{}stat}\PYG{p}{,} \PYG{l+m}{2}\PYG{p}{,} \PYG{n}{summary}\PYG{p}{)}
 \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n}{post\PYGZus{}params\PYGZus{}ns\PYGZus{}stat}\PYG{p}{,} \PYG{l+m}{2}\PYG{p}{,} \PYG{n}{summary}\PYG{p}{)}
+
+\PYG{n}{dpp\PYGZus{}rand\PYGZus{}ns\PYGZus{}stat} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{extract}\PYG{p}{(}\PYG{n}{stan\PYGZus{}binomial\PYGZus{}glm\PYGZus{}reff\PYGZus{}station\PYGZus{}s}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}data\PYGZus{}prop\PYGZdq{}}\PYG{p}{)}\PYG{n}{[[1]]}
+\PYG{n+nf}{apply}\PYG{p}{(}\PYG{n}{dpp\PYGZus{}rand\PYGZus{}ns\PYGZus{}stat}\PYG{p}{,} \PYG{l+m}{2}\PYG{p}{,} \PYG{n}{summary}\PYG{p}{)}
+\PYG{n}{dpp\PYGZus{}ofintns\PYGZus{}stat} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{dpp\PYGZus{}rand\PYGZus{}ns\PYGZus{}stat[}\PYG{p}{,}\PYG{n}{index]}
+\PYG{n+nf}{apply}\PYG{p}{(}\PYG{n}{dpp\PYGZus{}ofintns\PYGZus{}stat}\PYG{p}{,} \PYG{l+m}{2}\PYG{p}{,} \PYG{n}{mean}\PYG{p}{)}
+\PYG{n+nf}{apply}\PYG{p}{(}\PYG{n}{dpp\PYGZus{}ofintns\PYGZus{}stat}\PYG{p}{,} \PYG{l+m}{2}\PYG{p}{,} \PYG{n}{quantile}\PYG{p}{,} \PYG{n+nf}{c}\PYG{p}{(}\PYG{l+m}{0.025}\PYG{p}{,} \PYG{l+m}{0.975}\PYG{p}{))}
+\PYG{n+nf}{apply}\PYG{p}{(}\PYG{n}{dpp\PYGZus{}ofintns\PYGZus{}stat} \PYG{o}{\PYGZgt{}} \PYG{l+m}{0.6}\PYG{p}{,} \PYG{l+m}{2}\PYG{p}{,} \PYG{n}{mean}\PYG{p}{)}
 \end{Verbatim}

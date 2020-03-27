@@ -1,9 +1,9 @@
 [0] Config.pm:304> INFO - This is Biber 2.14
 [0] Config.pm:307> INFO - Logfile is 'assign2.blg'
-[68] biber-MSWIN64:322> INFO - === 
-[85] Biber.pm:415> INFO - Reading 'assign2.bcf'
-[185] Biber.pm:943> INFO - Found 0 citekeys in bib section 0
-[191] Utils.pm:304> WARN - The file 'assign2.bcf' does not contain any citations!
-[201] bbl.pm:652> INFO - Writing 'assign2.bbl' with encoding 'UTF-8'
-[202] bbl.pm:755> INFO - Output to assign2.bbl
-[203] Biber.pm:128> INFO - WARNINGS: 1
+[99] biber-MSWIN64:322> INFO - === 
+[120] Biber.pm:415> INFO - Reading 'assign2.bcf'
+[239] Biber.pm:943> INFO - Found 0 citekeys in bib section 0
+[245] Utils.pm:304> WARN - The file 'assign2.bcf' does not contain any citations!
+[255] bbl.pm:652> INFO - Writing 'assign2.bbl' with encoding 'UTF-8'
+[255] bbl.pm:755> INFO - Output to assign2.bbl
+[256] Biber.pm:128> INFO - WARNINGS: 1

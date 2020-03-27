@@ -379,7 +379,7 @@ We are now interested in the posterior distribution for the proportion of deaths
 			& Station 1: 2015 & 2018 & Station 8: 2015 & 2018 & Station 10: 2015 & 2018 \\
 			\hline
 			Mean & 0.45 & 0.33 & 0.51 & 0.31 & 0.37 & 0.23 \\
-			Interval & (0.24, 0.0.69) & (0.12, 0.63) & (0.34, 0.65) & (0.14, 0.51) & (0.19, 0.54) & (0.09, 0.41)\\
+			Interval & (0.24, 0.69) & (0.12, 0.63) & (0.34, 0.65) & (0.14, 0.51) & (0.19, 0.54) & (0.09, 0.41)\\
 			\hline
 	\end{tabular}
 \caption{Posterior summaries for the predicted proportion of casualties near the given recording stations in the given years. Data from the years has been used to construct these statistics.}
@@ -447,6 +447,24 @@ We run the sampler with the same settings as above and obtain the following summ
 \caption{Posterior summaries for the third binomial random effects model, which has the effects on the recording station. This model has been adjusted to compensate for collinearity between Snow\_meters and Snow\_fnights.}
 \label{tab:postsum_binmod3}
 \end{table}
+
+We also obtain the following means and 95\% credible intervals for the proportion of casualties near the given stations in the given years. 
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{r|rr|rr|rr}
+		\hline
+		& Station 1: 2015 & 2018 & Station 8: 2015 & 2018 & Station 10: 2015 & 2018 \\
+		\hline
+		Mean & 0.72 & 0.61 & 0.58 & 0.37 & 0.47 & 0.30 \\
+		Interval & (0.34, 0.99) & (0.18, 0.98) & (0.12, 0.68) & (0.14, 0.51) & (0.15, 0.79) & (0.06, 0.66)\\
+		\hline
+	\end{tabular}
+	\caption{Posterior summaries for the predicted proportion of casualties near the given recording stations in the given years. Data from the years has been used to construct these statistics. This model has the random effect on the station, not geographical area as previous.}
+	\label{tab:postprop_stat}
+\end{table}
+
+These have much wider credible intervals, reflecting the relative lack of data that we have for each station. This model does not take into account geographical similarity between stations which lead to similar casualty proportions. 
 
 However we could have a random effect on the recording station drawn from the geographical area drawn from an overarching distribution. We propose the following model:
 
