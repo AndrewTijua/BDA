@@ -15,9 +15,10 @@
 \PYG{c+c1}{\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}}
 \PYG{c+c1}{\PYGZsh{}loading and eda}
 \PYG{n}{avalanches\PYGZus{}prop} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{fread}\PYG{p}{(}\PYG{n}{file} \PYG{o}{=} \PYG{l+s}{\PYGZdq{}data/Avalanches\PYGZus{}part2.csv\PYGZdq{}}\PYG{p}{)}
-\PYG{n}{avalanches\PYGZus{}prop[}\PYG{p}{,} \PYG{n}{Event\PYGZus{}ID} \PYG{o}{:=} \PYG{k+kc}{NULL}\PYG{n}{]}
+\PYG{c+c1}{\PYGZsh{}avalanches\PYGZus{}prop[, Event\PYGZus{}ID := NULL]}
 \PYG{n}{avalanches\PYGZus{}prop[}\PYG{p}{,} \PYG{n}{Snow\PYGZus{}meters} \PYG{o}{:=} \PYG{n}{Snow\PYGZus{}total} \PYG{o}{/} \PYG{l+m}{100}\PYG{n}{]}
 \PYG{n}{avalanches\PYGZus{}prop[}\PYG{p}{,} \PYG{n}{Snow\PYGZus{}fnights} \PYG{o}{:=} \PYG{n}{Snow\PYGZus{}days} \PYG{o}{/} \PYG{l+m}{14}\PYG{n}{]}
+\PYG{n}{avalanches\PYGZus{}prop[}\PYG{p}{,} \PYG{n}{Year} \PYG{o}{:=} \PYG{n}{Season]}
 \PYG{n}{avalanches\PYGZus{}prop[}\PYG{p}{,} \PYG{n}{death\PYGZus{}prop} \PYG{o}{:=} \PYG{n}{Deaths} \PYG{o}{/} \PYG{n}{Hit]}
 \PYG{n}{avalanches\PYGZus{}prop[}\PYG{p}{,} \PYG{n}{Geo\PYGZus{}space} \PYG{o}{:=} \PYG{n+nf}{as.factor}\PYG{p}{(}\PYG{n}{Geo\PYGZus{}space}\PYG{p}{)}\PYG{n}{]}
 \PYG{n}{avalanches\PYGZus{}prop[}\PYG{p}{,} \PYG{n}{Rec.station} \PYG{o}{:=} \PYG{n+nf}{as.factor}\PYG{p}{(}\PYG{n}{Rec.station}\PYG{p}{)}\PYG{n}{]}
@@ -31,6 +32,14 @@
   \PYG{n}{x} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{x} \PYG{o}{\PYGZhy{}} \PYG{n}{m}
   \PYG{n+nf}{attributes}\PYG{p}{(}\PYG{n}{x}\PYG{p}{)} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{list}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}scaled:submin\PYGZdq{}} \PYG{o}{=} \PYG{n}{m}\PYG{p}{)}
   \PYG{n+nf}{return}\PYG{p}{(}\PYG{n}{x}\PYG{p}{)}
+\PYG{p}{\PYGZcb{}}
+
+\PYG{n}{probcomp\PYGZus{}geq} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{function}\PYG{p}{(}\PYG{n}{x}\PYG{p}{,} \PYG{n}{value}\PYG{p}{)\PYGZob{}}
+  \PYG{n+nf}{mean}\PYG{p}{(}\PYG{n}{x} \PYG{o}{\PYGZgt{}=} \PYG{n}{value}\PYG{p}{)}
+\PYG{p}{\PYGZcb{}}
+
+\PYG{n}{probcomp\PYGZus{}leq} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{function}\PYG{p}{(}\PYG{n}{x}\PYG{p}{,} \PYG{n}{value}\PYG{p}{)\PYGZob{}}
+  \PYG{n+nf}{mean}\PYG{p}{(}\PYG{n}{x} \PYG{o}{\PYGZlt{}=} \PYG{n}{value}\PYG{p}{)}
 \PYG{p}{\PYGZcb{}}
 
 \PYG{n}{cont\PYGZus{}vars} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{c}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}Snow\PYGZus{}meters\PYGZdq{}}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}Snow\PYGZus{}fnights\PYGZdq{}}\PYG{p}{)}\PYG{c+c1}{\PYGZsh{}variables to centre}
@@ -113,6 +122,9 @@
 
 \PYG{c+c1}{\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}}
 \PYG{c+c1}{\PYGZsh{}sans snow fortnights}
+\PYG{n}{varofint} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{avalanches\PYGZus{}prop}\PYG{n+nf}{[}\PYG{p}{(}\PYG{n}{Rec.station} \PYG{o}{\PYGZpc{}in\PYGZpc{}} \PYG{n+nf}{c}\PYG{p}{(}\PYG{l+m}{1}\PYG{p}{,} \PYG{l+m}{8}\PYG{p}{,} \PYG{l+m}{10}\PYG{p}{))} \PYG{o}{\PYGZam{}} \PYG{p}{(}\PYG{n}{Year} \PYG{o}{\PYGZpc{}in\PYGZpc{}} \PYG{n+nf}{c}\PYG{p}{(}\PYG{l+m}{2015}\PYG{p}{,} \PYG{l+m}{2018}\PYG{p}{))}\PYG{n}{]}
+\PYG{n}{ids} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{unique}\PYG{p}{(}\PYG{n}{varofint}\PYG{p}{,} \PYG{n}{by} \PYG{o}{=} \PYG{n+nf}{c}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}Rec.station\PYGZdq{}}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}Year\PYGZdq{}}\PYG{p}{))}
+\PYG{n}{index} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{which}\PYG{p}{(}\PYG{n}{avalanches\PYGZus{}prop}\PYG{o}{\PYGZdl{}}\PYG{n}{Event\PYGZus{}ID} \PYG{o}{\PYGZpc{}in\PYGZpc{}} \PYG{n}{ids}\PYG{p}{)}
 
 \PYG{n}{X\PYGZus{}f\PYGZus{}nsf} \PYG{o}{\PYGZlt{}\PYGZhy{}}
   \PYG{n+nf}{model.matrix}\PYG{p}{(}\PYG{n}{death\PYGZus{}prop} \PYG{o}{\PYGZti{}} \PYG{n}{Season} \PYG{o}{+} \PYG{n}{Snow\PYGZus{}meters} \PYG{o}{\PYGZhy{}} \PYG{l+m}{1}\PYG{p}{,} \PYG{n}{data} \PYG{o}{=} \PYG{n}{avalanches\PYGZus{}prop}\PYG{p}{)}
@@ -139,6 +151,8 @@
     \PYG{n}{init\PYGZus{}r} \PYG{o}{=} \PYG{l+m}{0.1}
   \PYG{p}{)}
 
+
+
 \PYG{n}{post\PYGZus{}params\PYGZus{}rand\PYGZus{}ns} \PYG{o}{\PYGZlt{}\PYGZhy{}}
   \PYG{n+nf}{extract}\PYG{p}{(}\PYG{n}{stan\PYGZus{}binomial\PYGZus{}glm\PYGZus{}reff\PYGZus{}nsf\PYGZus{}s}\PYG{p}{,} \PYG{n+nf}{c}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}beta\PYGZus{}r\PYGZdq{}}\PYG{p}{))}\PYG{n}{[[1]]}
 \PYG{n}{post\PYGZus{}params\PYGZus{}fixed\PYGZus{}ns} \PYG{o}{\PYGZlt{}\PYGZhy{}}
@@ -150,9 +164,12 @@
 \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n}{ilogit\PYGZus{}post\PYGZus{}params\PYGZus{}ns}\PYG{p}{,} \PYG{l+m}{2}\PYG{p}{,} \PYG{n}{summary}\PYG{p}{)}
 \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n}{post\PYGZus{}params\PYGZus{}ns}\PYG{p}{,} \PYG{l+m}{2}\PYG{p}{,} \PYG{n}{summary}\PYG{p}{)}
 
-\PYG{n}{dpp\PYGZus{}rand} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{extract}\PYG{p}{(}\PYG{n}{stan\PYGZus{}binomial\PYGZus{}glm\PYGZus{}reff\PYGZus{}nsf\PYGZus{}s}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}data\PYGZus{}ppred\PYGZdq{}}\PYG{p}{)}\PYG{n}{[[1]]}
-\PYG{n}{dpp\PYGZus{}prop} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n}{dpp\PYGZus{}rand}\PYG{p}{,} \PYG{l+m}{1}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}/\PYGZdq{}}\PYG{p}{,} \PYG{n}{avalanches\PYGZus{}prop}\PYG{o}{\PYGZdl{}}\PYG{n}{Hit}\PYG{p}{)}
-\PYG{n+nf}{apply}\PYG{p}{(}\PYG{n}{dpp\PYGZus{}prop}\PYG{p}{,} \PYG{l+m}{1}\PYG{p}{,} \PYG{n}{summary}\PYG{p}{)}
+\PYG{n}{dpp\PYGZus{}rand\PYGZus{}nf} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{extract}\PYG{p}{(}\PYG{n}{stan\PYGZus{}binomial\PYGZus{}glm\PYGZus{}reff\PYGZus{}nsf\PYGZus{}s}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}data\PYGZus{}prop\PYGZdq{}}\PYG{p}{)}\PYG{n}{[[1]]}
+\PYG{n+nf}{apply}\PYG{p}{(}\PYG{n}{dpp\PYGZus{}rand\PYGZus{}nf}\PYG{p}{,} \PYG{l+m}{2}\PYG{p}{,} \PYG{n}{summary}\PYG{p}{)}
+\PYG{n}{dpp\PYGZus{}ofint} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{dpp\PYGZus{}rand\PYGZus{}nf[}\PYG{p}{,}\PYG{n}{index]}
+\PYG{n+nf}{apply}\PYG{p}{(}\PYG{n}{dpp\PYGZus{}ofint}\PYG{p}{,} \PYG{l+m}{2}\PYG{p}{,} \PYG{n}{mean}\PYG{p}{)}
+\PYG{n+nf}{apply}\PYG{p}{(}\PYG{n}{dpp\PYGZus{}ofint}\PYG{p}{,} \PYG{l+m}{2}\PYG{p}{,} \PYG{n}{quantile}\PYG{p}{,} \PYG{n+nf}{c}\PYG{p}{(}\PYG{l+m}{0.025}\PYG{p}{,} \PYG{l+m}{0.975}\PYG{p}{))}
+\PYG{n+nf}{apply}\PYG{p}{(}\PYG{n}{dpp\PYGZus{}ofint} \PYG{o}{\PYGZgt{}} \PYG{l+m}{0.6}\PYG{p}{,} \PYG{l+m}{2}\PYG{p}{,} \PYG{n}{mean}\PYG{p}{)}
 
 \PYG{c+c1}{\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}}
 \PYG{c+c1}{\PYGZsh{}hierarchical on station, sans snow fortnights}
@@ -180,4 +197,15 @@
     \PYG{n}{iter} \PYG{o}{=} \PYG{l+m}{10000}\PYG{c+c1}{\PYGZsh{},}
     \PYG{c+c1}{\PYGZsh{}init\PYGZus{}r = 0.1}
   \PYG{p}{)}
+
+\PYG{n}{post\PYGZus{}params\PYGZus{}rand\PYGZus{}ns\PYGZus{}stat} \PYG{o}{\PYGZlt{}\PYGZhy{}}
+  \PYG{n+nf}{extract}\PYG{p}{(}\PYG{n}{stan\PYGZus{}binomial\PYGZus{}glm\PYGZus{}reff\PYGZus{}station\PYGZus{}s}\PYG{p}{,} \PYG{n+nf}{c}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}beta\PYGZus{}r\PYGZdq{}}\PYG{p}{))}\PYG{n}{[[1]]}
+\PYG{n}{post\PYGZus{}params\PYGZus{}fixed\PYGZus{}ns\PYGZus{}stat} \PYG{o}{\PYGZlt{}\PYGZhy{}}
+  \PYG{n+nf}{extract}\PYG{p}{(}\PYG{n}{stan\PYGZus{}binomial\PYGZus{}glm\PYGZus{}reff\PYGZus{}station\PYGZus{}s}\PYG{p}{,} \PYG{n+nf}{c}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}beta\PYGZus{}f\PYGZdq{}}\PYG{p}{))}\PYG{n}{[[1]]}
+\PYG{n}{post\PYGZus{}params\PYGZus{}ns\PYGZus{}stat} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{cbind}\PYG{p}{(}\PYG{n}{post\PYGZus{}params\PYGZus{}fixed\PYGZus{}ns\PYGZus{}stat}\PYG{p}{,} \PYG{n}{post\PYGZus{}params\PYGZus{}rand\PYGZus{}ns\PYGZus{}stat}\PYG{p}{)}
+\PYG{n+nf}{colnames}\PYG{p}{(}\PYG{n}{post\PYGZus{}params\PYGZus{}ns\PYGZus{}stat}\PYG{p}{)} \PYG{o}{\PYGZlt{}\PYGZhy{}}
+  \PYG{n+nf}{c}\PYG{p}{(}\PYG{n+nf}{colnames}\PYG{p}{(}\PYG{n}{X\PYGZus{}f\PYGZus{}nsf}\PYG{p}{),} \PYG{n+nf}{colnames}\PYG{p}{(}\PYG{n}{X\PYGZus{}r\PYGZus{}station}\PYG{p}{))}
+\PYG{n}{ilogit\PYGZus{}post\PYGZus{}params\PYGZus{}ns\PYGZus{}stat} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{plogis}\PYG{p}{(}\PYG{n}{post\PYGZus{}params\PYGZus{}ns\PYGZus{}stat}\PYG{p}{)}
+\PYG{n+nf}{apply}\PYG{p}{(}\PYG{n}{ilogit\PYGZus{}post\PYGZus{}params\PYGZus{}ns\PYGZus{}stat}\PYG{p}{,} \PYG{l+m}{2}\PYG{p}{,} \PYG{n}{summary}\PYG{p}{)}
+\PYG{n+nf}{apply}\PYG{p}{(}\PYG{n}{post\PYGZus{}params\PYGZus{}ns\PYGZus{}stat}\PYG{p}{,} \PYG{l+m}{2}\PYG{p}{,} \PYG{n}{summary}\PYG{p}{)}
 \end{Verbatim}

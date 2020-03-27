@@ -103,3 +103,40 @@ res.b_nf <-
 
 summary(res.b_nf)
 #####
+snow <- avalanches_prop$Snow_meters
+season <- avalanches_prop$Season
+#n_eff <- length(unique(avalanches_prop$Geo_space))
+#eff <- as.integer(avalanches_prop$Geo_space)
+eff_stat <- as.integer(avalanches_prop$Rec.station)
+n_eff_stat <- length(unique(eff_stat))
+n <- nrow(avalanches_prop)
+deaths <- as.integer(avalanches_prop$Deaths)
+hit <- as.integer(avalanches_prop$Hit)
+
+bglm_data_nf_stat <-
+  list(
+    n = n,
+    snow = snow,
+    season = season,
+    n_eff = n_eff_stat,
+    eff = eff_stat,
+    deaths = deaths,
+    hit = hit
+  )
+
+res.a_nf_stat <-
+  jags.model(
+    file = "jags/binom_reff_nofn.jags",
+    data = bglm_data_nf_stat,
+    n.chains = 4,
+    quiet = T
+  )
+update(res.a_nf_stat, n.iter = 1e4)
+res.b_nf_stat <-
+  coda.samples(
+    res.a_nf_stat,
+    variable.names = c("beta_snow", "beta_season", "reff"),
+    n.iter = 1e4
+  )
+
+summary(res.b_nf_stat)

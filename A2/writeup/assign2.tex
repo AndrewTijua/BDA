@@ -121,7 +121,7 @@
 	We obtain the following correlations (90\% bootstrap intervals)
 \begin{table}[H]
 	\centering
-	\begin{tabular}{ccc}
+	\begin{tabular}{c|c|c}
 		\hline
 		No EADS & EADS & EADS Online \\
 		\hline
@@ -228,7 +228,7 @@ We obtain the following table for our posterior values
 	\centering
 	\begin{tabular}{r|rrrr}
 		\hline
-		& Rep.events $(\beta_3)$ & EADS1TRUE $(\beta_1)$ & EADS2TRUE $(\beta_2)$ & theta ($\theta$) \\ 
+		& Rep.events $\exp(\beta_3)$ & EADS1TRUE $\exp(\beta_1)$ & EADS2TRUE $\exp(\beta_2)$ & theta $\exp$($\theta$) \\ 
 		\hline
 		Min. & 1.09 & 0.26 & 0.12 & 0.37 \\ 
 		1st Qu. & 1.19 & 0.73 & 0.32 & 0.89 \\ 
@@ -238,7 +238,7 @@ We obtain the following table for our posterior values
 		Max. & 1.36 & 2.99 & 1.34 & 3.35 \\ 
 		\hline
 	\end{tabular}
-\caption{Posterior summaries for the second Poisson model, which attempts to encapsulate the extra variability}
+\caption{Posterior summaries for the second Poisson model, which attempts to encapsulate the extra variability.}
 \label{tab:postsum_poexv}
 \end{table}
 
@@ -277,7 +277,7 @@ We have data on each avalanche reported in the Piedmont region between 2014 and 
 
 We transform Snow\_days into Snow\_fnights by dividing by 14. This gives us the permanence in fortnights. We transform Snow\_total into Snow\_meters by dividing by 100. This gives us the amount of snow in meters.  We do not round, as this would lose information. 
 
-We centre both Snow\_fnights and Snow\_meters, as they are continuous variables, so centering them will bot aid in interpretation and in sampler convergence. 
+We mean-centre both Snow\_fnights and Snow\_meters, as they are continuous variables, so centering them will both aid in interpretation and in sampler convergence. 
 
 We subtract the minimum of Season from Season, meaning that we interpret Season as the number of years since 2014. This will aid in interpretation and in sampler convergence. 
 
@@ -309,7 +309,7 @@ R_{hyp} &\sim \mathrm{Uniform}(0, 10)\\
 
 Note that there is no intercept as the random effects on the geographical location serve the same purpose. If we included an intercept we would not get repeatable results as the random effects would be offset by the intercept, thus both the intercept and random effects would converge to different values in each run (but would sum to the same distribution). We would include an intercept if some events had no random effect associated, but that is not the case here.
 
-We are going to run $4$ parallel chains with initial values drawn from a Uniform(-0.1, 0.1) distribution. We are going to run each chain for 10000 iterations and discard the first 5000 (HMC/NUTS converges faster than Gibbs so the length is fine). We are going to increase the adaptation acceptance probability to 0.95 (from 0.8). These will help us to deal with the implied distributional shape given by the uniform-normal combination. It will significantly slow sampling, but this is required for convergence.
+We are going to run $4$ parallel chains with initial values drawn from a Uniform(-0.1, 0.1) distribution. We are going to run each chain for 10000 iterations and discard the first 5000 (HMC/NUTS converges faster than Gibbs so the length is fine). We are going to increase the adaptation acceptance probability to 0.95 (from 0.8). These will help us to deal with the implied distributional shape given by the uniform-normal combination. It will significantly slow sampling, but this is required for convergence. We have implemented this model in both Stan and JAGS, but we will use the Stan samples for this analysis (both of them agree on the summaries anyway.) The Stan code is in \ref{code:stan_2} with the main R script in \ref{code:main_2}, whereas the JAGS code and R script is in \ref{code:jags_2}. All the code for this question is contained in these categories.
 
 After running we check BGR statistics and find that they have all converged to 1. We also check NUTS specific diagnostics (divergences, energies) and find them satisfactory as well (no divergences, good energy mixing). Therefore we proceed with our analysis.
 
@@ -370,10 +370,81 @@ Looking at the tables we come to very similar conclusions. Of particular note is
 
 This means that the random effects are more prominent. Notable is that the 3rd region seems more dangerous under this model. 
 
+We are now interested in the posterior distribution for the proportion of deaths expected at stations 1, 8, and 10 for the 2015 and 2018 seasons. We obtain the following means and 95\% credible intervals:
 
+\begin{table}[ht]
+	\centering
+	\begin{tabular}{r|rr|rr|rr}
+			\hline
+			& Station 1: 2015 & 2018 & Station 8: 2015 & 2018 & Station 10: 2015 & 2018 \\
+			\hline
+			Mean & 0.45 & 0.33 & 0.51 & 0.31 & 0.37 & 0.23 \\
+			Interval & (0.24, 0.0.69) & (0.12, 0.63) & (0.34, 0.65) & (0.14, 0.51) & (0.19, 0.54) & (0.09, 0.41)\\
+			\hline
+	\end{tabular}
+\caption{Posterior summaries for the predicted proportion of casualties near the given recording stations in the given years. Data from the years has been used to construct these statistics.}
+\label{tab:postprop}
+\end{table}
 
+We are also interested in comparing the probabilities of having a proportion of deaths greater than 60\% between the stations. We obtain the following table:
 
+\begin{table}[ht]
+	\centering
+	\begin{tabular}{l|r|r|r}
+		\hline
+		Year & Station 1 & Station 8 & Station 10 \\
+		\hline
+		2015 & 0.10 & 0.08 & 0.003 \\
+		2018 & 0.04 & 0.003 & 0.00 \\
+		\hline
+	\end{tabular}
+	\caption{Posterior probabilities of having a proportion of deaths greater than 60\% near these stations in the years of interest.}
+	\label{tab:post_60}
+\end{table}
 
+After the success of this model we might be interested in fitting a model with more granular random effects. Therefore we propose a model with a random effect on the station, not on the geographical area. We will design the model with the following formula:
+
+\begin{align*}
+\mathrm{logit}(p_i) &= \beta_1 \cdot \mathrm{Season} + \beta_2 \cdot \mathrm{Snow\_meters} + \beta_3 \cdot \mathrm{Snow\_fnight} + R_{\mathrm{Station}_i}\\
+R_i \equiv R_{\mathrm{Station}_i} &\sim \mathrm{Normal}(0, R_{hyp})\\
+R_{hyp} &\sim \mathrm{Uniform}(0, 10)\\
+\beta_i &\sim \mathrm{Normal}(0, 10)\\
+\mathrm{Deaths}_i &\sim \mathrm{Binomial}(\mathrm{Hit}_i, p_i)
+\end{align*}
+This model is very similar to our previous model, but we expect more finely tuned results. We will also be able to assess the relative danger of stations (somewhat). 
+
+We run the sampler with the same settings as above and obtain the following summary statistics: 
+
+\begin{table}[ht]
+	\centering
+	\begin{tabular}{r|rrrrrrr}
+		\hline
+		& Season & Snow\_meters & Rec.station1 & Rec.station2 & Rec.station3 & Rec.station4 & Rec.station5 \\ 
+		\hline
+		Min. & -0.77 & -0.97 & -1.62 & -16.32 & -6.27 & -6.44 & -2.74 \\ 
+		1st Qu. & -0.30 & -0.23 & 0.77 & -1.22 & -1.12 & -1.64 & -0.05 \\ 
+		Median & -0.21 & -0.11 & 1.55 & -0.37 & -0.50 & -1.03 & 0.33 \\ 
+		Mean & -0.21 & -0.12 & 1.78 & -0.59 & -0.60 & -1.12 & 0.36 \\ 
+		3rd Qu. & -0.12 & 0.00 & 2.50 & 0.23 & 0.00 & -0.48 & 0.75 \\ 
+		Max. & 0.31 & 0.56 & 14.07 & 6.94 & 3.05 & 1.49 & 3.33 \\ 
+		\hline
+	\end{tabular}
+
+\vspace{1em}
+
+	\begin{tabular}{r|rrrrrr}
+		\hline
+		& Rec.station6 & Rec.station7 & Rec.station8 & Rec.station9 & Rec.station10 & Rec.station11 \\ 
+		\hline
+		Min. & -6.73 & -5.21 & -1.92 & -4.96 & -4.33 & -3.63 \\ 
+		1st Qu. & -1.25 & 0.05 & -0.01 & -1.60 & -0.69 & -0.74 \\ 
+		Median & -0.62 & 0.72 & 0.33 & -1.04 & -0.16 & -0.29 \\ 
+		Mean & -0.72 & 0.96 & 0.35 & -1.11 & -0.20 & -0.32 \\ 
+		3rd Qu. & -0.09 & 1.65 & 0.70 & -0.53 & 0.31 & 0.10 \\ 
+		Max. & 2.63 & 18.10 & 3.29 & 1.70 & 3.54 & 2.58 \\ 
+		\hline
+	\end{tabular}
+\end{table}
 \printbibliography
 
 \newpage
@@ -405,6 +476,7 @@ This means that the random effects are more prominent. Notable is that the 3rd r
 \subsection{JAGS}
 \tcbr{../jags/Q2jags.R}
 \tcbjags{../jags/binom_reff.jags}
+\tcbjags{../jags/binom_reff_nofn.jags}
 \label{code:jags_2}
 \end{document}
 

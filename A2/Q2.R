@@ -14,9 +14,10 @@ library(bayesplot)
 #####
 #loading and eda
 avalanches_prop <- fread(file = "data/Avalanches_part2.csv")
-avalanches_prop[, Event_ID := NULL]
+#avalanches_prop[, Event_ID := NULL]
 avalanches_prop[, Snow_meters := Snow_total / 100]
 avalanches_prop[, Snow_fnights := Snow_days / 14]
+avalanches_prop[, Year := Season]
 avalanches_prop[, death_prop := Deaths / Hit]
 avalanches_prop[, Geo_space := as.factor(Geo_space)]
 avalanches_prop[, Rec.station := as.factor(Rec.station)]
@@ -30,6 +31,14 @@ submin <- function(x) {
   x <- x - m
   attributes(x) <- list("scaled:submin" = m)
   return(x)
+}
+
+probcomp_geq <- function(x, value){
+  mean(x >= value)
+}
+
+probcomp_leq <- function(x, value){
+  mean(x <= value)
 }
 
 cont_vars <- c("Snow_meters", "Snow_fnights")#variables to centre
@@ -112,6 +121,9 @@ plot_diag <- function(stanfit, pars) {
 
 #####
 #sans snow fortnights
+varofint <- avalanches_prop[(Rec.station %in% c(1, 8, 10)) & (Year %in% c(2015, 2018))]
+ids <- unique(varofint, by = c("Rec.station", "Year"))
+index <- which(avalanches_prop$Event_ID %in% ids)
 
 X_f_nsf <-
   model.matrix(death_prop ~ Season + Snow_meters - 1, data = avalanches_prop)
@@ -138,6 +150,8 @@ stan_binomial_glm_reff_nsf_s <-
     init_r = 0.1
   )
 
+
+
 post_params_rand_ns <-
   extract(stan_binomial_glm_reff_nsf_s, c("beta_r"))[[1]]
 post_params_fixed_ns <-
@@ -149,9 +163,12 @@ ilogit_post_params_ns <- plogis(post_params_ns)
 apply(ilogit_post_params_ns, 2, summary)
 apply(post_params_ns, 2, summary)
 
-dpp_rand <- extract(stan_binomial_glm_reff_nsf_s, "data_ppred")[[1]]
-dpp_prop <- apply(dpp_rand, 1, "/", avalanches_prop$Hit)
-apply(dpp_prop, 1, summary)
+dpp_rand_nf <- extract(stan_binomial_glm_reff_nsf_s, "data_prop")[[1]]
+apply(dpp_rand_nf, 2, summary)
+dpp_ofint <- dpp_rand_nf[,index]
+apply(dpp_ofint, 2, mean)
+apply(dpp_ofint, 2, quantile, c(0.025, 0.975))
+apply(dpp_ofint > 0.6, 2, mean)
 
 #####
 #hierarchical on station, sans snow fortnights
@@ -179,3 +196,14 @@ stan_binomial_glm_reff_station_s <-
     iter = 10000#,
     #init_r = 0.1
   )
+
+post_params_rand_ns_stat <-
+  extract(stan_binomial_glm_reff_station_s, c("beta_r"))[[1]]
+post_params_fixed_ns_stat <-
+  extract(stan_binomial_glm_reff_station_s, c("beta_f"))[[1]]
+post_params_ns_stat <- cbind(post_params_fixed_ns_stat, post_params_rand_ns_stat)
+colnames(post_params_ns_stat) <-
+  c(colnames(X_f_nsf), colnames(X_r_station))
+ilogit_post_params_ns_stat <- plogis(post_params_ns_stat)
+apply(ilogit_post_params_ns_stat, 2, summary)
+apply(post_params_ns_stat, 2, summary)
