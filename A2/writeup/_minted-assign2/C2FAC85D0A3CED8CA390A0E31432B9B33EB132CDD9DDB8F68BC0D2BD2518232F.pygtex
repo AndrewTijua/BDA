@@ -103,6 +103,10 @@
   \PYG{p}{)}
 
 \PYG{n+nf}{summary}\PYG{p}{(}\PYG{n}{res.b\PYGZus{}nf}\PYG{p}{)}
+
+\PYG{n+nf}{dic.samples}\PYG{p}{(}\PYG{n}{model} \PYG{o}{=} \PYG{n}{res.a\PYGZus{}nf}\PYG{p}{,}
+            \PYG{n}{n.iter} \PYG{o}{=} \PYG{l+m}{1e4}\PYG{p}{,}
+            \PYG{n}{type} \PYG{o}{=} \PYG{l+s}{\PYGZsq{}pD\PYGZsq{}}\PYG{p}{)}
 \PYG{c+c1}{\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}}
 \PYG{n}{snow} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{avalanches\PYGZus{}prop}\PYG{o}{\PYGZdl{}}\PYG{n}{Snow\PYGZus{}meters}
 \PYG{n}{season} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{avalanches\PYGZus{}prop}\PYG{o}{\PYGZdl{}}\PYG{n}{Season}
@@ -141,6 +145,10 @@
   \PYG{p}{)}
 
 \PYG{n+nf}{summary}\PYG{p}{(}\PYG{n}{res.b\PYGZus{}nf\PYGZus{}stat}\PYG{p}{)}
+
+\PYG{n+nf}{dic.samples}\PYG{p}{(}\PYG{n}{model} \PYG{o}{=} \PYG{n}{res.a\PYGZus{}nf\PYGZus{}stat}\PYG{p}{,}
+            \PYG{n}{n.iter} \PYG{o}{=} \PYG{l+m}{1e4}\PYG{p}{,}
+            \PYG{n}{type} \PYG{o}{=} \PYG{l+s}{\PYGZsq{}pD\PYGZsq{}}\PYG{p}{)}
 \PYG{c+c1}{\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}}
 \PYG{n}{snow} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{avalanches\PYGZus{}prop}\PYG{o}{\PYGZdl{}}\PYG{n}{Snow\PYGZus{}meters}
 \PYG{n}{season} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{avalanches\PYGZus{}prop}\PYG{o}{\PYGZdl{}}\PYG{n}{Season}
@@ -179,7 +187,7 @@
   \PYG{n+nf}{coda.samples}\PYG{p}{(}
     \PYG{n}{res.a\PYGZus{}nf\PYGZus{}statgeo}\PYG{p}{,}
     \PYG{n}{variable.names} \PYG{o}{=} \PYG{n+nf}{c}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}beta\PYGZus{}snow\PYGZdq{}}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}beta\PYGZus{}season\PYGZdq{}}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}r\PYGZus{}eff\PYGZus{}geo\PYGZdq{}}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}r\PYGZus{}eff\PYGZus{}statgeo\PYGZdq{}}\PYG{p}{),}
-    \PYG{n}{n.iter} \PYG{o}{=} \PYG{l+m}{1e5}
+    \PYG{n}{n.iter} \PYG{o}{=} \PYG{l+m}{1e4}
   \PYG{p}{)}
 
 \PYG{n+nf}{summary}\PYG{p}{(}\PYG{n}{res.b\PYGZus{}nf\PYGZus{}statgeo}\PYG{p}{)}

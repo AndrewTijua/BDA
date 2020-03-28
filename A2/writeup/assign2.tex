@@ -1,4 +1,4 @@
-\documentclass[10pt]{extarticle}
+\documentclass[12pt]{extarticle}
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{amssymb}
@@ -464,9 +464,13 @@ We also obtain the following means and 95\% credible intervals for the proportio
 	\label{tab:postprop_stat}
 \end{table}
 
-These have much wider credible intervals, reflecting the relative lack of data that we have for each station. This model does not take into account geographical similarity between stations which lead to similar casualty proportions. 
+These have much wider credible intervals, reflecting the relative lack of data that we have for each station. This model does not take into account geographical similarity between stations which lead to similar casualty proportions. We also often have only one point of data per station per year, leading to the estimates being overfit to the data. We have 43 data points and 13 parameters. 
 
-However we could have a random effect on the recording station drawn from the geographical area drawn from an overarching distribution. We propose the following model:
+I would be inclined to say that we are overfitting on the station level, thus we should incorporate variability from the geographical level as well. This will add more parameters, but they will be more constrained on each other rather than biased on the data.
+
+Comparing the two models above using the DIC we obtain a DIC of 91.04 for the model with effects on geographical area and a DIC of 85.21 for the model with effects of the nearest station. This is due to the better fit: the penalty terms are 4.171 and 8.854 respectively, showing the effect of the increased number of parameters. Based on this we would prefer the station level model. However both of them lead to similar conclusions.
+
+We could have a random effect on the recording station drawn from the geographical area drawn from an overarching distribution. We propose the following model:
 
 \begin{align*}
 \sigma_1, \sigma_2 &\sim \Gamma(1, 0.1), \\
@@ -476,7 +480,7 @@ R_{\mathrm{(Rep.station, Geo.space)}_i} &\sim \mathrm{Normal}(\mu_{\mathrm{Geo.s
 \mathrm{Deaths}_i &\sim \mathrm{Binomial}(\mathrm{Hit}_i, p_i),
 \end{align*}
 
-which we have encoded in JAGS in \texttt{binom\_doublereff.jags}.
+which we have encoded in JAGS in \texttt{binom\_doublereff.jags}. This model works rather well. It has a DIC of 86.82, which is slightly higher than that of the station level model, but more than compensates for it in the information that we can glean from it, as we can observe both geographical and station level effects, rather than just station level. 
 \printbibliography
 
 \newpage

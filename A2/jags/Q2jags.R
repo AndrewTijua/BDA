@@ -102,6 +102,10 @@ res.b_nf <-
   )
 
 summary(res.b_nf)
+
+dic.samples(model = res.a_nf,
+            n.iter = 1e4,
+            type = 'pD')
 #####
 snow <- avalanches_prop$Snow_meters
 season <- avalanches_prop$Season
@@ -140,6 +144,10 @@ res.b_nf_stat <-
   )
 
 summary(res.b_nf_stat)
+
+dic.samples(model = res.a_nf_stat,
+            n.iter = 1e4,
+            type = 'pD')
 #####
 snow <- avalanches_prop$Snow_meters
 season <- avalanches_prop$Season
@@ -178,7 +186,11 @@ res.b_nf_statgeo <-
   coda.samples(
     res.a_nf_statgeo,
     variable.names = c("beta_snow", "beta_season", "r_eff_geo", "r_eff_statgeo"),
-    n.iter = 1e5
+    n.iter = 1e4
   )
 
 summary(res.b_nf_statgeo)
+
+dic.samples(model = res.a_nf_statgeo,
+            n.iter = 1e4,
+            type = 'pD')
