@@ -175,17 +175,35 @@ We are interested in the posterior predictive distribution. We want to predict t
 
 We obtain a probability of $P(\mathrm{Deaths}<15|\mathrm{Rep.events}=20, \mathrm{EADS}=2) = 0.185$ with a 95\% bootstrap interval of $(0.1838, 0.1864)$. This is rather low, but this is expected given that large number of avalanches (and that they get more dangerous the more there are.)
 
-We are also interested in the probability of observing more than 1 death in mean per avalanche in each stage of the EADS lifespan (not present, present, online). For this we need to calculate $$P\left(\frac{\lambda}{\mathrm{Rep.events}}>1 \ \vline \ \mathrm{EADS}=x\right).$$ Given our offsetting this is rather simple, as this simplifies to $$P\left(\exp(\beta_0 + \beta_1 \cdot \mathrm{EADS1} + \beta_2 \cdot \mathrm{EADS2}) > 1 | \mathrm{EADS} = x\right),$$
-of which we have posterior samples.
+%We are also interested in the probability of observing more than 1 death in mean per avalanche in each stage of the EADS lifespan (not present, present, online). For this we need to calculate $$P\left(\frac{\lambda}{\mathrm{Rep.events}}>1 \ \vline \ \mathrm{EADS}=x\right).$$ Given our offsetting this is rather simple, as this simplifies to $$P\left(\exp(\beta_0 + \beta_1 \cdot \mathrm{EADS1} + \beta_2 \cdot \mathrm{EADS2}) > 1 | \mathrm{EADS} = x\right),$$
+%of which we have posterior samples.
+%
+%We calculate these probabilities for all values of the EADS and obtain
+%\begin{table}[ht]
+%	\centering
+%\begin{tabular}{ccc}
+%	\hline
+%	No EADS & EADS & EADS online \\
+%	\hline
+%	0.105 & 0.005 & 0 (machine precision) \\
+%	\hline
+%\end{tabular}
+%\caption{Probabilities of multiple fatalities per avalanche given the various states of the EADS}
+%\label{tab:probmdpa}
+%\end{table}
 
-We calculate these probabilities for all values of the EADS and obtain
+We are also interested in calculating the probabilities that the expected number of deaths is greater than one in each epoch of the EADS. 
+
+To do this we use our posterior estimates for $\lambda$ in each epoch and compute the probability. We obtain the following average rates per avalanche and probabilities of aforementioned rate being greater than 1.
+
 \begin{table}[ht]
 	\centering
-\begin{tabular}{ccc}
+\begin{tabular}{r|rrr}
 	\hline
-	No EADS & EADS & EADS online \\
+	& No EADS & EADS & EADS online \\
 	\hline
-	0.105 & 0.005 & 0 (machine precision) \\
+	Mean Rate per Avalanche& 0.90 & 0.58 & 0.32 \\
+	P($\lambda > 1$) & 0.31 & 0.014 & 0.00008\\
 	\hline
 \end{tabular}
 \caption{Probabilities of multiple fatalities per avalanche given the various states of the EADS}
@@ -317,7 +335,7 @@ We obtain the following posterior summaries for our parameters:
 
 \begin{table}[ht]
 	\centering
-	\footnotesize
+	\tiny
 	\begin{tabular}{r|rrrrrr}
 		\hline
 		& Season ($\beta_1$) & Snow\_meters ($\beta_2$) & Snow\_fnights ($\beta_3$) & Geo\_space1 ($\mathrm{R}_{1}$) & Geo\_space2 ($\mathrm{R}_{2}$) & Geo\_space3 ($\mathrm{R}_{3}$)\\ 
@@ -350,6 +368,7 @@ We obtain the following posterior summaries for our parameters:
 
 \begin{table}[ht]
 	\centering
+	\footnotesize
 	\begin{tabular}{r|rrrrr}
 		\hline
 		& Season ($\beta_1$) & Snow\_meters ($\beta_2$) & Geo\_space1 ($\mathrm{R}_{1}$) & Geo\_space2 ($\mathrm{R}_{2}$) & Geo\_space3 ($\mathrm{R}_{3}$)\\ 
@@ -374,6 +393,7 @@ We are now interested in the posterior distribution for the proportion of deaths
 
 \begin{table}[ht]
 	\centering
+	\footnotesize
 	\begin{tabular}{r|rr|rr|rr}
 			\hline
 			& Station 1: 2015 & 2018 & Station 8: 2015 & 2018 & Station 10: 2015 & 2018 \\
@@ -417,6 +437,7 @@ We run the sampler with the same settings as above and obtain the following summ
 
 \begin{table}[H]
 	\centering
+	\footnotesize
 	\begin{tabular}{r|rrrrrrr}
 		\hline
 		& Season & Snow\_meters & Rec.station1 & Rec.station2 & Rec.station3 & Rec.station4 & Rec.station5 \\ 
@@ -452,6 +473,7 @@ We also obtain the following means and 95\% credible intervals for the proportio
 
 \begin{table}[H]
 	\centering
+	\footnotesize
 	\begin{tabular}{r|rr|rr|rr}
 		\hline
 		& Station 1: 2015 & 2018 & Station 8: 2015 & 2018 & Station 10: 2015 & 2018 \\

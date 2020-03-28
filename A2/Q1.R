@@ -115,7 +115,7 @@ stan_poisson_glm_s <-
     data = stan_poisson_glm_data,
     chains = 7,
     control = list(adapt_delta = 0.8),
-    iter = 1e5,
+    iter = 1e4,
     init_r = 0.1
   )
 
@@ -156,6 +156,29 @@ dpp_m1_plotdf <-
     uq = apply(data_pred, 2, quantile, 0.95),
     Season = avalanches$Season
   )
+
+lr_data <- extract(stan_poisson_glm_s, "log_rate")[[1]]
+r_data <- exp(lr_data)
+r_data_pe <- apply(r_data, 1, '/', avalanches$Rep.events)
+
+r_data_b <- r_data_pe[avalanches$Season < 1994]
+r_data_do <- r_data_pe[avalanches$EADS1 == TRUE]
+r_data_o <- r_data_pe[avalanches$EADS2 == TRUE]
+
+r_data_b <- unlist(r_data_b)
+r_data_b <- r_data_b[!is.infinite(r_data_b)]
+mean(r_data_b >= 1)
+mean(r_data_b)
+
+r_data_do <- unlist(r_data_do)
+r_data_do <- r_data_do[!is.infinite(r_data_do)]
+mean(r_data_do >= 1)
+mean(r_data_do)
+
+r_data_o <- unlist(r_data_o)
+r_data_o <- r_data_o[!is.infinite(r_data_o)]
+mean(r_data_o >= 1)
+mean(r_data_o)
 #####
 #dic is bad
 #formulae taken from https://en.wikipedia.org/wiki/Deviance_information_criterion

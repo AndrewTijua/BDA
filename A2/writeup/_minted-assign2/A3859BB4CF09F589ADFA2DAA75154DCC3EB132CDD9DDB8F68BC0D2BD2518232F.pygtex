@@ -191,4 +191,8 @@
   \PYG{p}{)}
 
 \PYG{n+nf}{summary}\PYG{p}{(}\PYG{n}{res.b\PYGZus{}nf\PYGZus{}statgeo}\PYG{p}{)}
+
+\PYG{n+nf}{dic.samples}\PYG{p}{(}\PYG{n}{model} \PYG{o}{=} \PYG{n}{res.a\PYGZus{}nf\PYGZus{}statgeo}\PYG{p}{,}
+            \PYG{n}{n.iter} \PYG{o}{=} \PYG{l+m}{1e4}\PYG{p}{,}
+            \PYG{n}{type} \PYG{o}{=} \PYG{l+s}{\PYGZsq{}pD\PYGZsq{}}\PYG{p}{)}
 \end{Verbatim}

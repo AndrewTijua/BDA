@@ -116,7 +116,7 @@
     \PYG{n}{data} \PYG{o}{=} \PYG{n}{stan\PYGZus{}poisson\PYGZus{}glm\PYGZus{}data}\PYG{p}{,}
     \PYG{n}{chains} \PYG{o}{=} \PYG{l+m}{7}\PYG{p}{,}
     \PYG{n}{control} \PYG{o}{=} \PYG{n+nf}{list}\PYG{p}{(}\PYG{n}{adapt\PYGZus{}delta} \PYG{o}{=} \PYG{l+m}{0.8}\PYG{p}{),}
-    \PYG{n}{iter} \PYG{o}{=} \PYG{l+m}{1e5}\PYG{p}{,}
+    \PYG{n}{iter} \PYG{o}{=} \PYG{l+m}{1e4}\PYG{p}{,}
     \PYG{n}{init\PYGZus{}r} \PYG{o}{=} \PYG{l+m}{0.1}
   \PYG{p}{)}
 
@@ -157,6 +157,23 @@
     \PYG{n}{uq} \PYG{o}{=} \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n}{data\PYGZus{}pred}\PYG{p}{,} \PYG{l+m}{2}\PYG{p}{,} \PYG{n}{quantile}\PYG{p}{,} \PYG{l+m}{0.95}\PYG{p}{),}
     \PYG{n}{Season} \PYG{o}{=} \PYG{n}{avalanches}\PYG{o}{\PYGZdl{}}\PYG{n}{Season}
   \PYG{p}{)}
+
+\PYG{n}{lr\PYGZus{}data} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{extract}\PYG{p}{(}\PYG{n}{stan\PYGZus{}poisson\PYGZus{}glm\PYGZus{}s}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}log\PYGZus{}rate\PYGZdq{}}\PYG{p}{)}\PYG{n}{[[1]]}
+\PYG{n}{r\PYGZus{}data} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{exp}\PYG{p}{(}\PYG{n}{lr\PYGZus{}data}\PYG{p}{)}
+\PYG{n}{r\PYGZus{}data\PYGZus{}pe} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n}{r\PYGZus{}data}\PYG{p}{,} \PYG{l+m}{1}\PYG{p}{,} \PYG{l+s}{\PYGZsq{}/\PYGZsq{}}\PYG{p}{,} \PYG{n}{avalanches}\PYG{o}{\PYGZdl{}}\PYG{n}{Rep.events}\PYG{p}{)}
+
+\PYG{n}{r\PYGZus{}data\PYGZus{}b} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{r\PYGZus{}data\PYGZus{}pe[avalanches}\PYG{o}{\PYGZdl{}}\PYG{n}{Season} \PYG{o}{\PYGZlt{}} \PYG{l+m}{1994}\PYG{n}{]}
+\PYG{n}{r\PYGZus{}data\PYGZus{}do} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{r\PYGZus{}data\PYGZus{}pe[avalanches}\PYG{o}{\PYGZdl{}}\PYG{n}{EADS1} \PYG{o}{==} \PYG{k+kc}{TRUE}\PYG{n}{]}
+\PYG{n}{r\PYGZus{}data\PYGZus{}o} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{r\PYGZus{}data\PYGZus{}pe[avalanches}\PYG{o}{\PYGZdl{}}\PYG{n}{EADS2} \PYG{o}{==} \PYG{k+kc}{TRUE}\PYG{n}{]}
+
+\PYG{n}{r\PYGZus{}data\PYGZus{}b} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{unlist}\PYG{p}{(}\PYG{n}{r\PYGZus{}data\PYGZus{}b}\PYG{p}{)}
+\PYG{n}{r\PYGZus{}data\PYGZus{}b} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{r\PYGZus{}data\PYGZus{}b[}\PYG{o}{!}\PYG{n+nf}{is.infinite}\PYG{p}{(}\PYG{n}{r\PYGZus{}data\PYGZus{}b}\PYG{p}{)}\PYG{n}{]}
+
+\PYG{n}{r\PYGZus{}data\PYGZus{}do} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{unlist}\PYG{p}{(}\PYG{n}{r\PYGZus{}data\PYGZus{}do}\PYG{p}{)}
+\PYG{n}{r\PYGZus{}data\PYGZus{}do} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{r\PYGZus{}data\PYGZus{}do[}\PYG{o}{!}\PYG{n+nf}{is.infinite}\PYG{p}{(}\PYG{n}{r\PYGZus{}data\PYGZus{}do}\PYG{p}{)}\PYG{n}{]}
+
+\PYG{n}{r\PYGZus{}data\PYGZus{}o} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{unlist}\PYG{p}{(}\PYG{n}{r\PYGZus{}data\PYGZus{}o}\PYG{p}{)}
+\PYG{n}{r\PYGZus{}data\PYGZus{}o} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{r\PYGZus{}data\PYGZus{}o[}\PYG{o}{!}\PYG{n+nf}{is.infinite}\PYG{p}{(}\PYG{n}{r\PYGZus{}data\PYGZus{}o}\PYG{p}{)}\PYG{n}{]}
 \PYG{c+c1}{\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}}
 \PYG{c+c1}{\PYGZsh{}dic is bad}
 \PYG{c+c1}{\PYGZsh{}formulae taken from https://en.wikipedia.org/wiki/Deviance\PYGZus{}information\PYGZus{}criterion}
