@@ -130,12 +130,11 @@
 		\hline
 	\end{tabular}
 \end{table}
-This shows that the events become less correlated after the general public obtained easy access to EADS. It is not likely that the introduction of EADS increased to correlation, so the observed increase in correlation for that period is likely due to noise (10 events in 2001 resulting in 10 deaths). However it may also be due to an increase in user confidence, which led to foolish behaviour.
+This shows that the events become less correlated after the general public obtained easy access to EADS. It is not likely that the introduction of EADS increased the correlation, so the observed increase in correlation for that period is likely due to noise (10 events in 2001 resulting in 10 deaths). However it may also be due to an increase in user confidence, which led to foolish behaviour.
 
 We are now going to model the number of deaths in avalanches. We are using a Poisson model with a logarithmic (canonical) link function. 
 
 Our formulae are as follows:
-
 \begin{align*}
 \lambda_i &= \exp(\beta_0 + \beta_1 \cdot \mathrm{EADS1}_i + \beta_2 \cdot \mathrm{EADS2}_i + \beta_3 \cdot \mathrm{Rep.events}_i)\\
 \log(\lambda_i) &= \beta_0 + \beta_1 \cdot \mathrm{EADS1}_i + \beta_2 \cdot \mathrm{EADS2}_i + \beta_3 \cdot \mathrm{Rep.events}_i\\
@@ -217,7 +216,11 @@ From this we work out that the mean number of avalanches is 10 with standard dev
 
 Suggested is a log-normal prior with mean 0 and standard deviation 2 on $\phi = \exp((x-\mu_x)\cdot\beta_{\mathrm{Rep.events}}),$ the multiplier. This implies a normal prior with mean 0 and standard deviation 2 for $(x-\mu_x)\cdot\beta_{\mathrm{Rep.events}}$, or $\beta_{\mathrm{Rep.events}} \sim N(\mu = 0, \sigma^2 = 4(x-\mu_x)^2).$ There could be problems with this, as it is possible for $(x-\mu_x)$ to be 0. 
 
-The mean and standard deviation parameters for a lognormal distribution are typically given as the mean and standard deviation of the underlying normal distribution. Hence we calculate the true mean and SD as \[\mu_{\phi} = \exp\left(0 + \frac{2^2}{2}\right) = e^2 \approx 7.39, \qquad \sigma^2_{\phi} = (\exp(2^2)-1)\exp(2\cdot0 + 2^2) = e^8 - e^4 \approx 2925, \implies \sigma \approx 54.\] This is clearly not appropriate for the multiplier, as the mean is too high, and the standard deviation even moreso.
+%The mean and standard deviation parameters for a lognormal distribution are typically given as the mean and standard deviation of the underlying normal distribution. Hence we calculate the true mean and SD as \[\mu_{\phi} = \exp\left(0 + \frac{2^2}{2}\right) = e^2 \approx 7.39, \qquad \sigma^2_{\phi} = (\exp(2^2)-1)\exp(2\cdot0 + 2^2) = e^8 - e^4 \approx 2925, \implies \sigma \approx 54.\] This is clearly not appropriate for the multiplier, as the mean is too high, and the standard deviation even moreso.
+
+Calculating the mass held between our suggested values of 0.25 and 4 we have an area of 0.512 out of 1, meaning that most of the mass is contained in the suggested area. This suggests that the distribution might be suitable. 
+
+However we calculate a mean of $e^2 \approx 7.39$ and standard deviation of $\sqrt{e^8 - e^4} \approx 54$, which are larger than we would like. However as the standard deviation is so large and the mass is in a location that we desire this prior is somewhat sensible. 
 
 We are now going to expand our model to include a term to capture randomness not accounted for by the other components. We are going to design the model as follows
 
