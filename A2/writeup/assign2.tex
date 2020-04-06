@@ -214,13 +214,15 @@ After this we are told that on average the number of avalanches per year is betw
 
 From this we work out that the mean number of avalanches is 10 with standard deviation 5. We also want to give the multiplier high mass between 0.25 and 4. 
 
-Suggested is a log-normal prior with mean 0 and standard deviation 2 on $\phi = \exp((x-\mu_x)\cdot\beta_{\mathrm{Rep.events}}),$ the multiplier. This implies a normal prior with mean 0 and standard deviation 2 for $(x-\mu_x)\cdot\beta_{\mathrm{Rep.events}}$, or $\beta_{\mathrm{Rep.events}} \sim N(\mu = 0, \sigma^2 = 4(x-\mu_x)^2).$ There could be problems with this, as it is possible for $(x-\mu_x)$ to be 0. 
+Suggested is a log-normal prior with mean 0 and standard deviation 2 on $\phi = \exp((x-\mu_x)\cdot\beta_{\mathrm{Rep.events}}),$ the multiplier. This implies a normal prior with mean 0 and standard deviation 2 for $(x-\mu_x)\cdot\beta_{\mathrm{Rep.events}}$, or $\beta_{\mathrm{Rep.events}} \sim N(\mu = 0, \sigma^2 = 4(x-\mu_x)^2).$ There could be problems with this, as it is possible for $(x-\mu_x)$ to be 0. However this is never true in this case. This is a more restrictive prior than we are currently using, but would not give very different results as it is still normal and zero centred. Overall it is appropriate.
 
 %The mean and standard deviation parameters for a lognormal distribution are typically given as the mean and standard deviation of the underlying normal distribution. Hence we calculate the true mean and SD as \[\mu_{\phi} = \exp\left(0 + \frac{2^2}{2}\right) = e^2 \approx 7.39, \qquad \sigma^2_{\phi} = (\exp(2^2)-1)\exp(2\cdot0 + 2^2) = e^8 - e^4 \approx 2925, \implies \sigma \approx 54.\] This is clearly not appropriate for the multiplier, as the mean is too high, and the standard deviation even moreso.
 
 Calculating the mass held between our suggested values of 0.25 and 4 we have an area of 0.512 out of 1, meaning that most of the mass is contained in the suggested area. This suggests that the distribution might be suitable. 
 
-However we calculate a mean of $e^2 \approx 7.39$ and standard deviation of $\sqrt{e^8 - e^4} \approx 54$, which are larger than we would like. However as the standard deviation is so large and the mass is in a location that we desire this prior is somewhat sensible. 
+However we calculate a mean of $e^2 \approx 7.39$ and standard deviation of $\sqrt{e^8 - e^4} \approx 54$, which are larger than we would like. However the mean and standard deviation are not appropriate measures of fit here, as the are both highly sensitive to asymmetric tail mass, which the log-normal distribution has a lot of. Perhaps more appropriate is the median of the distribution, which for our parameters comes out to 1. This is good, as we would expect the multiplier to be 1.
+
+Taking all of the above into consideration we see that this suggested prior is acceptable.
 
 We are now going to expand our model to include a term to capture randomness not accounted for by the other components. We are going to design the model as follows
 
