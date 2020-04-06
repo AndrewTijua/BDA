@@ -1,4 +1,4 @@
-\documentclass[12pt]{extarticle}
+\documentclass[10pt]{extarticle}
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{amssymb}
@@ -110,6 +110,7 @@
 \section*{Question 1}
 
 \begin{figure}[H]
+	\centering
 	\includegraphics[width = 0.45\textwidth]{../ava_sea}
 	\includegraphics[width = 0.45\textwidth]{../dea_sea}
 	\caption{Plots illustrating the temporal evolution of avalanche related statistics. The EWS measure is 1 = No EADS, 2 = EADS extant, 3 = EADS online daily.}
@@ -234,7 +235,7 @@ To make this model run well we must remove the intercept term. This is because $
 
 We are going to run $4$ parallel chains with initial values drawn from a Uniform(-0.05, 0.05) distribution. We are going to run each chain for 8000 iterations and discard the first 4000 (HMC/NUTS converges faster than Gibbs so the length is fine). We are going to increase the maximum tree depth to 15 (from 10) and increase the adaptation acceptance probability to 0.99 (from 0.8). These will help us to deal with the implied distributional shape given by the uniform-normal combination. It will significantly slow sampling, but this is required for convergence.
 
-After running we check BGR statistics and find that they have all converged to 1. We also check NUTS specific diagnostics (divergences, energies) and find them satisfactory as well (no divergences, good energy mixing). Therefore we proceed with our analysis.
+After running we check BGR statistics and find that they have all converged to 1. We also check NUTS specific diagnostics (divergences, energies) and find them satisfactory as well (no divergences, good energy mixing). Generally autocorrelation is not as much a problem with HMC as it is with Gibbs sampling, and we receive no warnings relating to it (we would if the ACF did not decay quickly enough). Therefore we proceed with our analysis.
 
 This is one of the few times I have seen JAGS converge better than Stan, as the NUTS sampler finds it somewhat tricky to deal with the implied distribution space given by the normal-uniform combination alongside the others. We have to run for more iterations and with a smaller stepping than we would like, so it takes significantly longer to run. A single chain of this model takes over 3 times as long as all of the chains of the previous model. Given all of this it should give us a lot better predictions right?
 
@@ -265,6 +266,7 @@ Observe that these are mostly the same as the estimates that we got above, with 
 Now we are going to compare the two models and make some recommendations. Comparing the posterior predictives for the data they give identical results: 
 
 \begin{figure}[H]
+	\centering
 	\includegraphics[width = 0.45\textwidth]{../ppmod1}
 	\includegraphics[width = 0.45\textwidth]{../ppmod2}
 	\caption{Posterior predictive plots for the data. Note that they are identical. the red line indicates the predictive mean, and the bands indicate the 90\% credible interval.}
@@ -274,6 +276,7 @@ Now we are going to compare the two models and make some recommendations. Compar
 Comparing the parameter summaries tells a similar story: 
 
 \begin{figure}[H]
+	\centering
 	\includegraphics[width = 0.45\textwidth]{../psmod1}
 	\includegraphics[width = 0.45\textwidth]{../psmod2}
 	\caption{Posterior summaries for the parameters for each model. The parameters have been exponentiated to ease interpretation.}
@@ -325,7 +328,14 @@ R_{hyp} &\sim \mathrm{Uniform}(0, 10)\\
 \mathrm{Deaths}_i &\sim \mathrm{Binomial}(\mathrm{Hit}_i, p_i)
 \end{align*}
 
-Note that there is no intercept as the random effects on the geographical location serve the same purpose. If we included an intercept we would not get repeatable results as the random effects would be offset by the intercept, thus both the intercept and random effects would converge to different values in each run (but would sum to the same distribution). We would include an intercept if some events had no random effect associated, but that is not the case here.
+Note that there is no intercept as the random effects on the geographical location serve the same purpose. If we included an intercept we would not get repeatable results as the random effects would be offset by the intercept, thus both the intercept and random effects would converge to different values in each run (but would sum to the same distribution). We would include an intercept if some events had no random effect associated, but that is not the case here. Our model has the following DAG associated:
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.25\textwidth]{DAG-figure0}
+	\caption{DAG of the random effects model described above. Note that the random effect is associated with the geographical region and hence takes information from the data. We denote stochastic nodes with circles and data nodes with squares.}
+	\label{fig:dag0}
+\end{figure}
 
 We are going to run $4$ parallel chains with initial values drawn from a Uniform(-0.1, 0.1) distribution. We are going to run each chain for 10000 iterations and discard the first 5000 (HMC/NUTS converges faster than Gibbs so the length is fine). We are going to increase the adaptation acceptance probability to 0.95 (from 0.8). These will help us to deal with the implied distributional shape given by the uniform-normal combination. It will significantly slow sampling, but this is required for convergence. We have implemented this model in both Stan and JAGS, but we will use the Stan samples for this analysis (both of them agree on the summaries anyway.) The Stan code is in \ref{code:stan_2} with the main R script in \ref{code:main_2}, whereas the JAGS code and R script is in \ref{code:jags_2}. All the code for this question is contained in these categories.
 
@@ -385,6 +395,14 @@ We obtain the following posterior summaries for our parameters:
 \label{tab:postsum_binmod2}
 \end{table}
 
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.45\textwidth]{../acf_region}
+	\includegraphics[width = 0.45\textwidth]{../acf_region_ns}
+	\caption{Average autocorrelations for our variables of interest. The left plot is before removing the permanence covariate and the right plot is after removal. Note the decrease in autocorrelation. The variables in the ACF graphs correspond to those in the corresponding above tables when read left to right, top to bottom.}
+	\label{fig:acfregional}
+\end{figure}
+
 Looking at the tables we come to very similar conclusions. Of particular note is that $\beta_2$ has mean equal to the sum of the means of the previous $\beta_2$ and $\beta_3$. This is due to the high correlation between these variables. 
 
 This means that the random effects are more prominent. Notable is that the 3rd region seems more dangerous under this model. 
@@ -433,7 +451,7 @@ R_{hyp} &\sim \mathrm{Uniform}(0, 10)\\
 \end{align*}
 This model is very similar to our previous model, but we expect more finely tuned results. We will also be able to assess the relative danger of stations (somewhat). 
 
-We run the sampler with the same settings as above and obtain the following summary statistics: 
+We run the sampler with the same settings as above, checking BGR and autocorrelation, and obtain the following summary statistics: 
 
 \begin{table}[H]
 	\centering
@@ -469,6 +487,13 @@ We run the sampler with the same settings as above and obtain the following summ
 \label{tab:postsum_binmod3}
 \end{table}
 
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.90\textwidth]{../acf_station}
+	\caption{Average autocorrelations for our variables of interest. This plot explores the autocorrelation in the sampling for the station level model. We note the extremely rapic decay in autocorrelation for all variables of interest, indicating good sampling. The variables in the ACF graphs correspond to those in the above table when read left to right, top to bottom. }
+	\label{fig:acfstation}
+\end{figure}
+
 We also obtain the following means and 95\% credible intervals for the proportion of casualties near the given stations in the given years. 
 
 \begin{table}[H]
@@ -502,7 +527,14 @@ R_{\mathrm{(Rep.station, Geo.space)}_i} &\sim \mathrm{Normal}(\mu_{\mathrm{Geo.s
 \mathrm{Deaths}_i &\sim \mathrm{Binomial}(\mathrm{Hit}_i, p_i),
 \end{align*}
 
-which we have encoded in JAGS in \texttt{binom\_doublereff.jags}. This model works rather well. It has a DIC of 86.82, which is slightly higher than that of the station level model, but more than compensates for it in the information that we can glean from it, as we can observe both geographical and station level effects, rather than just station level. 
+which we have encoded in JAGS in \texttt{binom\_doublereff.jags}. This model works rather well. It has a DIC of 86.82, which is slightly higher than that of the station level model, but more than compensates for it in the information that we can glean from it, as we can observe both geographical and station level effects, rather than just station level. The model has the following DAG associated with it:
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.25\textwidth]{DAG-figure1}
+	\caption{DAG of the random effects model described above. Note that the random effect is associated with the geographical region and station and hence takes information from the data twice.}
+	\label{fig:dag1}
+\end{figure}
 \printbibliography
 
 \newpage

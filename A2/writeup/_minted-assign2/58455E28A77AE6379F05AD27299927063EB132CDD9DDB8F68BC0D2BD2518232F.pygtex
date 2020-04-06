@@ -168,12 +168,18 @@
 
 \PYG{n}{r\PYGZus{}data\PYGZus{}b} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{unlist}\PYG{p}{(}\PYG{n}{r\PYGZus{}data\PYGZus{}b}\PYG{p}{)}
 \PYG{n}{r\PYGZus{}data\PYGZus{}b} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{r\PYGZus{}data\PYGZus{}b[}\PYG{o}{!}\PYG{n+nf}{is.infinite}\PYG{p}{(}\PYG{n}{r\PYGZus{}data\PYGZus{}b}\PYG{p}{)}\PYG{n}{]}
+\PYG{n+nf}{mean}\PYG{p}{(}\PYG{n}{r\PYGZus{}data\PYGZus{}b} \PYG{o}{\PYGZgt{}=} \PYG{l+m}{1}\PYG{p}{)}
+\PYG{n+nf}{mean}\PYG{p}{(}\PYG{n}{r\PYGZus{}data\PYGZus{}b}\PYG{p}{)}
 
 \PYG{n}{r\PYGZus{}data\PYGZus{}do} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{unlist}\PYG{p}{(}\PYG{n}{r\PYGZus{}data\PYGZus{}do}\PYG{p}{)}
 \PYG{n}{r\PYGZus{}data\PYGZus{}do} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{r\PYGZus{}data\PYGZus{}do[}\PYG{o}{!}\PYG{n+nf}{is.infinite}\PYG{p}{(}\PYG{n}{r\PYGZus{}data\PYGZus{}do}\PYG{p}{)}\PYG{n}{]}
+\PYG{n+nf}{mean}\PYG{p}{(}\PYG{n}{r\PYGZus{}data\PYGZus{}do} \PYG{o}{\PYGZgt{}=} \PYG{l+m}{1}\PYG{p}{)}
+\PYG{n+nf}{mean}\PYG{p}{(}\PYG{n}{r\PYGZus{}data\PYGZus{}do}\PYG{p}{)}
 
 \PYG{n}{r\PYGZus{}data\PYGZus{}o} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{unlist}\PYG{p}{(}\PYG{n}{r\PYGZus{}data\PYGZus{}o}\PYG{p}{)}
 \PYG{n}{r\PYGZus{}data\PYGZus{}o} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{r\PYGZus{}data\PYGZus{}o[}\PYG{o}{!}\PYG{n+nf}{is.infinite}\PYG{p}{(}\PYG{n}{r\PYGZus{}data\PYGZus{}o}\PYG{p}{)}\PYG{n}{]}
+\PYG{n+nf}{mean}\PYG{p}{(}\PYG{n}{r\PYGZus{}data\PYGZus{}o} \PYG{o}{\PYGZgt{}=} \PYG{l+m}{1}\PYG{p}{)}
+\PYG{n+nf}{mean}\PYG{p}{(}\PYG{n}{r\PYGZus{}data\PYGZus{}o}\PYG{p}{)}
 \PYG{c+c1}{\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}}
 \PYG{c+c1}{\PYGZsh{}dic is bad}
 \PYG{c+c1}{\PYGZsh{}formulae taken from https://en.wikipedia.org/wiki/Deviance\PYGZus{}information\PYGZus{}criterion}

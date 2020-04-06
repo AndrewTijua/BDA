@@ -1,0 +1,5 @@
+[0] Config.pm:304> INFO - This is Biber 2.14
+[0] Config.pm:307> INFO - Logfile is 'DAG.blg'
+[67] biber-MSWIN64:322> INFO - === 
+[345] Utils.pm:320> ERROR - Cannot find 'DAG.bcf'!
+[345] Biber.pm:132> INFO - ERRORS: 1

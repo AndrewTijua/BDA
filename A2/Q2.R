@@ -214,3 +214,4 @@ dpp_ofintns_stat <- dpp_rand_ns_stat[,index]
 apply(dpp_ofintns_stat, 2, mean)
 apply(dpp_ofintns_stat, 2, quantile, c(0.025, 0.975))
 apply(dpp_ofintns_stat > 0.6, 2, mean)
+
