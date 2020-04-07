@@ -5,7 +5,7 @@
 \usepackage{extsizes}
 \usepackage{float}
 \usepackage{graphicx}
-\usepackage[margin = 1in]{geometry}
+\usepackage[margin = 0.75in]{geometry}
 \usepackage{hyperref}
 \usepackage[english]{babel}
 \usepackage[backend=biber, style=numeric]{biblatex}
@@ -225,7 +225,6 @@ However we calculate a mean of $e^2 \approx 7.39$ and standard deviation of $\sq
 Taking all of the above into consideration we see that this suggested prior is acceptable.
 
 We are now going to expand our model to include a term to capture randomness not accounted for by the other components. We are going to design the model as follows
-
 \begin{align*}
 \theta_{hyp} &\sim \mathrm{Uniform}(0, 10),\\
 \theta &\sim \mathrm{Normal}(0, \theta_{hyp}),\\
@@ -233,7 +232,6 @@ We are now going to expand our model to include a term to capture randomness not
 \log(\lambda_i) &= \beta_1 \cdot \mathrm{EADS1}_i + \beta_2 \cdot \mathrm{EADS2}_i + \beta_3 \cdot \mathrm{Rep.events}_i + \theta\\
 \mathrm{Deaths}_i &\sim \mathrm{Poisson}(\lambda_i)
 \end{align*} 
-
 This model is a lot more computationally complex than the other model and requires us to make some tweaks to the sampling and model code in order to make it converge well. It runs significantly slower than the previous model, but we do get convergence. We have re-parametrised and de-centred the model so that it is mathematically equivalent, but we are dealing with standard normals and multiples thereof, rather than working with normals with variable $\sigma$. 
 
 To make this model run well we must remove the intercept term. This is because $\theta$ and the intercept term serve the same purpose; capture the latent effect. Therefore the intercept term must be removed, as $\theta + \beta_0$ should be constant, but this does not constrain either of them, thus without removing the intercept we do not get convergence. We note that $\beta_0$ had a normal prior with mean 0, so $\theta$ should well compensate for it.
@@ -324,7 +322,6 @@ We obtain the following correlations between our three variables.
 From this we can deduce a weak negative correlation between Season and both Snow\_meters and Snow\_fnights, likely due to climate change. Furthermore we see that Snow\_meters and Snow\_fnights are extremely highly correlated, as expected (more snow means more time for snow to melt). This could prove to be a problem, so we will address this later. 
 
 We are interested in fitting a random effects model for the proportion of fatalities in an avalanche. We assume fixed effects for Season, Snow\_meters,and Snow\_fnights, with a random effect on Geo.space. This is characterised by the following equations:
-
 \begin{align*}
 \mathrm{logit}(p_i) &= \beta_1 \cdot \mathrm{Season} + \beta_2 \cdot \mathrm{Snow\_meters} + \beta_3 \cdot \mathrm{Snow\_fnight} + R_{\mathrm{Geo.space}_i}\\
 R_i \equiv R_{\mathrm{Geo.space}_i} &\sim \mathrm{Normal}(0, R_{hyp})\\
@@ -332,7 +329,6 @@ R_{hyp} &\sim \mathrm{Uniform}(0, 10)\\
 \beta_i &\sim \mathrm{Normal}(0, 10)\\
 \mathrm{Deaths}_i &\sim \mathrm{Binomial}(\mathrm{Hit}_i, p_i)
 \end{align*}
-
 Note that there is no intercept as the random effects on the geographical location serve the same purpose. If we included an intercept we would not get repeatable results as the random effects would be offset by the intercept, thus both the intercept and random effects would converge to different values in each run (but would sum to the same distribution). We would include an intercept if some events had no random effect associated, but that is not the case here. Our model has the following DAG associated:
 
 \begin{figure}[H]
@@ -372,11 +368,9 @@ These parameters have an effect on the logit scale, meaning that they affect the
 Looking at the regions we see that region 1 is more dangerous than region 2, which is more dangerous than region 3 (if all other variables are the same). 
 
 Some of these estimates seem strange, as we would intuitively think that more snow is more deadly. The seasonal trend is expected, and the geographical trend is interesting. However the high correlation between the amount of snow and its permanence seems to be affecting the model, as realistically both of them should have the same sign due to their correlation. Therefore we propose a second model without the Snow\_fnights term.
-
 \[
 \mathrm{logit}(p_i) = \beta_1 \cdot \mathrm{Season} + \beta_2 \cdot \mathrm{Snow\_meters} + R_{\mathrm{Geo.space}_i}
 \]
-
 We perform the same adjustments to the sampler that we did for this model, and check the same statistics.
 
 We obtain the following posterior summaries for our parameters:
@@ -446,7 +440,6 @@ We are also interested in comparing the probabilities of having a proportion of 
 \end{table}
 
 After the success of this model we might be interested in fitting a model with more granular random effects. Therefore we propose a model with a random effect on the station, not on the geographical area. We will design the model with the following formula:
-
 \begin{align*}
 \mathrm{logit}(p_i) &= \beta_1 \cdot \mathrm{Season} + \beta_2 \cdot \mathrm{Snow\_meters} + \beta_3 \cdot \mathrm{Snow\_fnight} + R_{\mathrm{Station}_i}\\
 R_i \equiv R_{\mathrm{Station}_i} &\sim \mathrm{Normal}(0, R_{hyp})\\
@@ -523,9 +516,8 @@ I would be inclined to say that we are overfitting on the station level, thus we
 Comparing the two models above using the DIC we obtain a DIC of 91.04 for the model with effects on geographical area and a DIC of 85.21 for the model with effects of the nearest station. This is due to the better fit: the penalty terms are 4.171 and 8.854 respectively, showing the effect of the increased number of parameters. Based on this we would prefer the station level model. However both of them lead to similar conclusions.
 
 We could have a random effect on the recording station drawn from the geographical area drawn from an overarching distribution. We propose the following model:
-
 \begin{align*}
-\sigma_1, \sigma_2 &\sim \Gamma(1, 0.1), \\
+\sigma_1, \sigma_2 &\stackrel{ind}{\sim} \Gamma(1, 0.1), \\
 \mu_{\mathrm{Geo.space}_i} &\sim \mathrm{Normal}(0, \sigma_2^{-2})\\\
 R_{\mathrm{(Rep.station, Geo.space)}_i} &\sim \mathrm{Normal}(\mu_{\mathrm{Geo.space}_i}, \sigma_1^{-2}),\\
 \mathrm{logit}(p_i) &= \beta_1 \cdot \mathrm{Season} + \beta_2 \cdot \mathrm{Snow\_meters} + R_{\mathrm{(Rep.station, Geo.space)}_i}, \\
